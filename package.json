@@ -1,0 +1,28 @@
+{
+    "name": "first-project",
+    "version": "1.0.0",
+    "description": "",
+    "main": "src/config/app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "nodemon server",
+        "seed": "node seeder.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "async": "^3.2.2",
+        "bcrypt": "^5.0.1",
+        "cookie-parser": "^1.4.6",
+        "dotenv": "^10.0.0",
+        "express": "^4.17.1",
+        "jsonwebtoken": "^8.5.1",
+        "mysql2": "^2.3.3",
+        "node-cache": "^5.1.2",
+        "passport": "^0.5.2",
+        "passport-jwt": "^4.0.0",
+        "sequelize": "^6.12.0-beta.3",
+        "yup": "^0.32.11"
+    }
+}
