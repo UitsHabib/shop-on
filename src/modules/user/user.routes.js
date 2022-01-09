@@ -10,6 +10,7 @@ module.exports = (app) => {
     app.get('/api/logout', AuthStrategy, controller.logout);
 
     app.route('/api/users')
+        .get(AuthStrategy, controller.getUsers)
         .post(validate(userRegisterSchema), controller.createUser);
 
     app.route('/api/users/:id')
