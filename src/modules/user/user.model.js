@@ -23,7 +23,7 @@ const User = sequelize.define("users", {
         validate: {
             isEmail: true
         },
-        set(value){
+        set(value) {
             this.setDataValue('email', value.toLowerCase());
         }
     },

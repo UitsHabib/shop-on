@@ -2,7 +2,7 @@ const User = require("./user.model");
 const UserProfile = require("./user-profile.model");
 const { generateAccessToken } = require("./services/user.service");
 
-async function login (req, res) {
+async function login(req, res) {
     try {
         const { email, password } = req.body;
 
@@ -29,13 +29,13 @@ async function logout(req, res) {
     res.clearCookie("refresh_token").redirect("/");
 }
 
-const getUsers = async (req, res) => {
+async function getUsers(req, res) {
     try {
         const users = await User.findAll({
             include: [
                 {
                     model: UserProfile,
-                    as: "user_profile",
+                    as: "user-profile",
                 },
             ],
         });
@@ -47,7 +47,7 @@ const getUsers = async (req, res) => {
     }
 };
 
-const getUser = async (req, res) => {
+async function getUser(req, res) {
     try {
         const { id } = req.params;
 
@@ -66,7 +66,7 @@ const getUser = async (req, res) => {
     }
 };
 
-const createUser = async (req, res) => {
+async function createUser(req, res) {
     try {
         const { username, email, password, user_type_id } = req.body;
 
@@ -95,7 +95,7 @@ const createUser = async (req, res) => {
     }
 };
 
-const updateUser = async (req, res) => {
+async function updateUser(req, res) {
     try {
         const { id } = req.params;
         const { firstName, lastName, username, email } = req.body;
@@ -123,7 +123,7 @@ const updateUser = async (req, res) => {
     }
 };
 
-const updateUserDetails = async (req, res) => {
+async function updateUserDetails(req, res) {
     try {
         const { id } = req.params;
         const { firstName, lastName, username, email } = req.body;
@@ -148,7 +148,7 @@ const updateUserDetails = async (req, res) => {
     }
 };
 
-const deleteUser = async (req, res) => {
+async function deleteUser(req, res) {
     try {
         const { id } = req.params;
 
@@ -162,7 +162,7 @@ const deleteUser = async (req, res) => {
 
         await user.destroy();
 
-        res.sendStatus(200).send(user);
+        res.status(200).send(user);
     } catch (err) {
         console.log(err);
         res.status(500).send("Internal server error!");

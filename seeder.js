@@ -46,14 +46,14 @@ async function init() {
                 });
             });
         });
-    }    
+    }
 
     function userUpdateSeeder(callback) {
         User.findOne({
             where: { email: 'habiburrahman3089@gmail.com' }
         }).then(admin => {
             UserProfile.findOne({ where: { title: 'System Admin' } }).then(sysAdminProfile => {
-                admin.update({ profile_id: sysAdminProfile.id }).then(function() {
+                admin.update({ profile_id: sysAdminProfile.id }).then(function () {
                     callback();
                 });
             });
