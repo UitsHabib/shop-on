@@ -9,4 +9,7 @@ module.exports = app => {
     app
         .route('/api/shops/:id')
         .get(controller.getShop)
+        .put(controller.updateShop)
+        .patch(controller.updateShopPartial)
+        .delete(controller.deleteShop);
 }
