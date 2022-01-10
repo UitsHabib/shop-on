@@ -34,7 +34,15 @@ async function getShop(req, res) {
 
 async function createShop(req, res) {
     try {
+        const { name, registrationNumber, userId } = req.body;
 
+        const shop = await Shop.create({
+            name,
+            registration_number: registrationNumber,
+            user_id: userId
+        });
+
+        res.status(201).send(shop);
     }
     catch (err) {
         console.log(err);
@@ -43,4 +51,5 @@ async function createShop(req, res) {
 }
 
 module.exports.getShops = getShops;
-module.exports.getShop = getShop; 
+module.exports.getShop = getShop;
+module.exports.createShop = createShop;
