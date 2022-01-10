@@ -13,7 +13,8 @@ async function init() {
 
     const User = require(path.join(process.cwd(), 'src/modules/user/user.model'));
     const UserProfile = require(path.join(process.cwd(), 'src/modules/user/user-profile.model'));
-    require(path.join(process.cwd(), 'src/modules/product/product.model'));
+    const Product = require(path.join(process.cwd(), 'src/modules/product/product.model'));
+    const Shop = require(path.join(process.cwd(), 'src/modules/shop/shop.model'));
 
     await sequelize.sync();
 
@@ -60,10 +61,27 @@ async function init() {
         })
     }
 
+    function shopSeeder(callback) {
+        User.findOne({
+            where: { email: 'habiburrahman3089@gmail.com' }
+        }).then(admin => {
+            Shop.findOrCreate({
+                where: { user_id: admin.id }, defaults: {
+                    name: 'Demo Shop',
+                    registration_number: 'Test_111',
+                    user_id: admin.id
+                }
+            })
+        }).then(function () {
+            callback();
+        })
+    }
+
     async.waterfall([
         userSeeder,
         userProfileSeeder,
-        userUpdateSeeder
+        userUpdateSeeder,
+        shopSeeder
     ], function (err) {
         if (err) console.error(err);
         else console.info('DB seed completed!');
