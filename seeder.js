@@ -64,13 +64,13 @@ async function init() {
     function shopSeeder(callback) {
         User.findOne({
             where: { email: 'habiburrahman3089@gmail.com' }
-        }).then(admin => {
+        }).then(admin =>
             Shop.create({
                 name: 'Demo Shop',
                 registration_number: 'Test_111',
                 user_id: admin.id
             })
-        }).then(function () {
+        ).then(function () {
             callback();
         })
     }
