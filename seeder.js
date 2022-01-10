@@ -65,12 +65,10 @@ async function init() {
         User.findOne({
             where: { email: 'habiburrahman3089@gmail.com' }
         }).then(admin => {
-            Shop.findOrCreate({
-                where: { user_id: admin.id }, defaults: {
-                    name: 'Demo Shop',
-                    registration_number: 'Test_111',
-                    user_id: admin.id
-                }
+            Shop.create({
+                name: 'Demo Shop',
+                registration_number: 'Test_111',
+                user_id: admin.id
             })
         }).then(function () {
             callback();
