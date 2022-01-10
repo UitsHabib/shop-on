@@ -67,7 +67,7 @@ async function init() {
         }).then(admin =>
             Shop.create({
                 name: 'Demo Shop',
-                registration_number: 'Test_111',
+                registration_number: 'T-111',
                 user_id: admin.id
             })
         ).then(function () {
