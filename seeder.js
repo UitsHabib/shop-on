@@ -76,7 +76,11 @@ async function init() {
         userUpdateSeeder
     ], function (err) {
         if (err) console.error(err);
+<<<<<<< HEAD
         else console.log('\x1b[32m', 'DB seed completed!', '\x1b[0m');
+=======
+        else console.log('\x1b[32m', 'DB seed completed!' ,'\x1b[0m');
+>>>>>>> e1e6b6e25c66a4107155a91b2e429e8f408f38c2
         process.exit();
     });
 }
