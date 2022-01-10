@@ -13,6 +13,9 @@ async function init() {
 
     const User = require(path.join(process.cwd(), 'src/modules/user/user.model'));
     const UserProfile = require(path.join(process.cwd(), 'src/modules/user/user-profile.model'));
+
+    const Customer = require(path.join(process.cwd(), 'src/modules/customer/customer.model'));
+
     require(path.join(process.cwd(), 'src/modules/product/product.model'));
 
     await sequelize.sync();
@@ -60,10 +63,23 @@ async function init() {
         })
     }
 
+    function customerSeeder(callback) {
+        Customer.findOrCreate({
+            where: { name: 'farhanSadek' }, defaults: {
+                name : 'farhanSadek',
+                address : 'Chittagong, Bangladesh',
+                phone_number : '0178989898'
+            }
+        }).then(function () {
+            callback();
+        });
+    }
+
     async.waterfall([
         userSeeder,
         userProfileSeeder,
-        userUpdateSeeder
+        userUpdateSeeder,
+        customerSeeder
     ], function (err) {
         if (err) console.error(err);
         else console.info('DB seed completed!');
