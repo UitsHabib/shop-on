@@ -28,7 +28,7 @@ PORT=<value>
 
 ```bash
 $ yarn install          # install dependencies
-$ yarn seed             # generate required database schemas
+$ yarn seed "admin@gmail.com" "adminPassword" # generate required database schemas with admin user
 $ yarn start            # development build
 $ yarn production       # production build
 $ yarn test             # run unit tests
