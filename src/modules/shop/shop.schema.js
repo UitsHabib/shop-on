@@ -1,28 +1,25 @@
-const { object, string, number } = require('yup');
+const { object, string } = require('yup');
 
 const shopCreateSchema = object().shape({
-    name: string()
-        .min(3, 'Shop name must be at least 3 characters.')
-        .max(255, 'Shop name must be at most 255 characters long.')
+    shop_name: string()
         .required('Shop name is required.'),
-    registrationNumber: string()
-        // .min(3, 'Shop registration number must be at least 3 characters.')
-        .max(255, 'Shop registration number must be at most 255 characters long.')
-        .required('Shop registration number is required.'),
-    userId: number()
-        .max(255, 'Shop user id must be at most 255 characters long.')
-        .required('Shop user id is required.')
+    password: string()
+        .min(8, 'The password must be at least 8 characters long.')
+        .max(50, 'The password must be at most 50 characters long.')
+        .required('Password is required.'),
+    description: string()
+        .required('Description is required.'),
+    registration_number: string()
+        .required('Registration number is required.')
 });
 
 const shopUpdateSchema = object().shape({
-    name: string()
-        .min(3, 'Shop name must be at least 3 characters.')
-        .max(255, 'Shop name must be at most 255 characters long.'),
-    registrationNumber: string()
-        // .min(3, 'Shop registration number must be at least 3 characters.')
-        .max(255, 'Shop registration number must be at most 255 characters long.'),
-    userId: number()
-        .max(255, 'Shop user id must be at most 255 characters long.')
+    shop_name: string(),
+    password: string()
+        .min(8, 'The password must be at least 8 characters long.')
+        .max(50, 'The password must be at most 50 characters long.'),
+    description: string(),
+    registration_number: string()
 });
 
 module.exports.shopCreateSchema = shopCreateSchema;

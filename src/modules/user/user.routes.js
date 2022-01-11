@@ -5,9 +5,9 @@ const validate = require(path.join(process.cwd(), "src/modules/core/middlewares/
 const { userRegisterSchema, userUpdateSchema } = require("./user.schema");
 
 module.exports = (app) => {
-    app.post('/api/login', controller.login);
+    // app.post('/api/login', controller.login);
 
-    app.get('/api/logout', AuthStrategy, controller.logout);
+    // app.get('/api/logout', AuthStrategy, controller.logout);
 
     app.route('/api/users')
         .get(AuthStrategy, controller.getUsers)
