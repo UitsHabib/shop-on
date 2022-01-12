@@ -39,7 +39,7 @@ async function init() {
             defaults: {
                 password: '123456',
                 description: 'Demo shop.',
-                registration_number: "df345rtr435rt"
+                license_number: "df345rtr435rt"
             }
         }).then(function () {
             callback();

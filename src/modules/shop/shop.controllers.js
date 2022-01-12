@@ -4,7 +4,7 @@ const Shop = require('./shop.model');
 
 async function createShop(req, res) {
     try {
-        const { shop_name, password, description, registration_number } = req.body;
+        const { shop_name, password, description, license_number } = req.body;
 
         const existShop = await Shop.findOne({
             where: {
@@ -18,7 +18,7 @@ async function createShop(req, res) {
             shop_name,
             password,
             description,
-            registration_number
+            license_number
         });
 
         res.cookie("access_token", generateAccessToken(shop), { httpOnly: true, sameSite: true, signed: true });
@@ -65,7 +65,7 @@ async function getShop(req, res) {
 async function updateShop(req, res) {
     try {
         const { id } = req.params;
-        const { shop_name, password, description, registration_number } = req.body;
+        const { shop_name, password, description, license_number } = req.body;
 
         const shop = await Shop.findOne({
             where: {
@@ -85,7 +85,7 @@ async function updateShop(req, res) {
             shop_name,
             password,
             description,
-            registration_number
+            license_number
         });
 
         res.status(201).send(shop);
@@ -99,7 +99,7 @@ async function updateShop(req, res) {
 async function updateShopInfo(req, res) {
     try {
         const { id } = req.params;
-        const { shop_name, password, description, registration_number } = req.body;
+        const { shop_name, password, description, license_number } = req.body;
 
         const shop = await Shop.findOne({
             where: {
@@ -120,7 +120,7 @@ async function updateShopInfo(req, res) {
         }
         if (password) await shop.update({ password });
         if (description) await shop.update({ description });
-        if (registration_number) await shop.update({ registration_number });
+        if (license_number) await shop.update({ license_number });
 
         res.status(201).send(shop);
     }

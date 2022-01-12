@@ -19,11 +19,16 @@ const Shop = sequelize.define('shops', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    registration_number: {
+    license_number: {
         type: DataTypes.STRING,
         allowNull: false
     }
-})
+}, {
+    tableName: 'shops',
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
+});
 
 Shop.prototype.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);

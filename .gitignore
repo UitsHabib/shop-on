@@ -27,6 +27,7 @@ bundles
 .idea
 .vscode
 .vs
+.yarn
 
 # Sonarqube
 .scannerwork
