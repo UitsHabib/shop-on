@@ -1,24 +1,24 @@
 const path = require("path");
 const controller = require("./customer.controller");
-const validate = require(path.join(
-  process.cwd(),
-  "src/modules/core/middlewares/validate"
-));
-const {
-  customerUploadSchema,
-  customerUpdateSchema,
-} = require("./customer.schema");
+const { AuthStrategy } = require("./customer-authentication.middleware");
+const validate = require(path.join(process.cwd(), "src/modules/core/middlewares/validate"));
+const { customerRegisterSchema, customerUpdateSchema } = require("./customer.schema");
 
 module.exports = (app) => {
-  app
-    .route("/api/customers")
-    .get(controller.getCustomers)
-    .post(validate(customerUploadSchema), controller.addCustomer);
+    app.post('/api/customer/login', controller.login);
 
-  app
-    .route("/api/customers/:id")
-    .get(controller.getCustomer)
-    .put(validate(customerUploadSchema), controller.putCustomer)
-    .patch(validate(customerUpdateSchema), controller.patchCustomer)
-    .delete(controller.deleteCustomer);
+    app.get('/api/customer/logout', AuthStrategy, controller.logout);
+
+    app.route('/api/customers')
+        .post(validate(customerRegisterSchema), controller.createCustomer);
+
+    // app.route('/api/customers/profile')
+    //     .get(AuthStrategy, controller.getSignedInCustomerProfile)
+    //     .put(AuthStrategy, controller.updateSignedInCustomerProfile);
+
+    app.route('/api/customers/:id')
+        .get(AuthStrategy, controller.getCustomer)
+        .put(AuthStrategy, validate(customerUpdateSchema), controller.updateCustomer)
+        .patch(AuthStrategy, validate(customerUpdateSchema), controller.updateCustomerDetails)
+        .delete(AuthStrategy, controller.deleteCustomer);
 };

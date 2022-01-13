@@ -47,11 +47,11 @@ const User = sequelize.define("users", {
     password_updated_at: {
         type: DataTypes.DATE
     },
-    created_by: {
-        type: DataTypes.INTEGER
+    created_at: {
+        type: DataTypes.DATE
     },
-    updated_by: {
-        type: DataTypes.INTEGER
+    updated_at: {
+        type: DataTypes.DATE
     },
 }, {
     tableName: 'users',

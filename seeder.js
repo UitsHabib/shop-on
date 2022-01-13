@@ -28,6 +28,7 @@ async function init() {
                 password: 'P@ssword123'
             }
         }).then(function () {
+            console.log('User Seeder Completed');
             callback();
         });
     }
@@ -45,6 +46,7 @@ async function init() {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
+                    console.log('User Profile Seeder Completed');
                     callback();
                 });
             });
@@ -57,6 +59,7 @@ async function init() {
         }).then(admin => {
             UserProfile.findOne({ where: { title: 'System Admin' } }).then(sysAdminProfile => {
                 admin.update({ profile_id: sysAdminProfile.id }).then(function() {
+                    console.log('User Update Seeder Completed');
                     callback();
                 });
             });
@@ -65,12 +68,13 @@ async function init() {
 
     function customerSeeder(callback) {
         Customer.findOrCreate({
-            where: { name: 'farhanSadek' }, defaults: {
-                name : 'farhanSadek',
-                address : 'Chittagong, Bangladesh',
-                phone_number : '0178989898'
+            where: { email: 'farhan@admin.com' }, defaults: {
+                first_name: 'Farhan',
+                last_name: 'Sadek',
+                password : 'myp@assword',
             }
         }).then(function () {
+            console.log('Customer Seeder Completed');
             callback();
         });
     }
