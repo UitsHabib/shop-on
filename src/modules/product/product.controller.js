@@ -1,5 +1,35 @@
 const Product = require("./product.model");
 
+async function getProducts(req, res) {
+    try {
+        const products = await Product.findAll();
+
+        res.status(200).send(products);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Internal server error.");
+    }
+};
+
+async function getProduct(req, res) {
+    try {
+        const { id } = req.params;
+
+        const product = await Product.findOne({
+            where: {
+                id
+            }
+        });
+
+        if (!product) return res.status(404).send("Product not found.");
+
+        res.status(200).send(product);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Internal server error.");
+    }
+};
+
 async function addProduct(req, res) {
     try {
         const { product_name, price, description, category, quantity } = req.body;
@@ -92,6 +122,8 @@ async function deleteProduct(req, res) {
     }
 };
 
+module.exports.getProducts = getProducts;
+module.exports.getProduct = getProduct;
 module.exports.addProduct = addProduct;
 module.exports.updateProduct = updateProduct;
 module.exports.updateProductInfo = updateProductInfo;
