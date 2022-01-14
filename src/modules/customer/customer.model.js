@@ -31,6 +31,10 @@ const Customer = sequelize.define("customers", {
     phone: {
         type: DataTypes.STRING(25)
     },
+    avatar_url: {
+        allowNull: true,
+        type: DataTypes.STRING(255)
+    },
     status: {
         type: DataTypes.ENUM,
         values: ['active', 'inactive'],

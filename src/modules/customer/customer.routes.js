@@ -3,9 +3,12 @@ const controller = require("./customer.controller");
 const { AuthStrategy } = require("./customer-authentication.middleware");
 const validate = require(path.join(process.cwd(), "src/modules/core/middlewares/validate"));
 const { customerRegisterSchema, customerUpdateSchema } = require("./customer.schema");
+const upload = require('../../config/lib/multer');
 
 module.exports = (app) => {
     app.post('/api/customer/login', controller.login);
+
+    app.put('/api/customer/upload/:id', AuthStrategy, upload.single('image'), controller.updateAvatar);
 
     app.get('/api/customer/logout', AuthStrategy, controller.logout);
 

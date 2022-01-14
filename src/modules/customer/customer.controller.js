@@ -1,5 +1,45 @@
+const path = require("path");
 const Customer = require("./customer.model");
 const { generateAccessToken } = require("./services/customer.service");
+const cloudinary = require(path.join(process.cwd(), 'src/config/lib/cloudinary'));
+
+
+async function updateAvatar(req, res, next) {
+    try {
+        const { id } = req.params;
+
+        const customer = await Customer.findOne({
+            where: {
+                id,
+            },
+        });
+
+        if (!customer) return res.status(404).send("Customer not found!");
+
+        const file_url = await cloudinary.uploader.upload(req.file.path);
+
+        customer.update({ avatar_url: file_url.secure_url });
+
+        res.status(201).send({
+            status: "success",
+            message: "Customer avatar updated successfully!",
+            data:
+            {
+                customer_id: customer.id,
+                avatar_url: file_url.secure_url,
+            }
+        });
+
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            status: 500,
+            message: "Internal server error!",
+            data: error,
+        });
+    }
+}
 
 async function login(req, res) {
     try {
@@ -177,6 +217,7 @@ const deleteCustomer = async (req, res) => {
     }
 };
 
+module.exports.updateAvatar = updateAvatar;
 module.exports.login = login;
 module.exports.logout = logout;
 module.exports.getCustomers = getCustomers;
