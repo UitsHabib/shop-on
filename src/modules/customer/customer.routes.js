@@ -8,20 +8,18 @@ const upload = require('../../config/lib/multer');
 module.exports = (app) => {
     app.post('/api/customer/login', controller.login);
 
-    app.put('/api/customer/upload/:id', AuthStrategy, upload.single('image'), controller.updateAvatar);
-
     app.get('/api/customer/logout', AuthStrategy, controller.logout);
 
     app.route('/api/customers')
         .post(validate(customerRegisterSchema), controller.createCustomer);
-
-    // app.route('/api/customers/profile')
-    //     .get(AuthStrategy, controller.getSignedInCustomerProfile)
-    //     .put(AuthStrategy, controller.updateSignedInCustomerProfile);
 
     app.route('/api/customers/:id')
         .get(AuthStrategy, controller.getCustomer)
         .put(AuthStrategy, validate(customerUpdateSchema), controller.updateCustomer)
         .patch(AuthStrategy, validate(customerUpdateSchema), controller.updateCustomerDetails)
         .delete(AuthStrategy, controller.deleteCustomer);
+
+    app.route('/api/customer/updateAvatar/:id')
+        .put(AuthStrategy, upload.single('image'), controller.updateAvatar);
 };
+
