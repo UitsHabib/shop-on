@@ -32,12 +32,12 @@ async function logout(req, res) {
 const getUsers = async (req, res) => {
     try {
         const users = await User.findAll({
-            include: [
-                {
-                    model: UserProfile,
-                    as: "user_profile",
-                },
-            ],
+            // include: [
+            //     {
+            //         model: UserProfile,
+            //         as: "user_profile",
+            //     },
+            // ],
         });
 
         res.status(200).send(users);
@@ -54,7 +54,12 @@ const getUser = async (req, res) => {
         const user = await User.findOne({
             where: {
                 id,
-            },
+            }, include: [
+                {
+                    model: UserProfile,
+                    as: "user_profile",
+                },
+            ],
         });
 
         if (!user) return res.status(404).send("User not found!");
@@ -68,7 +73,16 @@ const getUser = async (req, res) => {
 
 const createUser = async (req, res) => {
     try {
-        const { username, email, password, user_type_id } = req.body;
+        const { username, email, password, profile_id } = req.body;
+        const admin = await User.findOne({
+            where: {
+                id:req.user.id,
+            }
+        });
+        
+        if (admin.email != "habiburrahman3089@gmail.com"){
+            return res.status(403).send("You are not authorized to create an user.")
+        }
 
         const existUser = await User.findOne({
             where: {
@@ -85,7 +99,7 @@ const createUser = async (req, res) => {
             username,
             email,
             password,
-            user_type_id: user_type_id,
+            profile_id: profile_id,
         });
 
         res.status(201).send(user);

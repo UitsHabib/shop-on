@@ -9,11 +9,11 @@ const User = sequelize.define("users", {
         allowNull: true
     },
     first_name: {
-        allowNull: false,
+        allowNull: true,
         type: DataTypes.STRING(50)
     },
     last_name: {
-        allowNull: false,
+        allowNull: true,
         type: DataTypes.STRING(50)
     },
     email: {
@@ -28,6 +28,7 @@ const User = sequelize.define("users", {
         }
     },
     password: {
+        allowNull:false,
         type: DataTypes.STRING,
         set(value) {
             this.setDataValue('password', bcrypt.hashSync(value, 8));
@@ -64,7 +65,7 @@ User.prototype.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
 
-User.belongsTo(UserProfile, { as: 'user-profile', foreignKey: 'profile_id' });
-UserProfile.hasMany(User, { as: 'users', foreignKey: 'profile_id' });
+// User.belongsTo(UserProfile, { as: 'user-profile', foreignKey: 'profile_id' });
+// UserProfile.hasMany(User, { as: 'users', foreignKey: 'profile_id' });
 
 module.exports = User;

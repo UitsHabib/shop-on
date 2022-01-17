@@ -1,0 +1,6 @@
+controller
+permissionModel
+rolePermissionsModel
+profilePermissionsModel 
+permissionServiceModel
+route

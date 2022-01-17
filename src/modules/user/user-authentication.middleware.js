@@ -11,6 +11,7 @@ const AuthStrategy = (req, res, next) => {
 
         req.logIn(user, { session: false }, function (error) {
             if (error) return next(error);
+            // req.user = user.dataValues;
             next();
         });
     });
@@ -22,16 +23,9 @@ const AuthStrategy = (req, res, next) => {
     2. Strategy Object.
         a. secret.
         b. cookie extractor. 
-        c. callback function => Either pass the user.
-                                Or Pass false.
-    
-                                
+        c. callback function => Either pass the user Or Pass false.                               
     1. name of the strategy.
-    2. callback function => Process the request
-    3. 
-
-
-
+    2. callback function => Process the request 
 */
 
 module.exports.AuthStrategy = AuthStrategy;
