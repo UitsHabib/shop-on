@@ -33,30 +33,16 @@ const Shop = sequelize.define('shops', {
         type: DataTypes.STRING(255),
         allowNull: false
     },
-<<<<<<< HEAD
-    is_active: {
-        type: DataTypes.ENUM,
-        values: ['0', '1'],
-        defaultValue: '1'
-    },
-    shop_profile_image: {
-        type: DataTypes.STRING
-=======
     license_number: {
         type: DataTypes.STRING,
         allowNull: false
->>>>>>> a379c998cc9e9ac027a23347de4d8b51921bb714
     }
 }, {
     tableName: 'shops',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
-<<<<<<< HEAD
-})
-=======
 });
->>>>>>> a379c998cc9e9ac027a23347de4d8b51921bb714
 
 Shop.prototype.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
