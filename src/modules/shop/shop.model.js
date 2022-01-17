@@ -33,9 +33,8 @@ const Shop = sequelize.define('shops', {
         type: DataTypes.STRING(255),
         allowNull: false
     },
-    license_number: {
-        type: DataTypes.STRING,
-        allowNull: false
+    shop_profile_image: {
+        type: DataTypes.STRING
     }
 }, {
     tableName: 'shops',

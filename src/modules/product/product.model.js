@@ -27,6 +27,9 @@ const Product = sequelize.define('products', {
     shop_id: {
         type: DataTypes.INTEGER,
         allowNull: false
+    },
+    product_profile_image: {
+        type: DataTypes.STRING
     }
 }, {
     tableName: 'products',

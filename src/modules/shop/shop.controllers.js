@@ -239,7 +239,7 @@ async function getShopProducts(req, res) {
                 total,
                 page
             }
-        }
+        };
 
         res.status(200).send(data);
     }
