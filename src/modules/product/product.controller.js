@@ -1,6 +1,7 @@
 const Shop = require("../shop/shop.model");
 const Product = require("./product.model");
 
+
 async function getProducts(req, res) {
     try {
         const page = +req.query.page || 1;
@@ -168,6 +169,7 @@ async function deleteProduct(req, res) {
         res.status(500).send("Internal server error.");
     }
 };
+
 
 module.exports.getProducts = getProducts;
 module.exports.getProduct = getProduct;
