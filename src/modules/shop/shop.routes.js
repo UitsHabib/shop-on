@@ -1,25 +1,26 @@
 const path = require("path");
+const multer = require("../../config/lib/multer");
 const { AuthStrategy } = require("./shop-authentication.middleware");
 const controller = require("./shop.controllers");
-const { shopCreateSchema, shopUpdateSchema } = require("./shop.schema");
+const { shopRegisterSchema, shopUpdateSchema, validateFile } = require("./shop.schema");
 const validate = require(path.join(process.cwd(), "src/modules/core/middlewares/validate"));
 
+
 module.exports = (app) => {
+    app.post('/api/shops/login', controller.login);
+
+    app.get('/api/shops/logout', controller.logout);
+
     app.route('/api/shops')
-        .get(controller.getShops)
-        .post(validate(shopCreateSchema), controller.createShop);
+        .post(validate(shopRegisterSchema), controller.registerShop);
 
     app.route('/api/shops/:id')
-        .get(controller.getShop)
-        .put(AuthStrategy, validate(shopCreateSchema), controller.updateShop)
-        .patch(AuthStrategy, validate(shopUpdateSchema), controller.updateShopInfo)
+        .get(AuthStrategy, controller.getShop)
+        .put(AuthStrategy, validateFile(multer.single('shop_profile_image')), validate(shopRegisterSchema), controller.updateShop)
+        .patch(AuthStrategy, validateFile(multer.single('shop_profile_image')), validate(shopUpdateSchema), controller.updateShopInfo)
         .delete(AuthStrategy, controller.deleteShop);
 
-    app.post('/api/login', controller.login);
+    app.get("/api/shops/:id/products", AuthStrategy, controller.getShopProducts);
 
-    app.get('/api/logout', controller.logout);
-
-    app.get("/api/shops/:id/products", controller.getShopAllProduct);
-
-    app.get("/api/shops/:id/products/:productId", controller.getShopSingleProduct);
+    app.get("/api/shops/:id/products/:productId", AuthStrategy, controller.getShopProduct);
 }

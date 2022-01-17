@@ -7,7 +7,7 @@ const { productUploadSchema, productUpdateSchema } = require("./product.schema")
 module.exports = (app) => {
   app.route("/api/products")
     .get(controller.getProducts)
-    .post(AuthStrategy, validate(productUploadSchema), controller.createProduct);
+    .post(AuthStrategy, validate(productUploadSchema), controller.addProduct);
 
   app.route("/api/products/:id")
     .get(controller.getProduct)

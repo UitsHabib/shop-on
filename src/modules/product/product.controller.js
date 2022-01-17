@@ -1,8 +1,20 @@
+const Shop = require("../shop/shop.model");
 const Product = require("./product.model");
 
 async function getProducts(req, res) {
   try {
-    const products = await Product.findAll();
+    let { page, limit } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const products = await Product.findAll({
+      offset: (page - 1) * limit || 0,
+      limit: limit || 5,
+      include: [{
+        model: Shop,
+        as: 'shops'
+      }]
+    });
 
     res.status(200).send(products);
   } catch (err) {
@@ -18,7 +30,11 @@ async function getProduct(req, res) {
     const product = await Product.findOne({
       where: {
         id
-      }
+      },
+      include: [{
+        model: Shop,
+        as: 'shops'
+      }]
     });
 
     if (!product) return res.status(404).send("Product not found.");
@@ -30,8 +46,10 @@ async function getProduct(req, res) {
   }
 };
 
-async function createProduct(req, res) {
+async function addProduct(req, res) {
   try {
+    if (req.user.is_active === '0') return res.status(400).send('Shop is not active.');
+
     const { product_name, price, description, category, quantity } = req.body;
 
     const product = await Product.create({
@@ -40,7 +58,7 @@ async function createProduct(req, res) {
       description,
       category,
       quantity,
-      shop_id: req.data.dataValues.id
+      shop_id: req.user.id
     });
 
     res.status(201).send(product);
@@ -61,6 +79,8 @@ async function updateProduct(req, res) {
       }
     });
     if (!product) return res.status(404).send('Product not found.');
+
+    if (product.shop_id !== req.user.id) return res.status(403).send('Access denied.');
 
     await product.update({
       product_name,
@@ -89,6 +109,8 @@ async function updateProductInfo(req, res) {
     });
     if (!product) return res.status(404).send("Product not found!");
 
+    if (product.shop_id !== req.user.id) return res.status(403).send('Access denied.');
+
     if (product_name) product.update({ product_name });
     if (price) product.update({ price });
     if (description) product.update({ description });
@@ -112,6 +134,8 @@ async function deleteProduct(req, res) {
     });
     if (!product) return res.status(404).send("Product not found.");
 
+    if (product.shop_id !== req.user.id) return res.status(403).send('Access denied.');
+
     await product.destroy();
 
     res.status(200).send(product);
@@ -124,7 +148,7 @@ async function deleteProduct(req, res) {
 
 module.exports.getProducts = getProducts;
 module.exports.getProduct = getProduct;
-module.exports.createProduct = createProduct;
+module.exports.addProduct = addProduct;
 module.exports.updateProduct = updateProduct;
 module.exports.updateProductInfo = updateProductInfo;
 module.exports.deleteProduct = deleteProduct;

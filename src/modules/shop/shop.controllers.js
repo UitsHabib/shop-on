@@ -2,23 +2,26 @@ const Product = require('../product/product.model');
 const { generateAccessToken } = require('./services/shop.service');
 const Shop = require('./shop.model');
 
-async function createShop(req, res) {
+
+async function registerShop(req, res) {
     try {
-        const { shop_name, password, description, registration_number } = req.body;
+        if (req.signedCookies["access_token"])
+            return res.status(400).send('Already logged in.');
+
+        const { shop_name, email, password, license_number } = req.body;
 
         const existShop = await Shop.findOne({
             where: {
-                shop_name
+                email
             }
         });
-
-        if (existShop) return res.status(400).send('Duplicate shop name.');
+        if (existShop) return res.status(400).send('Duplicate email address.');
 
         const shop = await Shop.create({
             shop_name,
+            email,
             password,
-            description,
-            registration_number
+            license_number
         });
 
         res.cookie("access_token", generateAccessToken(shop), { httpOnly: true, sameSite: true, signed: true });
@@ -31,27 +34,17 @@ async function createShop(req, res) {
     }
 }
 
-async function getShops(req, res) {
-    try {
-        const shops = await Shop.findAll();
-
-        res.status(200).send(shops);
-    }
-    catch (error) {
-        console.log(error);
-        res.status(500).send('Internal server error.');
-    }
-}
-
 async function getShop(req, res) {
     try {
         const { id } = req.params;
+
+        if (id != req.user.id) return res.status(403).send('Access denied.');
+
         const shop = await Shop.findOne({
             where: {
                 id
             }
         });
-
         if (!shop) return res.status(404).send('Shop not found.');
 
         res.status(200).send(shop);
@@ -65,7 +58,9 @@ async function getShop(req, res) {
 async function updateShop(req, res) {
     try {
         const { id } = req.params;
-        const { shop_name, password, description, registration_number } = req.body;
+        const { shop_name, email, password, description, license_number } = req.body;
+
+        if (id != req.user.id) return res.status(403).send('Access denied.');
 
         const shop = await Shop.findOne({
             where: {
@@ -74,18 +69,20 @@ async function updateShop(req, res) {
         });
         if (!shop) return res.status(404).send('Shop not found.');
 
-        const shop_name_exists = await Shop.findOne({
+        const existShop = await Shop.findOne({
             where: {
-                shop_name
+                email
             }
-        })
-        if (shop_name_exists) return res.status(400).send('Duplicate shop name.');
+        });
+        if (req.user.email !== shop.email && existShop) return res.status(400).send('Duplicate email address.');
 
         await shop.update({
             shop_name,
+            email,
             password,
             description,
-            registration_number
+            license_number,
+            shop_profile_image: JSON.stringify(req.file)
         });
 
         res.status(201).send(shop);
@@ -99,7 +96,9 @@ async function updateShop(req, res) {
 async function updateShopInfo(req, res) {
     try {
         const { id } = req.params;
-        const { shop_name, password, description, registration_number } = req.body;
+        const { shop_name, email, password, description, license_number, is_active } = req.body;
+
+        if (id != req.user.id) return res.status(403).send('Access denied.');
 
         const shop = await Shop.findOne({
             where: {
@@ -108,19 +107,22 @@ async function updateShopInfo(req, res) {
         });
         if (!shop) return res.status(404).send('Shop not found.');
 
-        if (shop_name) {
-            const shop_name_exists = await Shop.findOne({
+        if (email) {
+            const existShop = await Shop.findOne({
                 where: {
-                    shop_name
+                    email
                 }
-            })
-            if (shop_name_exists) return res.status(400).send('Duplicate shop name.');
+            });
+            if (req.user.email !== shop.email && existShop) return res.status(400).send('Duplicate email address.');
 
-            await shop.update({ shop_name });
+            await shop.update({ email });
         }
         if (password) await shop.update({ password });
+        if (shop_name) await shop.update({ shop_name });
         if (description) await shop.update({ description });
-        if (registration_number) await shop.update({ registration_number });
+        if (license_number) await shop.update({ license_number });
+        if (is_active === true || is_active === false) await shop.update({ is_active: is_active ? '1' : '0' });
+        if (req.file) await shop.update({ shop_profile_image: JSON.stringify(req.file) });
 
         res.status(201).send(shop);
     }
@@ -133,6 +135,8 @@ async function updateShopInfo(req, res) {
 async function deleteShop(req, res) {
     try {
         const { id } = req.params;
+
+        if (id != req.user.id) return res.status(403).send('Access denied.');
 
         const shop = await Shop.findOne({
             where: {
@@ -160,11 +164,14 @@ async function deleteShop(req, res) {
 
 async function login(req, res) {
     try {
-        const { shop_name, password } = req.body;
+        if (req.signedCookies["access_token"])
+            return res.status(400).send('Already logged in.');
+
+        const { email, password } = req.body;
 
         const shop = await Shop.findOne({
             where: {
-                shop_name
+                email
             }
         })
 
@@ -182,21 +189,59 @@ async function login(req, res) {
 }
 
 async function logout(req, res) {
+    if (!req.signedCookies["access_token"])
+        return res.status(400).send('Already logged out.');
+
     res.clearCookie("access_token");
-    res.clearCookie("refresh_token").send('Logged out.');
+    res.clearCookie("refresh_token")
+    res.status(200).send('Logged out.');
 }
 
-async function getShopAllProduct(req, res) {
+async function getShopProducts(req, res) {
     try {
         const { id } = req.params;
+
+        if (id != req.user.id) return res.status(403).send('Access denied.');
+
+        const page = +req.query.page || 1;
+        const limit = +req.query.limit || 15;
+        const offset = (page - 1) * limit;
+        let { orderBy, orderType } = req.query;
+        orderType = orderType || 'asc';
+        let order = [['created_at', 'desc']];
+
+        if (orderBy) {
+            order.push([orderBy, orderType]);
+        }
 
         const products = await Product.findAll({
             where: {
                 shop_id: id
-            }
+            },
+            include: [
+                {
+                    model: Shop,
+                    as: 'shops'
+                }
+            ],
+            offset,
+            limit,
+            order
         });
 
-        res.status(200).send(products);
+        const total = await Product.count();
+
+        const data = {
+            products,
+            meta: {
+                start: offset + 1,
+                end: Math.min(total, page * limit),
+                total,
+                page
+            }
+        }
+
+        res.status(200).send(data);
     }
     catch (error) {
         console.log(error);
@@ -204,17 +249,24 @@ async function getShopAllProduct(req, res) {
     }
 }
 
-async function getShopSingleProduct(req, res) {
+async function getShopProduct(req, res) {
     try {
         const { id, productId } = req.params;
+
+        if (id != req.user.id) return res.status(403).send('Access denied.');
 
         const product = await Product.findOne({
             where: {
                 id: productId,
                 shop_id: id
-            }
+            },
+            include: [
+                {
+                    model: Shop,
+                    as: 'shops'
+                }
+            ]
         });
-
         if (!product) return res.status(404).send("Product not found.");
 
         res.status(200).send(product);
@@ -225,13 +277,13 @@ async function getShopSingleProduct(req, res) {
     }
 }
 
-module.exports.createShop = createShop;
-module.exports.getShops = getShops;
+
+module.exports.registerShop = registerShop;
 module.exports.getShop = getShop;
 module.exports.updateShop = updateShop;
 module.exports.updateShopInfo = updateShopInfo;
 module.exports.deleteShop = deleteShop;
 module.exports.login = login;
 module.exports.logout = logout;
-module.exports.getShopAllProduct = getShopAllProduct;
-module.exports.getShopSingleProduct = getShopSingleProduct;
+module.exports.getShopProducts = getShopProducts;
+module.exports.getShopProduct = getShopProduct;

@@ -34,12 +34,13 @@ async function init() {
     function shopSeeder(callback) {
         Shop.findOrCreate({
             where: {
-                shop_name: 'shop 1'
+                email: 'support@example.com'
             },
             defaults: {
-                password: '123456',
+                password: 'Aa@45678',
+                shop_name: 'shop 1',
                 description: 'Demo shop.',
-                registration_number: "df345rtr435rt"
+                license_number: "df345rtr435rt"
             }
         }).then(function () {
             callback();

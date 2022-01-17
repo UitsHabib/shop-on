@@ -12,7 +12,6 @@ const AuthStrategy = (req, res, next) => {
 
         req.logIn(shop, { session: false }, function (error) {
             if (error) return next(error);
-            req.data = shop;
             next();
         });
     });
