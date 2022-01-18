@@ -3,7 +3,7 @@ const controller = require("./customer.controller");
 const { AuthStrategy } = require("./customer-authentication.middleware");
 const validate = require(path.join(process.cwd(), "src/modules/core/middlewares/validate"));
 const { customerRegisterSchema, customerUpdateSchema } = require("./customer.schema");
-const upload = require('../../config/lib/multer');
+const multer = require('../../config/lib/multer');
 
 module.exports = (app) => {
     app.post('/api/customer/login', controller.login);
@@ -20,6 +20,6 @@ module.exports = (app) => {
         .delete(AuthStrategy, controller.deleteCustomer);
 
     app.route('/api/customer/updateAvatar/:id')
-        .put(AuthStrategy, upload.single('image'), controller.updateAvatar);
+        .put(AuthStrategy, multer.single('image'), controller.updateAvatar);
 };
 
