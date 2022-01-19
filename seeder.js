@@ -95,7 +95,7 @@ async function init() {
             where: { id: 1 },
             defaults: {
                 title: "Admin",
-                slug: ""
+                slug: "admin"
             },
         }).then(function () {
             callback();

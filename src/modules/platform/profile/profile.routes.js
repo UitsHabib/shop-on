@@ -3,10 +3,10 @@ const controller = require('./profile.controller');
 module.exports = (app) => {
     app.route('/api/profiles')
         .get(controller.getProfiles)
-        .post();
+        .post(controller.createProfile);
 
     app.route('/api/profiles/:id')
-        .get()
-        .put()
-        .delete();
+        .get(controller.getProfile)
+        .put(controller.updateProfile)
+        .delete(controller.deleteProfile);
 }
