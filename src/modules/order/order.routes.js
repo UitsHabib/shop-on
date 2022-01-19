@@ -12,11 +12,11 @@ module.exports = (app) => {
 
   app
     .route("/create-order")
-    .post(ordersController.postCreateOrder);
+    .post(ordersController.createOrder);
   app
     .route("/update-order")
-    .post(ordersController.postUpdateOrder);
+    .post(ordersController.updateOrder);
   app
     .route("/delete-order")
-    .post(ordersController.postDeleteOrder);
+    .post(ordersController.deleteOrder);
 };
