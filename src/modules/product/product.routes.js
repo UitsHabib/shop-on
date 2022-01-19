@@ -1,13 +1,7 @@
 const path = require("path");
 const controller = require("./product.controller");
-const validate = require(path.join(
-  process.cwd(),
-  "src/modules/core/middlewares/validate"
-));
-const {
-  productUploadSchema,
-  productUpdateSchema,
-} = require("./product.schema");
+const validate = require(path.join(process.cwd(), "src/modules/core/middlewares/validate"));
+const { productUploadSchema, productUpdateSchema, } = require("./product.schema");
 
 module.exports = (app) => {
   app
