@@ -1,10 +1,7 @@
 const path = require("path");
 const controller = require("./user.controller");
 const { AuthStrategy } = require("./user-authentication.middleware");
-const validate = require(path.join(
-    process.cwd(),
-    "src/modules/core/middlewares/validate"
-));
+const validate = require(path.join(process.cwd(), "src/modules/core/middlewares/validate"));
 const { userRegisterSchema, userUpdateSchema } = require("./user.schema");
 
 module.exports = (app) => {

@@ -1,6 +1,6 @@
 const User = require("./user.model");
 const UserProfile = require("./user-profile.model");
-const { generateAccessToken } = require("./services/user.service");
+const { generateAccessToken } = require("./service/user.service");
 
 async function login (req, res) {
     try {
