@@ -33,6 +33,11 @@ const Shop = sequelize.define('shops', {
         type: DataTypes.STRING(255),
         allowNull: false
     },
+    is_active: {
+        type: DataTypes.ENUM,
+        values: ['0', '1'],
+        defaultValue: '1'
+    },
     shop_profile_image: {
         type: DataTypes.STRING
     }
