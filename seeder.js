@@ -5,29 +5,18 @@ async function init() {
     const config = require(path.join(process.cwd(), "src/config/config"));
     await config.initEnvironmentVariables();
 
-    const nodecache = require(path.join(
-        process.cwd(),
-        "src/config/lib/nodecache"
-    ));
+    const nodecache = require(path.join(process.cwd(), "src/config/lib/nodecache"));
 
-    const sequelize = require(path.join(
-        process.cwd(),
-        "src/config/lib/sequelize"
-    ));
+    const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 
     await sequelize.query(
-        `CREATE DATABASE IF NOT EXISTS ${nodecache.getValue("shop_on")}`
+        `CREATE DATABASE IF NOT EXISTS ${nodecache.getValue("DB_NAME")}`
     );
 
-    const User = require(path.join(
-        process.cwd(),
-        "src/modules/user/user.model"
-    ));
-    const UserProfile = require(path.join(
-        process.cwd(),
-        "src/modules/user/user-profile.model"
-    ));
-    require(path.join(process.cwd(), "src/modules/product/product.model"));
+    const User = require(path.join(process.cwd(), "src/modules/user/user.model"));
+    const UserProfile = require(path.join(process.cwd(), "src/modules/user/user-profile.model"));
+    const Product = require(path.join(process.cwd(), "src/modules/product/product.model"));
+    const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/profile.model"));
 
     await sequelize.sync();
 
@@ -101,8 +90,23 @@ async function init() {
         });
     }
 
+    function profileSeeder(callback) {
+        Profile.findOrCreate({
+            where: { id: 1 },
+            defaults: {
+                title: "Admin",
+                slug: "admin",
+                description: "Test admin profile.",
+                created_by: 1,
+                updated_by: 1
+            },
+        }).then(function () {
+            callback();
+        });
+    }
+
     async.waterfall(
-        [userSeeder, userProfileSeeder, userUpdateSeeder],
+        [userSeeder, userProfileSeeder, userUpdateSeeder, profileSeeder],
         function (err) {
             if (err) console.error(err);
             else console.info("DB seed completed!");
