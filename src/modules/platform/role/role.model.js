@@ -10,6 +10,16 @@ const Role = sequelize.define('roles', {
     slug: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    description:{
+        type: DataTypes.STRING(255),
+        allowNull: true
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
     }
 }, {
     tableName: 'roles',
