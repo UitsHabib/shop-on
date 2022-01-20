@@ -69,21 +69,52 @@ async function createProfile(req, res) {
 async function updateProfile(req, res) {
     try {
         const { id } = req.params;
-        const { title } = req.body;
-        const slug = titleToSlug(title);
+        const { title, type, description } = req.body;
+        const slug = makeCustomSlug(title);
 
         const profile = await Profile.findOne({
             where: {
-                id: id
+                id
             },
         });
 
         if (!profile) return res.status(404).send('Profile not found!');
 
         await profile.update({
-            title: title,
-            slug: slug
+            title,
+            slug,
+            type,
+            description
         });
+
+        res.status(201).send(profile);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send('Internal server error!');
+    }
+}
+
+async function updateProfilePartial(req, res) {
+    try {
+        const { id } = req.params;
+        const { title, type, description } = req.body;
+
+        const profile = await Profile.findOne({
+            where: {
+                id
+            },
+        });
+
+        if (!profile) return res.status(404).send('Profile not found!');
+
+        if (title) {
+            const slug = makeCustomSlug(title);
+            await profile.update({ title, slug });
+        }
+
+        if (type) await profile.update({ type });
+        if (description) await profile.update({ description });
 
         res.status(201).send(profile);
     }
@@ -119,4 +150,5 @@ module.exports.getProfiles = getProfiles;
 module.exports.getProfile = getProfile;
 module.exports.createProfile = createProfile;
 module.exports.updateProfile = updateProfile;
+module.exports.updateProfilePartial = updateProfilePartial;
 module.exports.deleteProfile = deleteProfile;
