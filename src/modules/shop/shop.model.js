@@ -39,7 +39,7 @@ const Shop = sequelize.define('shops', {
         defaultValue: '1'
     },
     shop_profile_image: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING(1024)
     }
 }, {
     tableName: 'shops',
