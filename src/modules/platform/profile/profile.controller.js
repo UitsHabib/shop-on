@@ -1,5 +1,6 @@
 const Profile = require('./profile.model');
-const { titleToSlug } = require('./services/profile.service');
+const path = require('path');
+const { makeCustomSlug } = require(path.join(process.cwd(), 'src/modules/core/services/slug'));
 
 async function getProfiles(req, res) {
     try {
@@ -35,21 +36,26 @@ async function getProfile(req, res) {
 
 async function createProfile(req, res) {
     try {
-        const { title } = req.body;
+        const { title, type, description } = req.body;
+        // const userId = req.user.id;
 
         const existProfile = await Profile.findOne({
             where: {
-                title
+                title,
             }
         });
 
         if (existProfile) return res.status(400).send('Profile already exists!');
 
-        const slug = titleToSlug(title);
+        const slug = makeCustomSlug(title);
 
         const profile = await Profile.create({
             title,
-            slug
+            slug,
+            type,
+            description,
+            created_by: 1,
+            updated_by: 1
         });
 
         res.status(201).send(profile);

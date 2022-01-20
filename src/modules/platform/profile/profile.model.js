@@ -4,12 +4,24 @@ const { DataTypes } = require('sequelize');
 
 const Profile = sequelize.define('profiles', {
     title: {
-        type: DataTypes.STRING(50),
-        allowNull: false,
+        type: DataTypes.STRING(50)
     },
     slug: {
-        type: DataTypes.STRING,
-        allowNull: true
+        type: DataTypes.STRING
+    },
+    type: {
+        type: DataTypes.ENUM,
+        values: ['custom', 'standard'],
+        defaultValue: 'custom'
+    },
+    description: {
+        type: DataTypes.STRING(500)
+    },
+    created_by: {
+        type: DataTypes.INTEGER
+    },
+    updated_by: {
+        type: DataTypes.INTEGER
     }
 }, {
     tableName: 'profiles',
