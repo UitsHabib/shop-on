@@ -1,5 +1,6 @@
 const path = require("path");
 const controller = require("./product.controller");
+const multer = require('../../modules/product/product.multer');
 const validate = require(path.join(
   process.cwd(),
   "src/modules/core/middlewares/validate"

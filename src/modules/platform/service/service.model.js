@@ -3,23 +3,12 @@ const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 const { DataTypes } = require('sequelize');
 const { string } = require("yup/lib/locale");
 
-const Product = sequelize.define('products', {
-    name: {
+const service = sequelize.define('services', {
+    title: {
         allowNull: false,
         type: DataTypes.STRING,
     },
-    price: {
-        allowNull: false,
-        type: DataTypes.INTEGER,
-    },
-    description: {
-        allowNull: true,
-        type: DataTypes.STRING,
-    },
-    productImage:  {
-        type: string, required: true
-    },
-    category: {
+    slug: {
         allowNull: false,
         type: DataTypes.STRING,
     },
@@ -30,10 +19,10 @@ const Product = sequelize.define('products', {
         type: DataTypes.INTEGER
     },
 }, {
-    tableName: 'products',
+    tabletitle: 'services',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-module.exports = Product;
+module.exports = service;

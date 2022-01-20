@@ -1,4 +1,6 @@
 const Product = require("./product.model");
+const Formidable = require('formidable');
+const multer = require('../../modules/product/product.multer');
 
 const getProducts = async (req, res) => {
   try {
