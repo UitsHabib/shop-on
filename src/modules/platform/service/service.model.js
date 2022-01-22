@@ -19,7 +19,7 @@ const service = sequelize.define('services', {
         type: DataTypes.INTEGER
     },
 }, {
-    tabletitle: 'services',
+    tableName: 'services',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'

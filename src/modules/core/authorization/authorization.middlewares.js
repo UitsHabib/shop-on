@@ -7,12 +7,15 @@ async function getUserWithProfiles(id){
 }
 
 async function getProfilePermissions(profile) { 
-    const services = [];
-    if(profile){
-        for(const userProfilePermission of profile.userPermissions){
-            
-        }
-    }
+    // const services = [];
+    // if(profile){
+    //     for(const userProfilePermission of profile.userPermissions){
+    //         let permission = userProfilePermission.permission;
+    //             for(const ps of permission.permissions){
+                    
+    //             }
+    //     }
+    // }
 }
 
 async function getRolePermissions(role) { }
@@ -40,3 +43,5 @@ const ServiceGuard = (allowedServices) =>{
         next();
     }    
 }
+
+module.exports.ServiceGuard = ServiceGuard;
