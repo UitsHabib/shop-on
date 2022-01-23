@@ -18,7 +18,7 @@ const ProfilePermission = sequelize.define('profile_permissions', {
     updatedAt: 'updated_at'
 });
 
-ProfilePermission.belongsTo(Permission, { as: "permission", foreignKey: "permission_id" });
 Permission.hasMany(ProfilePermission, { as: "profile_permissions", foreignKey: "permission_id" });
+ProfilePermission.belongsTo(Permission, { as: "permission", foreignKey: "permission_id" });
 
 module.exports = ProfilePermission;
