@@ -6,19 +6,34 @@ async function getUserWithProfiles(id){
     return userWithPermissions;
 }
 
-async function getProfilePermissions(profile) { 
-    // const services = [];
-    // if(profile){
-    //     for(const userProfilePermission of profile.userPermissions){
-    //         let permission = userProfilePermission.permission;
-    //             for(const ps of permission.permissions){
-                    
-    //             }
-    //     }
-    // }
+async function getProfilePermissions(profile) {
+    const services = [];
+    if (profile) {
+        for (const profilePermission of profile.profile_permission) {
+            let permission = profilePermission.permission;
+            for (const permission_service of permission.permission_service) {
+                services.push(permission_service.service);
+            }
+        }
+
+        return services;
+    }
 }
 
-async function getRolePermissions(role) { }
+async function getRolePermissions(userRole) {
+    if (!userRole) return [];
+
+    const services = [];
+
+    for (const rolePermission of userRole.role_permission) {
+        let permission = rolePermission.permission;
+        for (const permission_service of permission.permission_service) {
+            services.push(permission_service.service);
+        }
+    }
+
+    return services;
+}
 
 async function isPermitted(userServices, allowedServices) {
     if(userServices.some( userService => allowedServices.includes(userService))){
