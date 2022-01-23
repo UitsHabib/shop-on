@@ -5,7 +5,7 @@ const Permission = require(path.join(process.cwd(), 'src/modules/platform/permis
 
 const { DataTypes } = require('sequelize');
 
-const RolePermission = sequelize.define('role_permission', {
+const RolePermission = sequelize.define('role_permissions', {
     permission_id: {  //FK of permission table
         type: DataTypes.INTEGER
     },
@@ -13,13 +13,13 @@ const RolePermission = sequelize.define('role_permission', {
         type: DataTypes.INTEGER
     },
 }, {
-    tableName: 'role_permission',
+    tableName: 'role_permissions',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-Permission.hasMany(RolePermission, { as:"role_permissions", foreignKey: "permission_id" });
-RolePermission.belongsTo(Permission, { as:"permission", foreignKey: "permission_id" });
+Permission.hasMany(RolePermission, { as: "role_permissions", foreignKey: "permission_id" });
+RolePermission.belongsTo(Permission, { as: "permission", foreignKey: "permission_id" });
 
 module.exports = RolePermission;
