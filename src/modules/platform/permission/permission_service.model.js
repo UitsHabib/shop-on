@@ -5,7 +5,7 @@ const Service = require(path.join(process.cwd(), 'src/modules/platform/service/s
 
 const { DataTypes } = require('sequelize');
 
-const PermissionService = sequelize.define('permission_service', {
+const PermissionService = sequelize.define('permission_services', {
     permission_id: {  //FK of permission table
         type: DataTypes.INTEGER
     },
@@ -13,7 +13,7 @@ const PermissionService = sequelize.define('permission_service', {
         type: DataTypes.INTEGER
     },
 }, {
-    tableName: 'permission_service',
+    tableName: 'permission_services',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'

@@ -4,7 +4,7 @@ const Permission = require(path.join(process.cwd(), 'src/modules/platform/permis
 // const Profile = require(path.join(process.cwd(), 'src/modules/platform/profile/profile.model'));
 const { DataTypes } = require('sequelize');
 
-const ProfilePermission = sequelize.define('profile_permission', {
+const ProfilePermission = sequelize.define('profile_permissions', {
     permission_id: {  //FK of permission table
         type: DataTypes.INTEGER
     },
@@ -12,7 +12,7 @@ const ProfilePermission = sequelize.define('profile_permission', {
         type: DataTypes.INTEGER
     },
 }, {
-    tableName: 'profile_permission',
+    tableName: 'profile_permissions',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
