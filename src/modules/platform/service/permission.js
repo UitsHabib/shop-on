@@ -18,14 +18,14 @@ const getUserWithPermissionRelations = async (whereCondition) => {
             as: 'profile',
             include: [{
                 model: Profile_Permission,
-                as: 'profile_permission',
+                as: 'profile_permissions',
                 include: [{
                     model: Permission,
                     as: 'permission',
                     include: [
                         {
                             model: Permission_Service,
-                            as: 'permission_service',
+                            as: 'permission_services',
                             include: [
                                 {
                                     model: Service,
@@ -42,14 +42,14 @@ const getUserWithPermissionRelations = async (whereCondition) => {
             as: 'role',
             include: [{
                 model: Role_Permission,
-                as: 'role_permission',
+                as: 'role_permissions',
                 include: [{
                     model: Permission,
                     as: 'permission',
                     include: [
                         {
                             model: Permission_Service,
-                            as: 'permission',
+                            as: 'permission_services',
                             include: [
                                 {
                                     model: Service,
@@ -62,14 +62,48 @@ const getUserWithPermissionRelations = async (whereCondition) => {
             }]
         }]
     });
+
     return user;
+    /*
+        const user = {
+            profile:{
+                profile_permissions:[
+                    {
+                        permission:{
+                            permission_services:[
+                                {
+                                    service:{},
+                                }
+                            ]
+                        }
+                    },
+                    {},
+                    ...
+                ]
+            },
+            role:{
+                role_permissions:[
+                    {
+                        permission:{
+                            permission_services: [
+                                {
+                                    service: {},
+                                }
+                            ]
+                        }
+                    },
+                    {}
+                ]
+            },
+        }
+    */
 }
 
 async function getProfileAndRolePermissions(user) {
     let services = [];
 
-    if (user.Profile) {
-        const profilePermissions = user.Profile.profile_permission;
+    if (user.profile) {
+        const profilePermissions = user.profile.profile_permissions;
         for (const profilePermission of profilePermissions) {
             const [profile_services] = await getPermissionsFromPermission(profilePermission.permission);
             services = services.concat(profile_services);
@@ -77,13 +111,14 @@ async function getProfileAndRolePermissions(user) {
     }
 
     if (user.role) {
-        for (const rolePermission of user.role.role_permission) {
+        const rolePermissions = user.role.role_permissions;
+        for (const rolePermission of rolePermissions) {
             const [role_services] = await getPermissionsFromPermission(rolePermission.permission);
             services = services.concat(role_services);
         }
     }
 
-    const user_services = _.uniqBy(services, sc => sc.slug);
+    const user_services = _.uniqBy(services, service => service.slug);
 
     return [user_services];
 }
@@ -91,7 +126,7 @@ async function getProfileAndRolePermissions(user) {
 async function getUserPermissions(userId) {
     const user = await getUserWithPermissionRelations({ id: userId });
 
-    if(!user) return [[], [], []];
+    if (!user) return [[]];
 
     const [user_services] = await getProfileAndRolePermissions(user);
 
@@ -101,19 +136,19 @@ async function getUserPermissions(userId) {
 async function getPermissionsFromPermission(permission) {
     let services = [];
 
-    if(permission.permission){
-        for (const permission of permission.permission) {
-            const userService = permission.service;
+    if (permission.permission_services) {
+        for (const permissionService of permission.permission_services) {
+            const userService = permissionService.service;
 
-            if (userService) services.push(userServiceCategory);
+            if (userService) services.push(userService);
         }
     }
 
-    return [applications, countries, services];
+    return [services];
 }
 
 async function getRequestingUserPermissions(user) {
-    if(!user) return [[], [], []];
+    if (!user) return [[]];
     const [user_services] = await getProfileAndRolePermissions(user);
     return [user_services];
 }

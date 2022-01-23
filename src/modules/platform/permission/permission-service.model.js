@@ -25,4 +25,6 @@ Permission.belongsToMany(Service, { through: PermissionService, foreignKey: "per
 
 PermissionService.belongsTo(Permission, { as: "permission", foreignKey: "permission_id" });
 
+PermissionService.belongsTo(Service, { as: "service", foreignKey: "service_id" });
+
 module.exports = PermissionService;
