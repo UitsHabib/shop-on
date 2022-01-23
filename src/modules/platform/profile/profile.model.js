@@ -1,5 +1,7 @@
 const path = require('path');
 const sequelize = require(path.join(process.cwd(), 'src/config/lib/sequelize'));
+const Permission = require(path.join(process.cwd(), 'src/modules/platform/permission/permission.model'));
+const ProfilePermission = require(path.join(process.cwd(), 'src/modules/platform/permission/profile_permission.model'));
 const { DataTypes } = require('sequelize');
 
 const Profile = sequelize.define('profiles', {
@@ -29,5 +31,9 @@ const Profile = sequelize.define('profiles', {
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
+
+Profile.hasMany(ProfilePermission, { as: "profile_permissions", foreignKey: "profile_id" });
+Profile.belongsToMany(Permission, { through: ProfilePermission, foreignKey: "profile_id", otherKey: "permission_id" });
+ProfilePermission.belongsTo(Profile, { as: "profile", foreignKey: "profile_id" });
 
 module.exports = Profile;

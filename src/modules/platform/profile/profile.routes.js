@@ -10,7 +10,7 @@ module.exports = (app) => {
 
     app.route('/api/profiles/:id')
         .get(controller.getProfile)
-        .put(validate(profileCreateSchema), controller.updateProfile)
+        // .put(validate(profileCreateSchema), controller.updateProfile)
         .patch(validate(profileUpdateSchema), controller.updateProfilePartial)
         .delete(controller.deleteProfile);
 }
