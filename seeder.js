@@ -14,9 +14,13 @@ async function init() {
     );
 
     const User = require(path.join(process.cwd(), "src/modules/user/user.model"));
-    const UserProfile = require(path.join(process.cwd(), "src/modules/user/user-profile.model"));
-    const Product = require(path.join(process.cwd(), "src/modules/product/product.model"));
     const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/profile.model"));
+    const PermissionService = require(path.join(process.cwd(), "src/modules/platform/permission/permission-service.model"));
+    const Permission = require(path.join(process.cwd(), "src/modules/platform/permission/permission.model"));
+    const ProfilePermission = require(path.join(process.cwd(), "src/modules/platform/permission/profile-permission.model"));
+    const RolePermission = require(path.join(process.cwd(), "src/modules/platform/permission/role-permission.model"));
+    const Role = require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
+    const Service = require(path.join(process.cwd(), "src/modules/platform/service/service.model"));
 
     await sequelize.sync();
 
@@ -33,36 +37,22 @@ async function init() {
         });
     }
 
-    function userProfileSeeder(callback) {
+    function profileSeeder(callback) {
         User.findOne({ where: { email: "habiburrahman3089@gmail.com" } }).then(
             (admin) => {
-                const userProfiles = [
+                const profiles = [
                     {
                         title: "System Admin",
                         description:
                             "This is the default profile for System Admin",
                         created_by: admin.id,
                         updated_by: admin.id,
-                    },
-                    {
-                        title: "Site Admin",
-                        description:
-                            "This is the default profile for Site Admin",
-                        created_by: admin.id,
-                        updated_by: admin.id,
-                    },
-                    {
-                        title: "Default Profile",
-                        description:
-                            "This is the default profile with no permission",
-                        created_by: admin.id,
-                        updated_by: admin.id,
-                    },
+                    }
                 ];
 
-                UserProfile.destroy({ truncate: { cascade: true } }).then(
+                Profile.destroy({ truncate: { cascade: true } }).then(
                     () => {
-                        UserProfile.bulkCreate(userProfiles, {
+                        Profile.bulkCreate(profiles, {
                             returning: true,
                             ignoreDuplicates: false,
                         }).then(function () {
@@ -78,7 +68,7 @@ async function init() {
         User.findOne({
             where: { email: "habiburrahman3089@gmail.com" },
         }).then((admin) => {
-            UserProfile.findOne({ where: { title: "System Admin" } }).then(
+            Profile.findOne({ where: { title: "System Admin" } }).then(
                 (sysAdminProfile) => {
                     admin
                         .update({ profile_id: sysAdminProfile.id })
@@ -90,25 +80,14 @@ async function init() {
         });
     }
 
-    function profileSeeder(callback) {
-        Profile.findOrCreate({
-            where: { id: 1 },
-            defaults: {
-                title: "Admin",
-                slug: "admin",
-                description: "Test admin profile.",
-                created_by: 1,
-                updated_by: 1
-            },
-        }).then(function () {
-            callback();
-        });
-    }
-
     function serviceSeeder(callback) {
         User.findOne({ where: { email: 'habiburrahman3089@gmail.com' } }).then(admin => {
             const services = [
-                { id: 'b73fd725-6112-475d-9071-682ab7c1d462', title: "Management of Platform", slug: "platform-management", created_by: admin.id, updated_by: admin.id },
+                { id: '1', title: "Management of Platform", slug: "platform-management", created_by: admin.id, updated_by: admin.id },
+                { id: '2', title: "Manage Users", slug: "manage-users", description: 'Manage CDP users', created_by: admin.id, updated_by: admin.id },
+                { id: '3', title: "Manage Profiles", slug: "manage-user-profiles", description: 'Manage user profiles', created_by: admin.id, updated_by: admin.id },
+                { id: '4', title: "Manage Roles", slug: "manage-roles", description: 'Manage user roles', created_by: admin.id, updated_by: admin.id },
+                { id: '5', title: "Manage Permissions", slug: "manage-permissions", description: 'Assign rights to Permission', created_by: admin.id, updated_by: admin.id },
             ];
 
             Service.destroy({ truncate: { cascade: true } }).then(() => {
@@ -116,24 +95,7 @@ async function init() {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
-                    const platform = Service.findOne({ where: { slug: 'platform-management' } });
-
-                    Promise.all([platform]).then(values => {
-                        const [platform] = values;
-
-                        const platformServices = [
-                            { id: '7e4dacf6-f26b-461f-b670-1bb37cd0f72e', title: "Manage Users", slug: "manage-users", description: 'Manage CDP users', created_by: admin.id, updated_by: admin.id },
-                            { id: '3c8da3e9-856a-49e4-8d85-d3022eada329', title: "Manage Profiles", slug: "manage-user-profiles", description: 'Manage user profiles', created_by: admin.id, updated_by: admin.id },
-                            { id: 'd3ab7f1b-bbce-4010-afb0-f8e2048de80f', title: "Manage Roles", slug: "manage-roles", description: 'Manage user roles', created_by: admin.id, updated_by: admin.id },
-                            { id: '35ca4f49-142d-427b-a098-2ab269b18a7a', title: "Manage Permissions", slug: "manage-permissions", description: 'Assign rights to Permission', created_by: admin.id, updated_by: admin.id },
-                        ];
-
-                        const allServices = [
-                            ...platformServices
-                        ];
-
-                        Service.bulkCreate(allServices, { returning: true, ignoreDuplicates: false }).then(res => { callback() });
-                    })
+                    callback();
                 });
             });
         });
@@ -159,26 +121,32 @@ async function init() {
     function permissionServiceSeeder(callback) {
         User.findOne({ where: { email: 'habiburrahman3089@gmail.com' } }).then(admin => {
             Promise.all([
-                Service.findOne({ where: { slug: 'platform-management' }, include: { model: Service, as: 'childServices' } }),
-                PermissionSet.findOne({ where: { slug: 'system_admin' } }),
+                Service.findOne({ where: { slug: 'platform-management' } }),
+                Service.findOne({ where: { slug: 'manage-users' } }),
+                Service.findOne({ where: { slug: 'manage-user-profiles' } }),
+                Service.findOne({ where: { slug: 'manage-roles' } }),
+                Service.findOne({ where: { slug: 'manage-permissions' } }),
+                Permission.findOne({ where: { slug: 'system_admin' } }),
             ]).then((values) => {
                 const [
                     platformService,
+                    userService,
+                    profileService,
+                    roleService,
+                    permissionService,
                     systemAdmin_permission,
                 ] = values;
 
-                const permission_service = [
+                const permissionServices = [
                     { permission_id: systemAdmin_permission.id, service_id: platformService.id },
+                    { permission_id: systemAdmin_permission.id, service_id: userService.id },
+                    { permission_id: systemAdmin_permission.id, service_id: profileService.id },
+                    { permission_id: systemAdmin_permission.id, service_id: roleService.id },
+                    { permission_id: systemAdmin_permission.id, service_id: permissionService.id },
                 ];
 
-                if (platformService.childServices) {
-                    platformServiceCategory.childServices.forEach(service => {
-                        permission_service.push({ permissionset_id: systemAdmin_permissionSet.id, service_id: service.id });
-                    });
-                }
-
-                Permission_Service.destroy({ truncate: { cascade: true } }).then(() => {
-                    Permissiont_Service.bulkCreate(permission_service, {
+                PermissionService.destroy({ truncate: { cascade: true } }).then(() => {
+                    PermissionService.bulkCreate(permissionServices, {
                         returning: true,
                         ignoreDuplicates: false
                     }).then(function () {
@@ -190,20 +158,16 @@ async function init() {
     }
 
     function profilePermissionSeeder(callback) {
-        const systemAdminProfile = UserProfile.findOne({ where: { slug: 'system_admin' } });
+        const systemAdminProfile = Profile.findOne({ where: { slug: 'system_admin' } });
         const systemAdminPermission = Permission.findOne({ where: { slug: 'system_admin' } });
 
         Promise.all([systemAdminProfile, systemAdminPermission]).then((values) => {
-            const profile_permission = [
-                { profile_id: values[0].id, permission_id: values[1].id },
-                { profile_id: values[2].id, permission_id: values[3].id },
-                { profile_id: values[6].id, permission_id: values[7].id },
-                { profile_id: values[4].id, permission_id: values[5].id },
-                { profile_id: values[8].id, permission_id: values[9].id }
+            const profilePermissions = [
+                { profile_id: values[0].id, permission_id: values[1].id }
             ];
 
-            Profile_Permission.destroy({ truncate: { cascade: true } }).then(() => {
-                Profile_Permission.bulkCreate(profile_permission, {
+            ProfilePermission.destroy({ truncate: { cascade: true } }).then(() => {
+                ProfilePermission.bulkCreate(profilePermissions, {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
@@ -214,7 +178,7 @@ async function init() {
     }
 
     async.waterfall(
-        [userSeeder, userProfileSeeder, userUpdateSeeder, profileSeeder, serviceSeeder, permissionSeeder, permissionServiceSeeder, profilePermissionSeeder],
+        [userSeeder, profileSeeder, userUpdateSeeder, serviceSeeder, permissionSeeder, permissionServiceSeeder, profilePermissionSeeder],
         function (err) {
             if (err) console.error(err);
             else console.info("DB seed completed!");
