@@ -33,7 +33,7 @@ const Profile = sequelize.define('profiles', {
 });
 
 Profile.hasMany(ProfilePermission, { as: "profile_permissions", foreignKey: "profile_id" });
-Profile.belongsToMany(Permission, { through: ProfilePermission, foreignKey: "profile_id", otherKey: "permission_id" });
+// Profile.belongsToMany(Permission, { through: ProfilePermission, foreignKey: "profile_id", otherKey: "permission_id" });
 ProfilePermission.belongsTo(Profile, { as: "profile", foreignKey: "profile_id" });
 
 module.exports = Profile;

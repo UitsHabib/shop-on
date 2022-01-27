@@ -26,6 +26,7 @@ async function init() {
     await sequelize.sync();
 
     function userSeeder(callback) {
+        try {
         User.findOrCreate({
             where: { email: "habiburrahman3089@gmail.com" },
             defaults: {
@@ -36,6 +37,10 @@ async function init() {
         }).then(function () {
             callback();
         });
+        }
+        catch(err) {
+            console.log(err);
+        }
     }
 
     function profileSeeder(callback) {
@@ -44,6 +49,7 @@ async function init() {
                 const profiles = [
                     {
                         title: "System Admin",
+                        slug: "system-admin",
                         description: "This is the default profile for System Admin",
                         created_by: admin.id,
                         updated_by: admin.id,
@@ -83,11 +89,11 @@ async function init() {
     function serviceSeeder(callback) {
         User.findOne({ where: { email: 'habiburrahman3089@gmail.com' } }).then(admin => {
             const services = [
-                { id: '1', title: "Management of Platform", slug: "platform-management", created_by: admin.id, updated_by: admin.id },
-                { id: '2', title: "Manage Users", slug: "manage-users", description: 'Manage CDP users', created_by: admin.id, updated_by: admin.id },
-                { id: '3', title: "Manage Profiles", slug: "manage-user-profiles", description: 'Manage user profiles', created_by: admin.id, updated_by: admin.id },
-                { id: '4', title: "Manage Roles", slug: "manage-roles", description: 'Manage user roles', created_by: admin.id, updated_by: admin.id },
-                { id: '5', title: "Manage Permissions", slug: "manage-permissions", description: 'Assign rights to Permission', created_by: admin.id, updated_by: admin.id },
+                { title: "Management of Platform", slug: "platform-management", created_by: admin.id, updated_by: admin.id },
+                { title: "Manage Users", slug: "manage-users", description: 'Manage CDP users', created_by: admin.id, updated_by: admin.id },
+                { title: "Manage Profiles", slug: "manage-user-profiles", description: 'Manage user profiles', created_by: admin.id, updated_by: admin.id },
+                { title: "Manage Roles", slug: "manage-roles", description: 'Manage user roles', created_by: admin.id, updated_by: admin.id },
+                { title: "Manage Permissions", slug: "manage-permissions", description: 'Assign rights to Permission', created_by: admin.id, updated_by: admin.id },
             ];
 
             Service.destroy({ truncate: { cascade: true } }).then(() => {
@@ -158,12 +164,14 @@ async function init() {
     }
 
     function profilePermissionSeeder(callback) {
-        const systemAdminProfile = Profile.findOne({ where: { slug: 'system-admin' } });
-        const systemAdminPermission = Permission.findOne({ where: { slug: 'system-admin' } });
+        Promise.all([
+            Profile.findOne({ where: { slug: 'system-admin' } }), 
+            Permission.findOne({ where: { slug: 'system-admin' } })
+        ]).then((values) => {
+            const [systemAdminProfile, systemAdminPermission] = values;
 
-        Promise.all([systemAdminProfile, systemAdminPermission]).then((values) => {
             const profilePermissions = [
-                { profile_id: values[0].id, permission_id: values[1].id }
+                { profile_id: systemAdminProfile.id, permission_id: systemAdminPermission.id }
             ];
 
             ProfilePermission.destroy({ truncate: { cascade: true } }).then(() => {
