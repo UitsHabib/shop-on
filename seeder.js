@@ -27,18 +27,18 @@ async function init() {
 
     function userSeeder(callback) {
         try {
-        User.findOrCreate({
-            where: { email: "habiburrahman3089@gmail.com" },
-            defaults: {
-                first_name: "System",
-                last_name: "Admin",
-                password: "P@ssword123",
-            },
-        }).then(function () {
-            callback();
-        });
+            User.findOrCreate({
+                where: { email: "habiburrahman3089@gmail.com" },
+                defaults: {
+                    first_name: "System",
+                    last_name: "Admin",
+                    password: "P@ssword123",
+                },
+            }).then(function () {
+                callback();
+            });
         }
-        catch(err) {
+        catch (err) {
             console.log(err);
         }
     }
@@ -140,15 +140,15 @@ async function init() {
                     profileService,
                     roleService,
                     permissionService,
-                    systemAdmin_permission,
+                    systemAdminPermission,
                 ] = values;
 
                 const permissionServices = [
-                    { permission_id: systemAdmin_permission.id, service_id: platformService.id },
-                    { permission_id: systemAdmin_permission.id, service_id: userService.id },
-                    { permission_id: systemAdmin_permission.id, service_id: profileService.id },
-                    { permission_id: systemAdmin_permission.id, service_id: roleService.id },
-                    { permission_id: systemAdmin_permission.id, service_id: permissionService.id },
+                    { permission_id: systemAdminPermission.id, service_id: platformService.id },
+                    { permission_id: systemAdminPermission.id, service_id: userService.id },
+                    { permission_id: systemAdminPermission.id, service_id: profileService.id },
+                    { permission_id: systemAdminPermission.id, service_id: roleService.id },
+                    { permission_id: systemAdminPermission.id, service_id: permissionService.id },
                 ];
 
                 PermissionService.destroy({ truncate: { cascade: true } }).then(() => {
@@ -165,7 +165,7 @@ async function init() {
 
     function profilePermissionSeeder(callback) {
         Promise.all([
-            Profile.findOne({ where: { slug: 'system-admin' } }), 
+            Profile.findOne({ where: { slug: 'system-admin' } }),
             Permission.findOne({ where: { slug: 'system-admin' } })
         ]).then((values) => {
             const [systemAdminProfile, systemAdminPermission] = values;
