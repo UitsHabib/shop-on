@@ -1,7 +1,7 @@
 const path = require('path');
 const sequelize = require(path.join(process.cwd(), 'src/config/lib/sequelize'));
 const Permission = require(path.join(process.cwd(), 'src/modules/platform/permission/permission.model'));
-const ProfilePermission = require(path.join(process.cwd(), 'src/modules/platform/permission/profile_permission.model'));
+const ProfilePermission = require(path.join(process.cwd(), 'src/modules/platform/permission/profile-permission.model'));
 const { DataTypes } = require('sequelize');
 
 const Profile = sequelize.define('profiles', {

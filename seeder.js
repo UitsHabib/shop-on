@@ -13,14 +13,15 @@ async function init() {
         `CREATE DATABASE IF NOT EXISTS ${nodecache.getValue("DB_NAME")}`
     );
 
-    const User = require(path.join(process.cwd(), "src/modules/user/user.model"));
+    const User = require(path.join(process.cwd(), "src/modules/platform/user/user.model"));
     const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/profile.model"));
     const PermissionService = require(path.join(process.cwd(), "src/modules/platform/permission/permission-service.model"));
     const Permission = require(path.join(process.cwd(), "src/modules/platform/permission/permission.model"));
     const ProfilePermission = require(path.join(process.cwd(), "src/modules/platform/permission/profile-permission.model"));
-    const RolePermission = require(path.join(process.cwd(), "src/modules/platform/permission/role-permission.model"));
-    const Role = require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
     const Service = require(path.join(process.cwd(), "src/modules/platform/service/service.model"));
+
+    require(path.join(process.cwd(), "src/modules/platform/permission/role-permission.model"));
+    require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
 
     await sequelize.sync();
 
