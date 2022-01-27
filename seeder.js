@@ -43,8 +43,7 @@ async function init() {
                 const profiles = [
                     {
                         title: "System Admin",
-                        description:
-                            "This is the default profile for System Admin",
+                        description: "This is the default profile for System Admin",
                         created_by: admin.id,
                         updated_by: admin.id,
                     }
@@ -104,7 +103,7 @@ async function init() {
     function permissionSeeder(callback) {
         User.findOne({ where: { email: 'habiburrahman3089@gmail.com' } }).then(admin => {
             const permission = [
-                { title: "System Admin Permission", slug: "system_admin", type: 'standard', description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
+                { title: "System Admin Permission", slug: "system-admin", type: 'standard', description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
             ];
 
             Permission.destroy({ truncate: { cascade: true } }).then(() => {
@@ -126,7 +125,7 @@ async function init() {
                 Service.findOne({ where: { slug: 'manage-user-profiles' } }),
                 Service.findOne({ where: { slug: 'manage-roles' } }),
                 Service.findOne({ where: { slug: 'manage-permissions' } }),
-                Permission.findOne({ where: { slug: 'system_admin' } }),
+                Permission.findOne({ where: { slug: 'system-admin' } }),
             ]).then((values) => {
                 const [
                     platformService,
@@ -158,8 +157,8 @@ async function init() {
     }
 
     function profilePermissionSeeder(callback) {
-        const systemAdminProfile = Profile.findOne({ where: { slug: 'system_admin' } });
-        const systemAdminPermission = Permission.findOne({ where: { slug: 'system_admin' } });
+        const systemAdminProfile = Profile.findOne({ where: { slug: 'system-admin' } });
+        const systemAdminPermission = Permission.findOne({ where: { slug: 'system-admin' } });
 
         Promise.all([systemAdminProfile, systemAdminPermission]).then((values) => {
             const profilePermissions = [
