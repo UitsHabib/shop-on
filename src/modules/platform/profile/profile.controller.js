@@ -1,5 +1,5 @@
-const Profile = require('./profile.model');
 const path = require('path');
+const Profile = require('./profile.model');
 const ProfilePermission = require(path.join(process.cwd(), 'src/modules/platform/permission/profile-permission.model'));
 const { makeCustomSlug } = require(path.join(process.cwd(), 'src/modules/core/services/slug'));
 
