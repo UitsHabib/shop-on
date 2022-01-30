@@ -1,8 +1,9 @@
+const path = require("path");
 const User = require("./user.model");
-const UserProfile = require("./user-profile.model");
+const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/profile.model"));
 const { generateAccessToken } = require("./service/user.service");
 
-async function login (req, res) {
+async function login(req, res) {
     try {
         const { email, password } = req.body;
 
@@ -32,12 +33,12 @@ async function logout(req, res) {
 const getUsers = async (req, res) => {
     try {
         const users = await User.findAll({
-            // include: [
-            //     {
-            //         model: UserProfile,
-            //         as: "user_profile",
-            //     },
-            // ],
+            include: [
+                {
+                    model: Profile,
+                    as: "profile",
+                },
+            ],
         });
 
         res.status(200).send(users);
@@ -76,11 +77,11 @@ const createUser = async (req, res) => {
         const { username, email, password, profile_id } = req.body;
         const admin = await User.findOne({
             where: {
-                id:req.user.id,
+                id: req.user.id,
             }
         });
-        
-        if (admin.email != "habiburrahman3089@gmail.com"){
+
+        if (admin.email != "habiburrahman3089@gmail.com") {
             return res.status(403).send("You are not authorized to create an user.")
         }
 

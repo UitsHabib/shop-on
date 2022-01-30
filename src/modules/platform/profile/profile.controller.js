@@ -1,6 +1,6 @@
 const Profile = require('./profile.model');
 const path = require('path');
-const ProfilePermission = require(path.join(process.cwd(), 'src/modules/platform/permission/profile_permission.model'));
+const ProfilePermission = require(path.join(process.cwd(), 'src/modules/platform/permission/profile-permission.model'));
 const { makeCustomSlug } = require(path.join(process.cwd(), 'src/modules/core/services/slug'));
 
 async function getProfiles(req, res) {
