@@ -44,8 +44,8 @@ async function getProfile(req, res) {
 
 async function createProfile(req, res) {
     try {
-        const { title, type, description } = req.body;
-        // const userId = req.user.id;
+        const { title, type, description, permissions } = req.body;
+        const userId = req.user.id;
 
         const slug = makeCustomSlug(title);
 
