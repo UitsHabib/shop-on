@@ -7,4 +7,4 @@ const makeCustomSlug = (title) => {
 };
 const convertToSlug = string => string.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 
-module.exports = makeCustomSlug;
+module.exports.makeCustomSlug = makeCustomSlug;
