@@ -1,13 +1,14 @@
 const path = require('path');
+const controller = require("./permission.controller")
 
 
 module.exports = (app) => {
     app.route('/api/permissions')
-        .get("get permissions")
-        .post("create permission")
+        .get(controller.getPermissions)
+        .post(controller.createPermissions)
 
     app.route("/api/permissions/:id")
-        .get("get by id")
-        .put("update permission")
-        .delete("delete permission");
+        .get(controller.getPermission)
+        .put(controller.updatePermission)
+        .delete(controller.deletePermission);
 }
