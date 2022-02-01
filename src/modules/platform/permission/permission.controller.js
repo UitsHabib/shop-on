@@ -41,7 +41,7 @@ async function createPermissions(req, res) {
             updated_by: 1
         });
 
-        const permission_services = await Promise.all(
+        await Promise.all(
             permissionServices.forEach( serviceId => {
                 return PermissionService.create({
                     permission_id: permission.id,
@@ -49,8 +49,6 @@ async function createPermissions(req, res) {
                 })
             })
         );
-
-        permission.permissionServices = permission_services;
 
         res.status(201).send(permission);
     } 
