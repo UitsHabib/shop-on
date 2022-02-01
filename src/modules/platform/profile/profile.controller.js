@@ -66,9 +66,11 @@ async function createProfile(req, res) {
             updated_by: userId
         });
 
-        await ProfilePermission.create({
-            permission_id: permissions,
-            profile_id: profile.id
+        permissions.forEach(async element => {
+            await ProfilePermission.create({
+                permission_id: element,
+                profile_id: profile.id
+            });
         });
 
         res.status(201).send(profile);

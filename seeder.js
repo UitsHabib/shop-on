@@ -23,7 +23,7 @@ async function init() {
     require(path.join(process.cwd(), "src/modules/platform/permission/role-permission.model"));
     require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
 
-    await sequelize.sync(); 
+    await sequelize.sync();
 
     function userSeeder(callback) {
         try {
@@ -91,7 +91,7 @@ async function init() {
             const services = [
                 { title: "Management of Platform", slug: "platform-management", created_by: admin.id, updated_by: admin.id },
                 { title: "Manage Users", slug: "manage-users", description: 'Manage CDP users', created_by: admin.id, updated_by: admin.id },
-                { title: "Manage Profiles", slug: "manage-user-profiles", description: 'Manage user profiles', created_by: admin.id, updated_by: admin.id },
+                { title: "Manage Profiles", slug: "manage-profiles", description: 'Manage user profiles', created_by: admin.id, updated_by: admin.id },
                 { title: "Manage Roles", slug: "manage-roles", description: 'Manage user roles', created_by: admin.id, updated_by: admin.id },
                 { title: "Manage Permissions", slug: "manage-permissions", description: 'Assign rights to Permission', created_by: admin.id, updated_by: admin.id },
             ];
@@ -129,7 +129,7 @@ async function init() {
             Promise.all([
                 Service.findOne({ where: { slug: 'platform-management' } }),
                 Service.findOne({ where: { slug: 'manage-users' } }),
-                Service.findOne({ where: { slug: 'manage-user-profiles' } }),
+                Service.findOne({ where: { slug: 'manage-profiles' } }),
                 Service.findOne({ where: { slug: 'manage-roles' } }),
                 Service.findOne({ where: { slug: 'manage-permissions' } }),
                 Permission.findOne({ where: { slug: 'system-admin' } }),
