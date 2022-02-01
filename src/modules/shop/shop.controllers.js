@@ -1,6 +1,8 @@
+const path = require("path");
 const Product = require('../product/product.model');
 const { generateAccessToken } = require('./services/shop.service');
 const Shop = require('./shop.model');
+const cloudinary = require(path.join(process.cwd(), 'src/config/lib/cloudinary'));
 
 
 async function registerShop(req, res) {
@@ -59,6 +61,7 @@ async function updateShop(req, res) {
     try {
         const { id } = req.params;
         const { shop_name, email, password, description, license_number } = req.body;
+        const file_url = await cloudinary.uploader.upload(req.file.path);
 
         if (id != req.user.id) return res.status(403).send('Access denied.');
 
@@ -82,7 +85,7 @@ async function updateShop(req, res) {
             password,
             description,
             license_number,
-            shop_profile_image: JSON.stringify(req.file)
+            shop_profile_image: file_url.secure_url
         });
 
         res.status(201).send(shop);
@@ -97,6 +100,7 @@ async function updateShopInfo(req, res) {
     try {
         const { id } = req.params;
         const { shop_name, email, password, description, license_number, is_active } = req.body;
+        const file_url = await cloudinary.uploader.upload(req.file.path);
 
         if (id != req.user.id) return res.status(403).send('Access denied.');
 
@@ -122,7 +126,7 @@ async function updateShopInfo(req, res) {
         if (description) await shop.update({ description });
         if (license_number) await shop.update({ license_number });
         if (is_active === true || is_active === false) await shop.update({ is_active: is_active ? '1' : '0' });
-        if (req.file) await shop.update({ shop_profile_image: JSON.stringify(req.file) });
+        if (file_url) await shop.update({ shop_profile_image: file_url.secure_url });
 
         res.status(201).send(shop);
     }

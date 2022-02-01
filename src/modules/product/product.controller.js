@@ -1,5 +1,7 @@
+const path = require("path");
 const Shop = require("../shop/shop.model");
 const Product = require("./product.model");
+const cloudinary = require(path.join(process.cwd(), 'src/config/lib/cloudinary'));
 
 
 async function getProducts(req, res) {
@@ -94,6 +96,7 @@ async function updateProduct(req, res) {
     try {
         const { id } = req.params;
         const { product_name, price, description, category } = req.body;
+        const file_url = await cloudinary.uploader.upload(req.file.path);
 
         const product = await Product.findOne({
             where: {
@@ -109,7 +112,7 @@ async function updateProduct(req, res) {
             price,
             description,
             category,
-            product_profile_image: JSON.stringify(req.file)
+            product_profile_image: file_url.secure_url
         }
         );
 
@@ -124,6 +127,7 @@ async function updateProductInfo(req, res) {
     try {
         const { id } = req.params;
         const { product_name, price, description, category } = req.body;
+        const file_url = await cloudinary.uploader.upload(req.file.path);
 
         const product = await Product.findOne({
             where: {
@@ -138,7 +142,7 @@ async function updateProductInfo(req, res) {
         if (price) product.update({ price });
         if (description) product.update({ description });
         if (category) product.update({ category });
-        if (req.file) await product.update({ product_profile_image: JSON.stringify(req.file) });
+        if (file_url) await product.update({ product_profile_image: file_url.secure_url });
 
         res.status(201).send(product);
     } catch (err) {

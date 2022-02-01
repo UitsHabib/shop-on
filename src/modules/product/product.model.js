@@ -29,7 +29,7 @@ const Product = sequelize.define('products', {
         allowNull: false
     },
     product_profile_image: {
-        type: DataTypes.STRING(1024)
+        type: DataTypes.STRING
     }
 }, {
     tableName: 'products',
