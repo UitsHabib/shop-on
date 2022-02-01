@@ -23,7 +23,7 @@ async function init() {
     require(path.join(process.cwd(), "src/modules/platform/permission/role-permission.model"));
     require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
 
-    await sequelize.sync();
+    await sequelize.sync(); 
 
     function userSeeder(callback) {
         try {

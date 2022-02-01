@@ -12,6 +12,9 @@ const service = sequelize.define('services', {
         allowNull: false,
         type: DataTypes.STRING,
     },
+    description: {
+        type: DataTypes.STRING(500),
+    },
     created_by: {
         type: DataTypes.INTEGER
     },
@@ -19,10 +22,10 @@ const service = sequelize.define('services', {
         type: DataTypes.INTEGER
     },
 }, {
-    tableName: 'services',
+    tabletitle: 'services',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-module.exports = service;
+module.exports.service = service;
