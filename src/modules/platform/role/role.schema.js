@@ -2,11 +2,11 @@ const { object, string, array } = require("yup");
 
 const types = ['custom', 'standard'];
 
-const profileCreateSchema = object().shape({
+const roleCreateSchema = object().shape({
     title: string()
-        .min(3, "Profile title must be at least 3 characters.")
-        .max(50, "Profile title must be at most 255 characters long.")
-        .required("Profile title is required."),
+        .min(3, "Role title must be at least 3 characters.")
+        .max(50, "Role title must be at most 255 characters long.")
+        .required("Role title is required."),
     type: string()
         .oneOf(Object.values(types))
         .required('Type is a required.')
@@ -17,10 +17,10 @@ const profileCreateSchema = object().shape({
         min(1, 'At least one permission is required.')
 });
 
-const profileUpdateSchema = object().shape({
+const roleUpdateSchema = object().shape({
     title: string()
-        .min(3, "Profile title must be at least 3 characters.")
-        .max(50, "Profile title must be at most 255 characters long."),
+        .min(3, "Role title must be at least 3 characters.")
+        .max(50, "Role title must be at most 255 characters long."),
     type: string()
         .oneOf(Object.values(types))
         .ensure(),
@@ -28,5 +28,5 @@ const profileUpdateSchema = object().shape({
     permissions: array()
 });
 
-module.exports.profileCreateSchema = profileCreateSchema;
-module.exports.profileUpdateSchema = profileUpdateSchema;
+module.exports.roleCreateSchema = roleCreateSchema;
+module.exports.roleUpdateSchema = roleUpdateSchema;

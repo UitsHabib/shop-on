@@ -11,15 +11,15 @@ const Role = sequelize.define('roles', {
         type: DataTypes.STRING,
         allowNull: true
     },
-    description:{
+    description: {
         type: DataTypes.STRING(255),
         allowNull: true
     },
-    createdAt: {
-        type: DataTypes.DATE,
+    created_by: {
+        type: DataTypes.INTEGER
     },
-    updatedAt: {
-        type: DataTypes.DATE,
+    updated_by: {
+        type: DataTypes.INTEGER
     }
 }, {
     tableName: 'roles',

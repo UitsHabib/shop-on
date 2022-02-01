@@ -1,5 +1,6 @@
 const Role = require('./role.model');
-const { titleToSlug } = require('./services/role.service');
+const RolePermission = require(path.join(process.cwd(), 'src/modules/platform/permission/role-permission.model'));
+const { makeCustomSlug } = require(path.join(process.cwd(), 'src/modules/core/services/slug'));
 
 async function getRoles(req, res) {
     try {
@@ -35,21 +36,30 @@ async function getRole(req, res) {
 
 async function createRole(req, res) {
     try {
-        const { title } = req.body;
+        const { title, slug, description, permissions } = req.body;
+        const userId = req.user.id;
+
+        const slug = makeCustomSlug(title);
 
         const existRole = await Role.findOne({
             where: {
-                title
+                slug
             }
         });
 
         if (existRole) return res.status(400).send('Role already exists!');
 
-        const slug = titleToSlug(title);
-
         const role = await Role.create({
             title,
-            slug
+            slug,
+            description,
+            created_by: userId,
+            updated_by: userId
+        });
+
+        await RolePermission.create({
+            permission_id: permissions,
+            role_id: role.id
         });
 
         res.status(201).send(role);
@@ -64,7 +74,7 @@ async function updateRole(req, res) {
     try {
         const { id } = req.params;
         const { title } = req.body;
-        const slug = titleToSlug(title);
+        const slug = makeCustomSlug(title);
 
         const role = await Role.findOne({
             where: {

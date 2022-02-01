@@ -62,8 +62,13 @@ async function createProfile(req, res) {
             slug,
             type,
             description,
-            created_by: 1,
-            updated_by: 1
+            created_by: userId,
+            updated_by: userId
+        });
+
+        await ProfilePermission.create({
+            permission_id: permissions,
+            profile_id: profile.id
         });
 
         res.status(201).send(profile);
@@ -74,36 +79,7 @@ async function createProfile(req, res) {
     }
 }
 
-// async function updateProfile(req, res) {
-//     try {
-//         const { id } = req.params;
-//         const { title, type, description } = req.body;
-//         const slug = makeCustomSlug(title);
-
-//         const profile = await Profile.findOne({
-//             where: {
-//                 id
-//             },
-//         });
-
-//         if (!profile) return res.status(404).send('Profile not found!');
-
-//         await profile.update({
-//             title,
-//             slug,
-//             type,
-//             description
-//         });
-
-//         res.status(201).send(profile);
-//     }
-//     catch (err) {
-//         console.error(err);
-//         res.status(500).send('Internal server error!');
-//     }
-// }
-
-async function updateProfilePartial(req, res) {
+async function updateProfile(req, res) {
     try {
         const { id } = req.params;
         const { title, type, description } = req.body;
@@ -118,11 +94,11 @@ async function updateProfilePartial(req, res) {
 
         if (title) {
             const slug = makeCustomSlug(title);
-            await profile.update({ title, slug });
+            await profile.update({ title, slug, updated_by: userId });
         }
 
         if (type) await profile.update({ type });
-        if (description) await profile.update({ description });
+        if (description) await profile.update({ description, updated_by: userId });
 
         res.status(201).send(profile);
     }
@@ -157,6 +133,5 @@ async function deleteProfile(req, res) {
 module.exports.getProfiles = getProfiles;
 module.exports.getProfile = getProfile;
 module.exports.createProfile = createProfile;
-// module.exports.updateProfile = updateProfile;
-module.exports.updateProfilePartial = updateProfilePartial;
+module.exports.updateProfile = updateProfile;
 module.exports.deleteProfile = deleteProfile;
