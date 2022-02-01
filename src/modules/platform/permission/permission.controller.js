@@ -47,7 +47,7 @@ async function createPermissions(req, res) {
     }
 }
 
-async function getPermissionsById(req, res) {
+async function getPermission(req, res) {
     try {
         const { id } = req.params;
 
@@ -119,7 +119,7 @@ async function deletePermission(req,res) {
 
 
 module.exports.getPermissions = getPermissions;
-module.exports.getPermissionsById = getPermissionsById;
+module.exports.getPermission = getPermission;
 module.exports.createPermissions = createPermissions; 
 module.exports.deletePermission = deletePermission; 
 module.exports.updatePermission = updatePermission; 
