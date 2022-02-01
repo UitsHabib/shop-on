@@ -1,7 +1,6 @@
 const path = require("path");
 const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 const { DataTypes } = require('sequelize');
-const { string } = require("yup/lib/locale");
 
 const service = sequelize.define('services', {
     title: {
@@ -11,9 +10,6 @@ const service = sequelize.define('services', {
     slug: {
         allowNull: false,
         type: DataTypes.STRING,
-    },
-    description: {
-        type: DataTypes.STRING(500),
     },
     created_by: {
         type: DataTypes.INTEGER
@@ -28,4 +24,4 @@ const service = sequelize.define('services', {
     updatedAt: 'updated_at'
 });
 
-module.exports.service = service;
+module.exports = service;

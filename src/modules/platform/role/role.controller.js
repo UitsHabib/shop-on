@@ -1,3 +1,4 @@
+const path = require('path');
 const Role = require('./role.model');
 const RolePermission = require(path.join(process.cwd(), 'src/modules/platform/permission/role-permission.model'));
 const { makeCustomSlug } = require(path.join(process.cwd(), 'src/modules/core/services/slug'));
@@ -36,7 +37,7 @@ async function getRole(req, res) {
 
 async function createRole(req, res) {
     try {
-        const { title, slug, description, permissions } = req.body;
+        const { title, description, permissions } = req.body;
         const userId = req.user.id;
 
         const slug = makeCustomSlug(title);
