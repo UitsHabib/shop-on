@@ -1,6 +1,7 @@
 const path = require('path');
 const Permission = require("./permission.model");
 const { makeCustomSlug } = require(path.join(process.cwd(), 'src/modules/core/services/slug'));
+const PermissionService = require("./permission-service.model")
 
 
 async function getPermissions(req, res) {
@@ -19,7 +20,7 @@ async function getPermissions(req, res) {
 
 async function createPermissions(req, res) {
     try {
-        const { title, type, description } = req.body;
+        const { title, type, description, permissionServices } = req.body;
 
         const slug = makeCustomSlug(title);
 
@@ -39,6 +40,17 @@ async function createPermissions(req, res) {
             created_by: 1,
             updated_by: 1
         });
+
+        const permission_services = await Promise.all(
+            permissionServices.forEach( serviceId => {
+                return PermissionService.create({
+                    permission_id: permission.id,
+                    service_id: serviceId,
+                })
+            })
+        );
+
+        permission.permissionServices = permission_services;
 
         res.status(201).send(permission);
     } 

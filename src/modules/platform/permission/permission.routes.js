@@ -3,7 +3,7 @@ const controller = require("./permission.controller");
 const {AuthStrategy} = require(path.join(process.cwd(), "src/modules/platform/user/user-authentication.middleware"));
 const {ServiceGuard} = require(path.join(process.cwd(), "src/modules/core/authorization/authorization.mddlewares"));
 const {Services} = require(path.join(process.cwd(), "src/modules/core/authorization/authorization.constants"));
-
+const validate = require(path.join(process.cwd(), "src/modules/core/middlewares/validate"));
 
 module.exports = (app) => {
     app.route('/api/permissions')
