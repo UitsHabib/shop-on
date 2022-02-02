@@ -1,6 +1,7 @@
 const path = require("path");
 const User = require("./user.model");
 const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/profile.model"));
+const Role = require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
 const { generateAccessToken } = require("./service/user.service");
 
 async function login(req, res) {
@@ -141,7 +142,7 @@ const updateUser = async (req, res) => {
 const updateUserDetails = async (req, res) => {
     try {
         const { id } = req.params;
-        const { firstName, lastName, username, email } = req.body;
+        const { firstName, lastName, username, email, profile_id, role_id } = req.body;
 
         const user = await User.findOne({
             where: {
@@ -155,7 +156,29 @@ const updateUserDetails = async (req, res) => {
         if (lastName) user.update({ first_name: lastName });
         if (username) user.update({ username });
         if (email) user.update({ email });
+        if (profile_id){
+            const profile = await Profile.findOne({
+                where: {
+                    id: profile_id,
+                },
+            });  
 
+            if (!profile) return res.status(400).send("Bad Request!");
+
+            user.update({ profile_id });
+        }
+         
+        if (role_id){
+            const role = await Role.findOne({
+                where: {
+                    id: role_id,
+                },
+            }); 
+
+            if (!role) return res.status(400).send("Bad Request!");
+
+            user.update({ role_id });
+        }
         res.status(201).send(user);
     } catch (err) {
         console.log(err);
