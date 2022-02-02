@@ -145,9 +145,9 @@ async function updateProfile(req, res) {
                 })
             );
 
-            permissions.forEach(async element =>
+            permissions.forEach(async permissionId =>
                 await ProfilePermission.create({
-                    permission_id: element,
+                    permission_id: permissionId,
                     profile_id: profile.id
                 })
             );
