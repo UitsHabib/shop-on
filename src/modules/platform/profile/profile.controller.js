@@ -1,5 +1,6 @@
 const path = require('path');
 const Profile = require('./profile.model');
+const Permission = require(path.join(process.cwd(), 'src/modules/platform/permission/permission.model'));
 const ProfilePermission = require(path.join(process.cwd(), 'src/modules/platform/permission/profile-permission.model'));
 const { makeCustomSlug } = require(path.join(process.cwd(), 'src/modules/core/services/slug'));
 
@@ -29,7 +30,13 @@ async function getProfile(req, res) {
         const profile = await Profile.findOne({
             where: {
                 id
-            }
+            },
+            include: [
+                {
+                    model: ProfilePermission,
+                    as: "profile_permissions"
+                }
+            ]
         });
 
         if (!profile) return res.status(404).send('Profile not found!');
@@ -46,6 +53,16 @@ async function createProfile(req, res) {
     try {
         const { title, type, description, permissions } = req.body;
         const userId = req.user.id;
+
+        permissions.forEach(async permissionId => {
+            const permissionExist = await Permission.findOne({
+                where: {
+                    id: permissionId
+                }
+            });
+
+            if (!permissionExist) return res.status(400).send('Bad request.');
+        });
 
         const slug = makeCustomSlug(title);
 
@@ -66,12 +83,12 @@ async function createProfile(req, res) {
             updated_by: userId
         });
 
-        permissions.forEach(async element => {
+        permissions.forEach(async element =>
             await ProfilePermission.create({
                 permission_id: element,
                 profile_id: profile.id
-            });
-        });
+            })
+        );
 
         res.status(201).send(profile);
     }
@@ -84,12 +101,19 @@ async function createProfile(req, res) {
 async function updateProfile(req, res) {
     try {
         const { id } = req.params;
-        const { title, type, description } = req.body;
+        const { title, type, description, permissions } = req.body;
+        const userId = req.user.id;
 
         const profile = await Profile.findOne({
             where: {
                 id
             },
+            include: [
+                {
+                    model: ProfilePermission,
+                    as: "profile_permissions"
+                }
+            ]
         });
 
         if (!profile) return res.status(404).send('Profile not found!');
@@ -99,8 +123,35 @@ async function updateProfile(req, res) {
             await profile.update({ title, slug, updated_by: userId });
         }
 
-        if (type) await profile.update({ type });
+        if (type) await profile.update({ type, updated_by: userId });
         if (description) await profile.update({ description, updated_by: userId });
+
+        if (permissions) {
+            permissions.forEach(async permissionId => {
+                const permissionExist = await Permission.findOne({
+                    where: {
+                        id: permissionId
+                    }
+                });
+
+                if (!permissionExist) return res.status(400).send('Bad request.');
+            });
+
+            profile.profile_permissions.forEach(async element =>
+                await ProfilePermission.destroy({
+                    where: {
+                        profile_id: profile.id
+                    }
+                })
+            );
+
+            permissions.forEach(async element =>
+                await ProfilePermission.create({
+                    permission_id: element,
+                    profile_id: profile.id
+                })
+            );
+        }
 
         res.status(201).send(profile);
     }
@@ -117,12 +168,26 @@ async function deleteProfile(req, res) {
         const profile = await Profile.findOne({
             where: {
                 id
-            }
+            },
+            include: [
+                {
+                    model: ProfilePermission,
+                    as: "profile_permissions"
+                }
+            ]
         });
 
         if (!profile) return res.status(404).send('Profile not found!');
 
         await profile.destroy();
+
+        profile.profile_permissions.forEach(async element =>
+            await ProfilePermission.destroy({
+                where: {
+                    profile_id: profile.id
+                }
+            })
+        );
 
         res.status(200).send(profile);
     }

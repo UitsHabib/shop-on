@@ -2,7 +2,7 @@ const path = require('path');
 const sequelize = require(path.join(process.cwd(), 'src/config/lib/sequelize'));
 const { DataTypes } = require('sequelize');
 
-const Permission = sequelize.define('permission', {
+const Permission = sequelize.define('permissions', {
     title: {
         type: DataTypes.STRING(50)
     },
