@@ -72,6 +72,4 @@ User.belongsTo(Profile, { as: 'profile', foreignKey: 'profile_id' });
 Role.hasMany(User, { as: 'users', foreignKey: 'role_id' });
 User.belongsTo(Role, { as: 'role', foreignKey: 'role_id' });
 
-
-
 module.exports = User;
