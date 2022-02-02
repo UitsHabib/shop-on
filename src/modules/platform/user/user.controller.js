@@ -1,6 +1,7 @@
 const path = require("path");
 const User = require("./user.model");
 const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/profile.model"));
+const Role = require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
 const { generateAccessToken } = require("./service/user.service");
 
 async function login(req, res) {
@@ -31,6 +32,7 @@ async function logout(req, res) {
 }
 
 const getUsers = async (req, res) => {
+    console.log(req.user.id);
     try {
         const users = await User.findAll({
             include: [
@@ -74,7 +76,8 @@ const getUser = async (req, res) => {
 
 const createUser = async (req, res) => {
     try {
-        const { username, email, password, profile_id } = req.body;
+        const userId = req.user.id;
+        const { first_name, last_name, email, password, profile_id, role_id} = req.body;
         const admin = await User.findOne({
             where: {
                 id: req.user.id,
@@ -97,10 +100,13 @@ const createUser = async (req, res) => {
                 .send("Already registered with this email address.");
 
         const user = await User.create({
-            username,
+            first_name,
+            last_name,
             email,
             password,
             profile_id: profile_id,
+            role_id: role_id,
+            created_by: userId,
         });
 
         res.status(201).send(user);
@@ -114,6 +120,7 @@ const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
         const { firstName, lastName, username, email } = req.body;
+        const userId = req.user.id;
 
         const user = await User.update(
             {
@@ -121,6 +128,7 @@ const updateUser = async (req, res) => {
                 last_name: lastName,
                 username,
                 email,
+                updated_by: userId,
             },
             {
                 where: {
@@ -141,7 +149,10 @@ const updateUser = async (req, res) => {
 const updateUserDetails = async (req, res) => {
     try {
         const { id } = req.params;
-        const { firstName, lastName, username, email } = req.body;
+        const { firstName, lastName, username, email, profile_id, role_id } = req.body;
+        const userId = req.user.id;
+
+        console.log(userId);
 
         const user = await User.findOne({
             where: {
@@ -151,11 +162,33 @@ const updateUserDetails = async (req, res) => {
 
         if (!user) return res.status(404).send("User not found!");
 
-        if (firstName) user.update({ first_name: firstName });
-        if (lastName) user.update({ first_name: lastName });
-        if (username) user.update({ username });
-        if (email) user.update({ email });
+        if (firstName) user.update({ first_name: firstName, updated_by: userId });
+        if (lastName) user.update({ first_name: lastName, updated_by: userId });
+        if (username) user.update({ username, updated_by: userId });
+        if (email) user.update({ email, updated_by: userId });
+        if (profile_id) {
+            const profile = await Profile.findOne({
+                where: {
+                    id: profile_id,
+                },
+            });
 
+            if (!profile) return res.status(400).send("Bad Request!");
+
+            user.update({ profile_id, updated_by: userId });
+        }
+
+        if (role_id) {
+            const role = await Role.findOne({
+                where: {
+                    id: role_id,
+                },
+            });
+
+            if (!role) return res.status(400).send("Bad Request!");
+
+            user.update({ role_id, updated_by: userId });
+        }
         res.status(201).send(user);
     } catch (err) {
         console.log(err);

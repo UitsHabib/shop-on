@@ -1,17 +1,23 @@
 const path = require('path');
 const Permission = require("./permission.model");
 const { makeCustomSlug } = require(path.join(process.cwd(), 'src/modules/core/services/slug'));
+const PermissionService = require("./permission-service.model")
 
 
 async function getPermissions(req, res) {
     try {
-        const permissions = Permission.findAll({
-            include:[{ /* write here */ }]
+        const permissions = await Permission.findAll({
+            include: [
+                {
+                    model: PermissionService,
+                    as: "permission_services"
+                }
+            ]
         });
 
         if (!permissions) return res.status(404).send("Permissions not found");
-
-        return res.status(202).send(permissions);
+        console.log(permissions);
+        res.status(200).send(permissions);
     } catch (err) {
         return res.status(500).send("Internal server error.");
     }
@@ -19,7 +25,8 @@ async function getPermissions(req, res) {
 
 async function createPermissions(req, res) {
     try {
-        const { title, type, description } = req.body;
+        const userId = req.user.id;
+        const { title, type, description, services } = req.body;
 
         const slug = makeCustomSlug(title);
 
@@ -36,13 +43,23 @@ async function createPermissions(req, res) {
             slug,
             type,
             description,
-            created_by: 1,
-            updated_by: 1
+            created_by: userId,
+            updated_by: userId
         });
+
+     
+        services.forEach(async id => 
+            await PermissionService.create({
+            permission_id: permission.id,
+            service_id: id
+            })
+        );       
+       
 
         res.status(201).send(permission);
     } 
     catch (err) {
+        console.log(err);
         return res.status(500).send("Internal server error.");
     }
 }
@@ -51,17 +68,26 @@ async function getPermission(req, res) {
     try {
         const { id } = req.params;
 
-        const permissions = Permission.findOne(
+        const permission = await Permission.findOne(
             {
-                where: id,
+                where: {
+                    id
+                },
+                include: [
+                    {
+                        model: PermissionService,
+                        as: "permission_services"
+                    }
+                ]
             }
         );
 
-        if (!permissions) return res.status(404).send("Permission not found.");
+        if (!permission) return res.status(404).send("Permission not found.");
 
-        res.status(200).send(permissions);
+        res.status(200).send(permission);
 
     } catch (err) {
+        console.log(err);
         return res.status(500).send("Internal server error.");
     }
 }
@@ -69,12 +95,17 @@ async function getPermission(req, res) {
 async function updatePermission(req, res) {
     try {
         const { id } = req.params;
-        const { title, type, description } = req.body;
+        const { title, type, description, services } = req.body;
 
         const permission = await Permission.findOne({
             where: {
                 id
-            },
+            },include: [
+                {
+                    model: PermissionService,
+                    as: "permission_services"
+                }
+            ]
         });
 
         if (!permission) return res.status(404).send('Permission not found!');
@@ -87,9 +118,27 @@ async function updatePermission(req, res) {
         if (type) await permission.update({ type });
         if (description) await permission.update({ description });
 
-        res.status(201).send(profile);
+        if (services) {
+
+
+            // return res.status(202).send(permission.permission_services);
+
+            permission.permission_services.forEach( async service => {
+                await PermissionService.destroy({where:{permission_id:permission.id}})
+            })
+
+            services.forEach(async serviceId => {
+                await PermissionService.create({
+                    permission_id: permission.id,
+                    service_id: serviceId
+                });
+            });
+        }
+
+        res.status(201).send(permission);
 
     } catch (err) {
+        console.log(err)
         return res.status(500).send("Internal server error.");
     }
 }

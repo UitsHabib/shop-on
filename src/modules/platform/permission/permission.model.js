@@ -24,7 +24,7 @@ const Permission = sequelize.define('permissions', {
         type: DataTypes.INTEGER
     }
 }, {
-    tableName: 'permission',
+    tableName: 'permissions',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
