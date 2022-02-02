@@ -13,11 +13,11 @@ module.exports = (app) => {
 
     app.route("/api/users")
         .get(AuthStrategy, ServiceGuard([Services.MANAGE_USER]), controller.getUsers)
-        .post(AuthStrategy, validate(userRegisterSchema), controller.createUser);
+        .post(AuthStrategy, ServiceGuard([Services.MANAGE_USER]), validate(userRegisterSchema), controller.createUser);
 
     app.route("/api/users/:id")
-        .get(AuthStrategy, controller.getUser)
-        .put(AuthStrategy, validate(userUpdateSchema), controller.updateUser)
-        .patch(AuthStrategy, validate(userUpdateSchema), controller.updateUserDetails)
-        .delete(AuthStrategy, controller.deleteUser);
+        .get(AuthStrategy, ServiceGuard([Services.MANAGE_USER]), controller.getUser)
+        .put(AuthStrategy, ServiceGuard([Services.MANAGE_USER]), validate(userUpdateSchema), controller.updateUser)
+        .patch(AuthStrategy, ServiceGuard([Services.MANAGE_USER]), validate(userUpdateSchema), controller.updateUserDetails)
+        .delete(AuthStrategy, ServiceGuard([Services.MANAGE_USER]), controller.deleteUser);
 };
