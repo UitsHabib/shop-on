@@ -7,9 +7,6 @@ const cloudinary = require(path.join(process.cwd(), 'src/config/lib/cloudinary')
 
 async function registerShop(req, res) {
     try {
-        if (req.signedCookies["access_token"])
-            return res.status(400).send('Already logged in.');
-
         const { shop_name, email, password, license_number } = req.body;
 
         const existShop = await Shop.findOne({
@@ -40,8 +37,6 @@ async function getShop(req, res) {
     try {
         const { id } = req.params;
 
-        if (id != req.user.id) return res.status(403).send('Access denied.');
-
         const shop = await Shop.findOne({
             where: {
                 id
@@ -62,8 +57,6 @@ async function updateShop(req, res) {
         const { id } = req.params;
         const { shop_name, email, password, description, license_number } = req.body;
         const file_url = await cloudinary.uploader.upload(req.file.path);
-
-        if (id != req.user.id) return res.status(403).send('Access denied.');
 
         const shop = await Shop.findOne({
             where: {
@@ -100,9 +93,7 @@ async function updateShopInfo(req, res) {
     try {
         const { id } = req.params;
         const { shop_name, email, password, description, license_number, is_active } = req.body;
-        const file_url = await cloudinary.uploader.upload(req.file.path);
-
-        if (id != req.user.id) return res.status(403).send('Access denied.');
+        const file_url = req.file && await cloudinary.uploader.upload(req.file.path);
 
         const shop = await Shop.findOne({
             where: {
@@ -140,8 +131,6 @@ async function deleteShop(req, res) {
     try {
         const { id } = req.params;
 
-        if (id != req.user.id) return res.status(403).send('Access denied.');
-
         const shop = await Shop.findOne({
             where: {
                 id
@@ -155,9 +144,6 @@ async function deleteShop(req, res) {
 
         await shop.destroy();
 
-        res.clearCookie("access_token");
-        res.clearCookie("refresh_token");
-
         res.status(200).send(shop)
     }
     catch (error) {
@@ -168,9 +154,6 @@ async function deleteShop(req, res) {
 
 async function login(req, res) {
     try {
-        if (req.signedCookies["access_token"])
-            return res.status(400).send('Already logged in.');
-
         const { email, password } = req.body;
 
         const shop = await Shop.findOne({
@@ -193,9 +176,6 @@ async function login(req, res) {
 }
 
 async function logout(req, res) {
-    if (!req.signedCookies["access_token"])
-        return res.status(400).send('Already logged out.');
-
     res.clearCookie("access_token");
     res.clearCookie("refresh_token")
     res.status(200).send('Logged out.');
@@ -204,8 +184,6 @@ async function logout(req, res) {
 async function getShopProducts(req, res) {
     try {
         const { id } = req.params;
-
-        if (id != req.user.id) return res.status(403).send('Access denied.');
 
         const page = +req.query.page || 1;
         const limit = +req.query.limit || 15;
@@ -256,8 +234,6 @@ async function getShopProducts(req, res) {
 async function getShopProduct(req, res) {
     try {
         const { id, productId } = req.params;
-
-        if (id != req.user.id) return res.status(403).send('Access denied.');
 
         const product = await Product.findOne({
             where: {

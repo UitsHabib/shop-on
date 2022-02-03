@@ -105,8 +105,6 @@ async function updateProduct(req, res) {
         });
         if (!product) return res.status(404).send('Product not found.');
 
-        if (product.shop_id !== req.user.id) return res.status(403).send('Access denied.');
-
         await product.update({
             product_name,
             price,
@@ -127,7 +125,7 @@ async function updateProductInfo(req, res) {
     try {
         const { id } = req.params;
         const { product_name, price, description, category } = req.body;
-        const file_url = await cloudinary.uploader.upload(req.file.path);
+        const file_url = req.file && await cloudinary.uploader.upload(req.file.path);
 
         const product = await Product.findOne({
             where: {
@@ -135,8 +133,6 @@ async function updateProductInfo(req, res) {
             },
         });
         if (!product) return res.status(404).send("Product not found!");
-
-        if (product.shop_id !== req.user.id) return res.status(403).send('Access denied.');
 
         if (product_name) product.update({ product_name });
         if (price) product.update({ price });
@@ -161,8 +157,6 @@ async function deleteProduct(req, res) {
             }
         });
         if (!product) return res.status(404).send("Product not found.");
-
-        if (product.shop_id !== req.user.id) return res.status(403).send('Access denied.');
 
         await product.destroy();
 
