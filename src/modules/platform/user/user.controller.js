@@ -76,7 +76,7 @@ const getUser = async (req, res) => {
 
 const createUser = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const loggedUser = req.user;
         const { first_name, last_name, email, password, profile_id, role_id} = req.body;
         const admin = await User.findOne({
             where: {
@@ -84,7 +84,7 @@ const createUser = async (req, res) => {
             }
         });
 
-        if (admin.email != "habiburrahman3089@gmail.com") {
+        if (admin.email != loggedUser.email) {
             return res.status(403).send("You are not authorized to create an user.")
         }
 
@@ -106,7 +106,8 @@ const createUser = async (req, res) => {
             password,
             profile_id: profile_id,
             role_id: role_id,
-            created_by: userId,
+            created_by: loggedUser.id,
+            updated_by: loggedUser.id,
         });
 
         res.status(201).send(user);
