@@ -140,7 +140,7 @@ async function updateRole(req, res) {
             role.role_permissions.forEach(async element =>
                 await RolePermission.destroy({
                     where: {
-                        role_id: role.id
+                        role_id: role.id,
                     }
                 })
             );

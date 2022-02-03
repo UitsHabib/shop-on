@@ -17,7 +17,6 @@ module.exports = (app) => {
 
     app.route("/api/users/:id")
         .get(AuthStrategy, ServiceGuard([Services.MANAGE_USER]), controller.getUser)
-        .put(AuthStrategy, ServiceGuard([Services.MANAGE_USER]), validate(userUpdateSchema), controller.updateUser)
-        .patch(AuthStrategy, ServiceGuard([Services.MANAGE_USER]), validate(userUpdateSchema), controller.updateUserDetails)
+        .patch(AuthStrategy, ServiceGuard([Services.MANAGE_USER]), validate(userUpdateSchema), controller.updateUser)
         .delete(AuthStrategy, ServiceGuard([Services.MANAGE_USER]), controller.deleteUser);
 };
