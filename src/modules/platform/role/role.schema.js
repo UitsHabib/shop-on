@@ -22,8 +22,7 @@ const roleUpdateSchema = object().shape({
         .min(3, "Role title must be at least 3 characters.")
         .max(50, "Role title must be at most 255 characters long."),
     type: string()
-        .oneOf(Object.values(types))
-        .ensure(),
+        .oneOf(Object.values(types)),
     description: string().max(500, "Description must be at most 500 characters long."),
     permissions: array()
 });
