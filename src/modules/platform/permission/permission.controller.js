@@ -23,6 +23,34 @@ async function getPermissions(req, res) {
     }
 }
 
+async function getPermission(req, res) {
+    try {
+        const { id } = req.params;
+
+        const permission = await Permission.findOne(
+            {
+                where: {
+                    id
+                },
+                include: [
+                    {
+                        model: PermissionService,
+                        as: "permission_services"
+                    }
+                ]
+            }
+        );
+
+        if (!permission) return res.status(404).send("Permission not found.");
+
+        res.status(200).send(permission);
+
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send("Internal server error.");
+    }
+}
+
 async function createPermissions(req, res) {
     try {
         const userId = req.user.id;
@@ -64,34 +92,6 @@ async function createPermissions(req, res) {
     }
 }
 
-async function getPermission(req, res) {
-    try {
-        const { id } = req.params;
-
-        const permission = await Permission.findOne(
-            {
-                where: {
-                    id
-                },
-                include: [
-                    {
-                        model: PermissionService,
-                        as: "permission_services"
-                    }
-                ]
-            }
-        );
-
-        if (!permission) return res.status(404).send("Permission not found.");
-
-        res.status(200).send(permission);
-
-    } catch (err) {
-        console.log(err);
-        return res.status(500).send("Internal server error.");
-    }
-}
-
 async function updatePermission(req, res) {
     try {
         const { id } = req.params;
@@ -100,7 +100,8 @@ async function updatePermission(req, res) {
         const permission = await Permission.findOne({
             where: {
                 id
-            },include: [
+            },
+            include: [
                 {
                     model: PermissionService,
                     as: "permission_services"
@@ -120,9 +121,6 @@ async function updatePermission(req, res) {
 
         if (services) {
 
-
-            // return res.status(202).send(permission.permission_services);
-
             permission.permission_services.forEach( async service => {
                 await PermissionService.destroy({where:{permission_id:permission.id}})
             })
@@ -134,6 +132,18 @@ async function updatePermission(req, res) {
                 });
             });
         }
+
+        // const updatedPermission = await Permission.findOne({
+        //     where: {
+        //         id
+        //     },
+        //     include: [
+        //         {
+        //             model: PermissionService,
+        //             as: "permission_services"
+        //         }
+        //     ]
+        // });
 
         res.status(201).send(permission);
 
@@ -150,11 +160,21 @@ async function deletePermission(req,res) {
         const permission = await Permission.findOne({
             where:{
                 id,
-            }
+            },
+            include: [
+                {
+                    model: PermissionService,
+                    as: "permission_services"
+                }
+            ]
         })
 
         if(!permission) return res.status(404).send('Permission not found!');
 
+        permission.permission_services.forEach( async service => {
+            await PermissionService.destroy({where:{permission_id:permission.id}})
+        })
+        
         await permission.destroy();
 
         res.status(200).send(permission);
@@ -163,9 +183,6 @@ async function deletePermission(req,res) {
         res.status(500).send('Internal server error!');
     }
 }
-
-
-
 
 module.exports.getPermissions = getPermissions;
 module.exports.getPermission = getPermission;
