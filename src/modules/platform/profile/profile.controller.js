@@ -179,8 +179,6 @@ async function deleteProfile(req, res) {
 
         if (!profile) return res.status(404).send('Profile not found!');
 
-        await profile.destroy();
-
         profile.profile_permissions.forEach(async element =>
             await ProfilePermission.destroy({
                 where: {
@@ -188,6 +186,8 @@ async function deleteProfile(req, res) {
                 }
             })
         );
+
+        await profile.destroy();
 
         res.status(200).send(profile);
     }

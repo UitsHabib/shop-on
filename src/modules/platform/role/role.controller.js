@@ -178,8 +178,6 @@ async function deleteRole(req, res) {
 
         if (!role) return res.status(404).send('Role not found!');
 
-        await role.destroy();
-
         role.role_permissions.forEach(async element =>
             await RolePermission.destroy({
                 where: {
@@ -187,6 +185,8 @@ async function deleteRole(req, res) {
                 }
             })
         );
+
+        await role.destroy();
 
         res.status(200).send(role);
     }
