@@ -134,7 +134,7 @@ const updateUser = async (req, res) => {
         if (first_name) user.update({ first_name, updated_by: userId });
         if (last_name) user.update({ last_name, updated_by: userId });
         if (email) user.update({ email, updated_by: userId });
-        
+
         if (profile_id) {
             const profile = await Profile.findOne({
                 where: {
@@ -192,5 +192,4 @@ module.exports.getUsers = getUsers;
 module.exports.getUser = getUser;
 module.exports.createUser = createUser;
 module.exports.updateUser = updateUser;
-module.exports.updateUserDetails = updateUserDetails;
 module.exports.deleteUser = deleteUser;
