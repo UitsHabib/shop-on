@@ -11,6 +11,11 @@ const Role = sequelize.define('roles', {
         type: DataTypes.STRING,
         allowNull: true
     },
+    type: {
+        type: DataTypes.ENUM,
+        values: ['custom', 'standard'],
+        defaultValue: 'custom'
+    },
     description: {
         type: DataTypes.STRING(255),
         allowNull: true

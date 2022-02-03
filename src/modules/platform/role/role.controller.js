@@ -115,7 +115,7 @@ async function updateRole(req, res) {
             ]
         });
 
-        if (!role) return res.status(404).send('Profile not found!');
+        if (!role) return res.status(404).send('Role not found!');
 
         if (title) {
             const slug = makeCustomSlug(title);
@@ -139,7 +139,7 @@ async function updateRole(req, res) {
             role.role_permissions.forEach(async element =>
                 await RolePermission.destroy({
                     where: {
-                        role_id: role.id
+                        role_id: role.id,
                     }
                 })
             );
@@ -147,7 +147,7 @@ async function updateRole(req, res) {
             permissions.forEach(async permissionId =>
                 await RolePermission.create({
                     permission_id: permissionId,
-                    profile_id: role.id
+                    role_id: role.id
                 })
             );
         }
@@ -178,8 +178,6 @@ async function deleteRole(req, res) {
 
         if (!role) return res.status(404).send('Role not found!');
 
-        await role.destroy();
-
         role.role_permissions.forEach(async element =>
             await RolePermission.destroy({
                 where: {
@@ -187,6 +185,8 @@ async function deleteRole(req, res) {
                 }
             })
         );
+
+        await role.destroy();
 
         res.status(200).send(role);
     }

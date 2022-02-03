@@ -59,8 +59,8 @@ const getUser = async (req, res) => {
                 id,
             }, include: [
                 {
-                    model: UserProfile,
-                    as: "user_profile",
+                    model: Profile,
+                    as: "profile",
                 },
             ],
         });
@@ -117,43 +117,12 @@ const createUser = async (req, res) => {
     }
 };
 
+
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const { firstName, lastName, username, email } = req.body;
+        const { first_name, last_name, email, profile_id, role_id } = req.body;
         const userId = req.user.id;
-
-        const user = await User.update(
-            {
-                first_name: firstName,
-                last_name: lastName,
-                username,
-                email,
-                updated_by: userId,
-            },
-            {
-                where: {
-                    id,
-                },
-            }
-        );
-
-        if (!user) return res.status(404).send("User not found!");
-
-        res.status(201).send(user);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send("Internal server error!");
-    }
-};
-
-const updateUserDetails = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { firstName, lastName, username, email, profile_id, role_id } = req.body;
-        const userId = req.user.id;
-
-        console.log(userId);
 
         const user = await User.findOne({
             where: {
@@ -163,10 +132,10 @@ const updateUserDetails = async (req, res) => {
 
         if (!user) return res.status(404).send("User not found!");
 
-        if (firstName) user.update({ first_name: firstName, updated_by: userId });
-        if (lastName) user.update({ first_name: lastName, updated_by: userId });
-        if (username) user.update({ username, updated_by: userId });
+        if (first_name) user.update({ first_name, updated_by: userId });
+        if (last_name) user.update({ last_name, updated_by: userId });
         if (email) user.update({ email, updated_by: userId });
+        
         if (profile_id) {
             const profile = await Profile.findOne({
                 where: {
@@ -211,7 +180,7 @@ const deleteUser = async (req, res) => {
 
         await user.destroy();
 
-        res.sendStatus(200).send(user);
+        res.status(200).send(user);
     } catch (err) {
         console.log(err);
         res.status(500).send("Internal server error!");
