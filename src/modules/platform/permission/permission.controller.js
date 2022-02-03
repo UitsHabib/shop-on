@@ -1,5 +1,6 @@
 const path = require('path');
 const Permission = require("./permission.model");
+const Service = require(path.join(process.cwd(), 'src/modules/platform/service/service.model'));
 const { makeCustomSlug } = require(path.join(process.cwd(), 'src/modules/core/services/slug'));
 const PermissionService = require("./permission-service.model")
 
@@ -10,7 +11,15 @@ async function getPermissions(req, res) {
             include: [
                 {
                     model: PermissionService,
-                    as: "permission_services"
+                    as: "permission_services",
+                    attributes: ["id"],
+                    include:[
+                        {
+                            model: Service,
+                            as: "service",
+                            attributes: ["id", "title", "slug"]
+                        }
+                    ]
                 }
             ]
         });
