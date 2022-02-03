@@ -9,6 +9,8 @@ module.exports = {
         "src/modules/platform/role/**/*.routes.js",
         "src/modules/platform/permission/*.routes.js",
         "src/modules/platform/permission/**/*.routes.js",
+        "src/modules/platform/service/*.routes.js",
+        "src/modules/platform/service/**/*.routes.js",
     ],
     strategies: [
         "src/modules/**/*.strategy.js",

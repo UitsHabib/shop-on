@@ -78,15 +78,6 @@ const createUser = async (req, res) => {
     try {
         const loggedUser = req.user;
         const { first_name, last_name, email, password, profile_id, role_id} = req.body;
-        const admin = await User.findOne({
-            where: {
-                id: req.user.id,
-            }
-        });
-
-        if (admin.email != loggedUser.email) {
-            return res.status(403).send("You are not authorized to create an user.")
-        }
 
         const existUser = await User.findOne({
             where: {
@@ -116,7 +107,6 @@ const createUser = async (req, res) => {
         res.status(500).send("Internal server error!");
     }
 };
-
 
 const updateUser = async (req, res) => {
     try {
@@ -159,6 +149,7 @@ const updateUser = async (req, res) => {
 
             user.update({ role_id, updated_by: userId });
         }
+
         res.status(201).send(user);
     } catch (err) {
         console.log(err);

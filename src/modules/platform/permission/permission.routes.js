@@ -9,7 +9,7 @@ const {permissionCreateSchema, permissionUpdateSchema} = require("./permission.s
 module.exports = (app) => {
     app.route('/api/permissions')
         .get(AuthStrategy, ServiceGuard([Services.MANAGE_PERMISSION]), controller.getPermissions)
-        .post(AuthStrategy, ServiceGuard([Services.MANAGE_PERMISSION]), validate(permissionCreateSchema), controller.createPermissions)
+        .post(AuthStrategy, ServiceGuard([Services.MANAGE_PERMISSION]), validate(permissionCreateSchema), controller.createPermission)
 
     app.route("/api/permissions/:id")
         .get(AuthStrategy, ServiceGuard([Services.MANAGE_PERMISSION]), controller.getPermission)

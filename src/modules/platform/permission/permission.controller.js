@@ -16,7 +16,6 @@ async function getPermissions(req, res) {
         });
 
         if (!permissions) return res.status(404).send("Permissions not found");
-        console.log(permissions);
         res.status(200).send(permissions);
     } catch (err) {
         return res.status(500).send("Internal server error.");
@@ -51,7 +50,7 @@ async function getPermission(req, res) {
     }
 }
 
-async function createPermissions(req, res) {
+async function createPermission(req, res) {
     try {
         const userId = req.user.id;
         const { title, type, description, services } = req.body;
@@ -186,7 +185,7 @@ async function deletePermission(req,res) {
 
 module.exports.getPermissions = getPermissions;
 module.exports.getPermission = getPermission;
-module.exports.createPermissions = createPermissions; 
+module.exports.createPermission = createPermission; 
 module.exports.deletePermission = deletePermission; 
 module.exports.updatePermission = updatePermission; 
 
