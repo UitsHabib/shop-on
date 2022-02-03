@@ -1,10 +1,6 @@
 const { object, string, ref } = require('yup');
 
 const isEmailLengthValid = email => {
-    //if (!email) return false;
-    //const part = email.split('@');
-    //const emailParts = part[0];
-    //return emailParts.length <= 64;
     if (email) {
         const part = email.split('@');
         const emailParts = part[0];

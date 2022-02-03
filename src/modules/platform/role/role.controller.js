@@ -51,7 +51,7 @@ async function getRole(req, res) {
 
 async function createRole(req, res) {
     try {
-        const { title, description, permissions } = req.body;
+        const { title, type, description, permissions } = req.body;
         const userId = req.user.id;
 
         permissions.forEach(async permissionId => {
@@ -77,6 +77,7 @@ async function createRole(req, res) {
         const role = await Role.create({
             title,
             slug,
+            type,
             description,
             created_by: userId,
             updated_by: userId
