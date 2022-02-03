@@ -115,7 +115,7 @@ async function updateRole(req, res) {
             ]
         });
 
-        if (!role) return res.status(404).send('Profile not found!');
+        if (!role) return res.status(404).send('Role not found!');
 
         if (title) {
             const slug = makeCustomSlug(title);
