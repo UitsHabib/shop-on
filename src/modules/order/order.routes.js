@@ -4,19 +4,9 @@ const ordersController = require("./order.controller");
 
 module.exports = (app) => {
   app
-    .route("/get-all-orders")
-    .get(ordersController.getAllOrders);
-  app
-    .route("/order-by-user")
-    .post(ordersController.getOrderByUser);
-
-  app
-    .route("/create-order")
-    .post(ordersController.createOrder);
-  app
-    .route("/update-order")
+    .route("/api/orders")
+    .get(ordersController.getOrders)
+    .post(ordersController.getOrderByUser)
+    .post(ordersController.createOrder)
     .post(ordersController.updateOrder);
-  app
-    .route("/delete-order")
-    .post(ordersController.deleteOrder);
 };

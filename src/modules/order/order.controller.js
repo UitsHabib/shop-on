@@ -1,6 +1,6 @@
 const OrderModel = require("./order.model");
 
-const getAllOrders = async (req, res) => {
+const getOrders = async (req, res) => {
   try {
     const orders = await OrderModel.findAll();
 
@@ -86,7 +86,7 @@ const deleteOrder = async (req, res) => {
 
 
 
-module.exports.getAllOrders = getAllOrders;
+module.exports.getOrders = getOrders;
 module.exports.getOrderByUser = getOrderByUser;
 module.exports.createOrder = createOrder;
 module.exports.updateOrder = updateOrder;
