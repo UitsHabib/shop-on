@@ -4,6 +4,22 @@ const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/p
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
 const { generateAccessToken } = require("./service/user.service");
 
+const userAttributes = [
+    "id",
+    "profile_id",
+    "first_name",
+    "last_name",
+    "email",
+    "phone",
+    "status",
+    "last_login",
+    "created_by",
+    "updated_by",
+    "created_at",
+    "updated_at",
+    "role_id"
+]
+
 async function login(req, res) {
     try {
         const { email, password } = req.body;
@@ -32,9 +48,9 @@ async function logout(req, res) {
 }
 
 const getUsers = async (req, res) => {
-    console.log(req.user.id);
     try {
         const users = await User.findAll({
+            attributes: userAttributes,
             include: [
                 {
                     model: Profile,
@@ -57,7 +73,9 @@ const getUser = async (req, res) => {
         const user = await User.findOne({
             where: {
                 id,
-            }, include: [
+            },
+            attributes: userAttributes,
+            include: [
                 {
                     model: Profile,
                     as: "profile",
@@ -77,7 +95,7 @@ const getUser = async (req, res) => {
 const createUser = async (req, res) => {
     try {
         const loggedUser = req.user;
-        const { first_name, last_name, email, password, profile_id, role_id} = req.body;
+        const { first_name, last_name, email, password, profile_id, role_id } = req.body;
 
         const existUser = await User.findOne({
             where: {
@@ -90,18 +108,34 @@ const createUser = async (req, res) => {
                 .status(400)
                 .send("Already registered with this email address.");
 
+        const profile = await Profile.findOne({
+            where: {
+                id: profile_id,
+            },
+        });
+
+        if (!profile) return res.status(400).send("Profile not found.");
+
+        const role = role_id && await Role.findOne({
+            where: {
+                id: role_id,
+            },
+        });
+
         const user = await User.create({
             first_name,
             last_name,
             email,
             password,
             profile_id: profile_id,
-            role_id: role_id,
+            role_id: role?.id || null,
             created_by: loggedUser.id,
             updated_by: loggedUser.id,
         });
 
-        res.status(201).send(user);
+
+        const { password: Password, ...restUserInfo } = user.dataValues;
+        res.status(201).send(restUserInfo);
     } catch (err) {
         console.log(err);
         res.status(500).send("Internal server error!");
@@ -124,7 +158,16 @@ const updateUser = async (req, res) => {
 
         if (first_name) user.update({ first_name, updated_by: userId });
         if (last_name) user.update({ last_name, updated_by: userId });
-        if (email) user.update({ email, updated_by: userId });
+        if (email) {
+            const existingUser = await User.findOne({
+                where: {
+                    email: email,
+                }
+            });
+            if (existingUser) return res.status(400).send("Already registered with this email address.");
+
+            user.update({ email, updated_by: userId });
+        }
 
         if (profile_id) {
             const profile = await Profile.findOne({
@@ -150,7 +193,11 @@ const updateUser = async (req, res) => {
             user.update({ role_id, updated_by: userId });
         }
 
-        res.status(201).send(user);
+        {
+            const { password, password_updated_at, ...userInfo } = user.dataValues;
+            res.status(201).send(userInfo);
+        }
+
     } catch (err) {
         console.log(err);
         res.status(500).send("Internal server error!");
@@ -171,7 +218,10 @@ const deleteUser = async (req, res) => {
 
         await user.destroy();
 
-        res.status(200).send(user);
+        {
+            const { password, password_updated_at, ...userInfo } = user.dataValues;
+            res.status(201).send(userInfo);
+        }
     } catch (err) {
         console.log(err);
         res.status(500).send("Internal server error!");

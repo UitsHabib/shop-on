@@ -8,11 +8,11 @@ const validate = require(path.join(process.cwd(), "src/modules/core/middlewares/
 
 module.exports = (app) => {
     app.route('/api/roles')
-        .get(AuthStrategy, ServiceGuard(Services.MANAGE_ROLE), controller.getRoles)
-        .post(AuthStrategy, ServiceGuard(Services.MANAGE_ROLE), validate(roleCreateSchema), controller.createRole);
+        .get(AuthStrategy, ServiceGuard([Services.MANAGE_ROLE]), controller.getRoles)
+        .post(AuthStrategy, ServiceGuard([Services.MANAGE_ROLE]), validate(roleCreateSchema), controller.createRole);
 
     app.route('/api/roles/:id')
-        .get(AuthStrategy, ServiceGuard(Services.MANAGE_ROLE), controller.getRole)
-        .patch(AuthStrategy, ServiceGuard(Services.MANAGE_ROLE), validate(roleUpdateSchema), controller.updateRole)
-        .delete(AuthStrategy, ServiceGuard(Services.MANAGE_ROLE), controller.deleteRole);
+        .get(AuthStrategy, ServiceGuard([Services.MANAGE_ROLE]), controller.getRole)
+        .patch(AuthStrategy, ServiceGuard([Services.MANAGE_ROLE]), validate(roleUpdateSchema), controller.updateRole)
+        .delete(AuthStrategy, ServiceGuard([Services.MANAGE_ROLE]), controller.deleteRole);
 }
