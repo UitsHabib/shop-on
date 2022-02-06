@@ -50,6 +50,7 @@ async function init() {
                     {
                         title: "System Admin",
                         slug: "system-admin",
+                        type: 'standard',
                         description: "This is the default profile for System Admin",
                         created_by: admin.id,
                         updated_by: admin.id,
