@@ -8,9 +8,7 @@ const profileCreateSchema = object().shape({
         .max(50, "Profile title must be at most 255 characters long.")
         .required("Profile title is required."),
     type: string()
-        .oneOf(Object.values(types))
-        .required('Type is a required.')
-        .ensure(),
+        .oneOf(Object.values(types)),
     description: string().max(500, "Description must be at most 500 characters long.")
         .required("Description is required."),
     permissions: array()

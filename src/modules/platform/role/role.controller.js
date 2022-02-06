@@ -10,7 +10,15 @@ async function getRoles(req, res) {
             include: [
                 {
                     model: RolePermission,
-                    as: 'role_permissions'
+                    as: 'role_permissions',
+                    attributes: ['id'],
+                    include: [
+                        {
+                            model: Permission,
+                            as: 'permission',
+                            attributes: ["id", "title", "slug"]
+                        }
+                    ]
                 }
             ]
         });
@@ -34,7 +42,15 @@ async function getRole(req, res) {
             include: [
                 {
                     model: RolePermission,
-                    as: 'role_permissions'
+                    as: 'role_permissions',
+                    attributes: ['id'],
+                    include: [
+                        {
+                            model: Permission,
+                            as: 'permission',
+                            attributes: ["id", "title", "slug"]
+                        }
+                    ]
                 }
             ]
         });
@@ -172,12 +188,21 @@ async function deleteRole(req, res) {
             include: [
                 {
                     model: RolePermission,
-                    as: "role_permissions"
+                    as: "role_permissions",
+                    attributes: ['id'],
+                    include: [
+                        {
+                            model: Permission,
+                            as: 'permission',
+                            attributes: ["id", "title", "slug"]
+                        }
+                    ]
                 }
             ]
         });
 
         if (!role) return res.status(404).send('Role not found!');
+        if (role.type == 'standard') return res.status(400).send("You can't delete default profile.");
 
         role.role_permissions.forEach(async element =>
             await RolePermission.destroy({

@@ -10,7 +10,15 @@ async function getProfiles(req, res) {
             include: [
                 {
                     model: ProfilePermission,
-                    as: "profile_permissions"
+                    as: "profile_permissions",
+                    attributes: ["id"],
+                    include: [
+                        {
+                            model: Permission,
+                            as: "permission",
+                            attributes: ["id", "title", "slug"]
+                        }
+                    ]
                 }
             ]
         });
@@ -34,7 +42,15 @@ async function getProfile(req, res) {
             include: [
                 {
                     model: ProfilePermission,
-                    as: "profile_permissions"
+                    as: "profile_permissions",
+                    attributes: ["id"],
+                    include: [
+                        {
+                            model: Permission,
+                            as: "permission",
+                            attributes: ["id", "title", "slug"]
+                        }
+                    ]
                 }
             ]
         });
@@ -172,12 +188,21 @@ async function deleteProfile(req, res) {
             include: [
                 {
                     model: ProfilePermission,
-                    as: "profile_permissions"
+                    as: "profile_permissions",
+                    attributes: ["id"],
+                    include: [
+                        {
+                            model: Permission,
+                            as: "permission",
+                            attributes: ["id", "title", "slug"]
+                        }
+                    ]
                 }
             ]
         });
 
         if (!profile) return res.status(404).send('Profile not found!');
+        if (profile.type == 'standard') return res.status(400).send("You can't delete default profile.");
 
         profile.profile_permissions.forEach(async element =>
             await ProfilePermission.destroy({
