@@ -1,8 +1,10 @@
 const path = require('path');
 const Permission = require("./permission.model");
 const Service = require(path.join(process.cwd(), 'src/modules/platform/service/service.model'));
+const ProfilePermission = require(path.join(process.cwd(), 'src/modules/platform/permission/profile-permission.model'));
+const RolePermission = require(path.join(process.cwd(), 'src/modules/platform/permission/role-permission.model'));
 const { makeCustomSlug } = require(path.join(process.cwd(), 'src/modules/core/services/slug'));
-const PermissionService = require("./permission-service.model")
+const PermissionService = require("./permission-service.model");
 
 
 async function getPermissions(req, res) {
@@ -43,7 +45,15 @@ async function getPermission(req, res) {
                 include: [
                     {
                         model: PermissionService,
-                        as: "permission_services"
+                        as: "permission_services",
+                        attributes: ["id"],
+                        include:[
+                            {
+                                model: Service,
+                                as: "service",
+                                attributes: ["id", "title", "slug"]
+                            }
+                        ]
                     }
                 ]
             }
@@ -179,15 +189,62 @@ async function deletePermission(req,res) {
 
         if(!permission) return res.status(404).send('Permission not found!');
 
-        permission.permission_services.forEach( async service => {
-            await PermissionService.destroy({where:{permission_id:permission.id}})
-        })
+        if(permission.type == "standard") return res.status(400).send("Standard permission can not be deleted.")
+
+
+
+        const rolePermissions = await RolePermission.findAll({
+            where: {
+                permission_id:permission.id
+            }
+        });
+
+        if(rolePermissions.length > 0){
+            rolePermissions.forEach( rolePermission =>{
+                rolePermission.destroy();
+            });
+        };
+
+        const profilePermissions = await ProfilePermission.findAll({
+            where: {
+                permission_id:permission.id
+            }
+        });
+
+        if(profilePermissions.length > 0){
+            profilePermissions.forEach( profilePermission =>{
+                profilePermission.destroy();
+            });
+        };
+
+        const permissionServices = await PermissionService.findAll({
+            where: {
+                permission_id:permission.id
+            }
+        });
+
+        if(permissionServices.length > 0){
+            permissionServices.forEach( permissionService =>{
+                permissionService.destroy();
+            });
+        };
+
+
+        // permission.permission_services.forEach( async service => {
+
+        //     await PermissionService.destroy({where:{permission_id:permission.id}});
+        //     await RolePermission.destroy({where:{permission_id:permission.id}});
+        //     await ProfilePermission.destroy({where:{permission_id:permission.id}});
+
+        // })
+        
         
         await permission.destroy();
 
         res.status(200).send(permission);
     }
     catch (err) {
+        console.log(err);
         res.status(500).send('Internal server error!');
     }
 }
@@ -197,5 +254,6 @@ module.exports.getPermission = getPermission;
 module.exports.createPermission = createPermission; 
 module.exports.deletePermission = deletePermission; 
 module.exports.updatePermission = updatePermission; 
+
 
 

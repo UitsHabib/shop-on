@@ -13,6 +13,6 @@ module.exports = (app) => {
 
     app.route("/api/permissions/:id")
         .get(AuthStrategy, ServiceGuard([Services.MANAGE_PERMISSION]), controller.getPermission)
-        .put(AuthStrategy, ServiceGuard([Services.MANAGE_PERMISSION]),  validate(permissionUpdateSchema), controller.updatePermission)
+        .patch(AuthStrategy, ServiceGuard([Services.MANAGE_PERMISSION]),  validate(permissionUpdateSchema), controller.updatePermission)
         .delete(AuthStrategy, ServiceGuard([Services.MANAGE_PERMISSION]), controller.deletePermission);
 }
