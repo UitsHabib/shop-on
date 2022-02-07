@@ -1,0 +1,160 @@
+openapi: 3.0.3
+info:
+  title: SHOP-ON API
+  description: "API spec for SHOP-ON API v1"
+  contact:
+    email: info@shopon.ltd
+    name: SHOP-ON
+    url: shopon.com
+  version: 1.0.0
+servers:
+  - url: "http://localhost:5000"
+    description: developoment
+tags:
+  - name: user
+    description: User operations
+paths:
+  /api/login:
+    post:
+      tags:
+        - user
+      summary: Login Admin
+      description: Login user into the system
+      operationId: loginAdmin
+      requestBody:
+        description: email and password are required for login
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        "200":
+          $ref: "#/components/responses/Login"
+        "400":
+          $ref: "#/components/responses/GenericBadRequest"
+
+# ********** Components **********
+components:
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT # optional, arbitrary value for documentation purposes
+
+  schemas:
+    LoginResponse:
+      type: object
+      required:
+        - token
+        - user
+      properties:
+        token:
+          type: string
+          description: JWT token
+        User:
+          type: object
+          required:
+            - id
+            - name
+            - email
+            - role
+          properties:
+            id:
+              type: integer
+              format: int64
+            name:
+              type: string
+            email:
+              type: string
+            role:
+              type: string
+              enum:
+                - admin
+                - user
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+
+    Login:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          description: Email of the user
+          type: string
+        password:
+          description: Password of the user
+          type: string
+
+    Message:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          description: The error message
+          type: string
+
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: array
+        items:
+          type: object
+          properties:
+            msg:
+              type: string
+            
+            
+  responses:
+    Login:
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LoginResponse"
+
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Message"
+
+    SuccessMessage:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Message"
+
+    Unauthorized:
+      description: Authentication failed
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: Unauthorized
+
+    ValidationError:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationError"
+
+    GenericBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "#/components/schemas/ValidationError"
+              - $ref: "#/components/schemas/Message"
