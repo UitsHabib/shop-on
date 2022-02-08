@@ -1,6 +1,6 @@
 const Product = require("./product.model");
 
-const getProducts = async (req, res) => {
+async function getProducts(req, res) {
     try {
         const products = await Product.findAll();
 
@@ -11,7 +11,7 @@ const getProducts = async (req, res) => {
     }
 };
 
-const getProduct = async (req, res) => {
+async function getProduct(req, res) {
     try {
         const { id } = req.params;
 
@@ -29,7 +29,7 @@ const getProduct = async (req, res) => {
     }
 };
 
-const addProduct = async (req, res) => {
+async function addProduct(req, res) {
     try {
         const { name, price, description, category } = req.body;
 
@@ -47,35 +47,7 @@ const addProduct = async (req, res) => {
     }
 };
 
-const putProduct = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { name, price, description, category } = req.body;
-
-        const product = await Product.update(
-            {
-                name,
-                price,
-                description,
-                category,
-            },
-            {
-                where: {
-                    id,
-                },
-            }
-        );
-
-        if (!product) return res.status(404).send("Product not found!");
-
-        res.status(201).send(product);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send("Internal server error!");
-    }
-};
-
-const patchProduct = async (req, res) => {
+async function updateProduct(req, res) {
     try {
         const { id } = req.params;
         const { name, price, description, category } = req.body;
@@ -100,7 +72,7 @@ const patchProduct = async (req, res) => {
     }
 };
 
-const deleteProduct = async (req, res) => {
+async function deleteProduct(req, res) {
     try {
         const { id } = req.params;
 
@@ -125,6 +97,5 @@ const deleteProduct = async (req, res) => {
 module.exports.getProducts = getProducts;
 module.exports.getProduct = getProduct;
 module.exports.addProduct = addProduct;
-module.exports.putProduct = putProduct;
-module.exports.patchProduct = patchProduct;
+module.exports.updateProduct = updateProduct;
 module.exports.deleteProduct = deleteProduct;

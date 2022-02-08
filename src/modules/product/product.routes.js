@@ -2,10 +2,7 @@ const path = require("path");
 const controller = require("./product.controller");
 const validate = require(path.join(process.cwd(), "src/modules/core/middlewares/validate"));
 
-const {
-    productUploadSchema,
-    productUpdateSchema,
-} = require("./product.schema");
+const { productUploadSchema, productUpdateSchema } = require("./product.schema");
 
 module.exports = (app) => {
     app
@@ -16,7 +13,6 @@ module.exports = (app) => {
     app
         .route("/api/products/:id")
         .get(controller.getProduct)
-        .put(validate(productUploadSchema), controller.putProduct)
-        .patch(validate(productUpdateSchema), controller.patchProduct)
+        .patch(validate(productUpdateSchema), controller.updateProduct)
         .delete(controller.deleteProduct);
 };
