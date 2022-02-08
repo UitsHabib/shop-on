@@ -1,4 +1,5 @@
 const { object, string, number } = require("yup");
+const multer = require("multer");
 
 const productUploadSchema = object().shape({
     product_name: string()
@@ -41,5 +42,17 @@ const productUpdateSchema = object().shape({
         .min(1, 'Minimum 1 product is required.'),
 });
 
+const validateFile = (upload) => {
+    return function (req, res, next) {
+        upload(req, res, function (err) {
+            if (err instanceof multer.MulterError) return res.status(400).send(err);
+            else if (err) return res.status(400).send(err);
+
+            next();
+        });
+    }
+}
+
 module.exports.productUploadSchema = productUploadSchema;
 module.exports.productUpdateSchema = productUpdateSchema;
+module.exports.validateFile = validateFile;
