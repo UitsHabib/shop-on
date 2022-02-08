@@ -9,14 +9,15 @@ Thumbs.db
 # ==========================
 .nodemonignore
 node_modules
-package-lock.json
-yarn.lock
 .bower-*/
 bower_components
 coverage
 *.env
 .env.development
 .env.production
+tmpnodejsnpm-cache
+package-lock.json
+yarn.lock
 
 # General
 # =======
