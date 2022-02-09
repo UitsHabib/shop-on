@@ -1,10 +1,21 @@
 const Product = require("./product.model");
+const { getPagination, getPagingData } = require("./services/product.service");
 
 async function getProducts(req, res) {
     try {
-        const products = await Product.findAll();
+        const { page, offset, limit, order } = getPagination(req);
 
-        res.status(200).send(products);
+        const products = await Product.findAll({
+            offset,
+            limit,
+            order
+        });
+
+        const total = await Product.count();
+
+        const data = getPagingData(total, page, offset, limit, products);
+
+        res.status(200).send(data);
     } catch (err) {
         console.error(err);
         res.status(500).send("Internal server error!");
