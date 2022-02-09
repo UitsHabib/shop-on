@@ -27,7 +27,7 @@ const shopRegisterSchema = object().shape({
     description: string(),
     license_number: string()
         .required('License number is required.'),
-    is_active: boolean('Must be boolean.')
+    is_active: boolean('Must be boolean.'),
 });
 
 const shopUpdateSchema = object().shape({

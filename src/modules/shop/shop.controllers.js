@@ -1,5 +1,6 @@
 const path = require("path");
-const Product = require('../product/product.model');
+const Product = require(path.join(process.cwd(), 'src/modules/product/product.model'));
+const Order = require(path.join(process.cwd(), 'src/modules/order/order.model'));
 const { generateAccessToken } = require('./services/shop.service');
 const Shop = require('./shop.model');
 const cloudinary = require(path.join(process.cwd(), 'src/config/lib/cloudinary'));
@@ -22,8 +23,6 @@ async function registerShop(req, res) {
             password,
             license_number
         });
-
-        res.cookie("access_token", generateAccessToken(shop), { httpOnly: true, sameSite: true, signed: true });
 
         res.status(201).send(shop);
     }
@@ -138,9 +137,12 @@ async function deleteShop(req, res) {
         })
         if (!shop) return res.status(404).send('Shop not found.');
 
-        Product.destroy({
-            where: { shop_id: id }
+        const product = await Product.findOne({
+            where: { 
+                shop_id: id
+            }
         })
+        if (product) return res.status(400).send('Shop can not be deleted it has some products.');
 
         await shop.destroy();
 
@@ -257,6 +259,98 @@ async function getShopProduct(req, res) {
     }
 }
 
+async function getShopOrders(req, res) {
+    try {
+        const { id } = req.params;
+
+        const page = +req.query.page || 1;
+        const limit = +req.query.limit || 15;
+        const offset = (page - 1) * limit;
+        let { orderBy, orderType } = req.query;
+        orderType = orderType || 'asc';
+        let order = [['created_at', 'desc']];
+
+        if (orderBy) {
+            order.push([orderBy, orderType]);
+        }
+
+        const orders = await Order.findAll({
+            where: {
+                shop_id: id
+            },
+            include: [
+                {
+                    model: Shop,
+                    as: 'shops'
+                }
+            ],
+            offset,
+            limit,
+            order
+        });
+
+        const total = await Order.count();
+
+        const data = {
+            orders,
+            meta: {
+                start: offset + 1,
+                end: Math.min(total, page * limit),
+                total,
+                page
+            }
+        };
+
+        res.status(200).send(data);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error.');
+    }
+}
+
+async function getShopOrder(req, res) {
+    try {
+        const { id, orderId } = req.params;
+
+        const order = await Order.findOne({
+            where: {
+                id: orderId,
+                shop_id: id
+            },
+            include: [
+                {
+                    model: Shop,
+                    as: 'shops'
+                }
+            ]
+        });
+        if (!order) return res.status(404).send("Order not found.");
+
+        res.status(200).send(order);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error.');
+    }
+}
+
+async function acceptOrder(req, res) {
+    const { id, orderId } = req.params;
+
+	const order = await Order.findOne({
+		where: {
+			id: orderId,
+			shop_id: id
+		}
+	});
+	if (!order) return res.status(404).send("Order not found.");
+
+    await order.update({ status: "accept" });
+
+    res.status(200).send(order);
+}
+
 
 module.exports.registerShop = registerShop;
 module.exports.getShop = getShop;
@@ -267,3 +361,6 @@ module.exports.login = login;
 module.exports.logout = logout;
 module.exports.getShopProducts = getShopProducts;
 module.exports.getShopProduct = getShopProduct;
+module.exports.getShopOrders = getShopOrders;
+module.exports.getShopOrder = getShopOrder;
+module.exports.acceptOrder = acceptOrder;

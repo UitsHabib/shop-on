@@ -1,5 +1,6 @@
 const path = require('path');
 const async = require('async');
+const crypto = require('crypto');
 
 async function init() {
     const config = require(path.join(process.cwd(), 'src/config/config'));
@@ -37,8 +38,8 @@ async function init() {
                 email: 'support@example.com'
             },
             defaults: {
-                password: 'Aa@45678',
                 shop_name: 'shop 1',
+                password: 'Aa@45678',
                 description: 'Demo shop.',
                 license_number: "df345rtr435rt"
             }

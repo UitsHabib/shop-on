@@ -1,5 +1,5 @@
 const path = require("path");
-const multer = require("../../config/lib/multer");
+const multer = require(path.join(process.cwd(), "src/config/lib/multer"));
 const { AuthStrategy } = require("./shop-authentication.middleware");
 const controller = require("./shop.controllers");
 const { shopRegisterSchema, shopUpdateSchema, validateFile } = require("./shop.schema");
@@ -11,8 +11,7 @@ module.exports = (app) => {
 
     app.get('/api/shops/logout', controller.logout);
 
-    app.route('/api/shops')
-        .post(validate(shopRegisterSchema), controller.registerShop);
+    app.post('/api/shops', validate(shopRegisterSchema), controller.registerShop);
 
     app.route('/api/shops/:id')
         .get(AuthStrategy, controller.getShop)
@@ -23,4 +22,10 @@ module.exports = (app) => {
     app.get("/api/shops/:id/products", AuthStrategy, controller.getShopProducts);
 
     app.get("/api/shops/:id/products/:productId", AuthStrategy, controller.getShopProduct);
+
+    app.get("/api/shops/:id/orders", AuthStrategy, controller.getShopOrders);
+
+    app.get("/api/shops/:id/orders/:orderId", AuthStrategy, controller.getShopOrder);
+
+    app.patch("/api/shops/:id/orders/:orderId/accept-order", AuthStrategy, controller.acceptOrder);
 }

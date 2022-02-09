@@ -27,7 +27,7 @@ const Shop = sequelize.define('shops', {
         }
     },
     description: {
-        type: DataTypes.STRING(2000)
+        type: DataTypes.STRING(2048)
     },
     license_number: {
         type: DataTypes.STRING(255),
@@ -39,7 +39,7 @@ const Shop = sequelize.define('shops', {
         defaultValue: '1'
     },
     shop_profile_image: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING(1024)
     }
 }, {
     tableName: 'shops',
