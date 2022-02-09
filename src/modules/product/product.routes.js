@@ -1,7 +1,10 @@
 const path = require("path");
 const controller = require("./product.controller");
-const validate = require(path.join(process.cwd(), "src/modules/core/middlewares/validate"));
-
+const multer = require('../../modules/product/product.multer');
+const validate = require(path.join(
+    process.cwd(),
+    "src/modules/core/middlewares/validate"
+));
 const {
     productUploadSchema,
     productUpdateSchema,
