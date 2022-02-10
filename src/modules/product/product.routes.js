@@ -1,18 +1,18 @@
 const path = require("path");
 const controller = require("./product.controller");
+const multer = require(path.join(process.cwd(), "src/config/lib/multer"));
 const validate = require(path.join(process.cwd(), "src/modules/core/middlewares/validate"));
-
-const { productUploadSchema, productUpdateSchema } = require("./product.schema");
+const { productUploadSchema, productUpdateSchema, validateFile } = require("./product.schema");
 
 module.exports = (app) => {
     app
         .route("/api/products")
         .get(controller.getProducts)
-        .post(validate(productUploadSchema), controller.addProduct);
+        .post(validateFile(multer.single('product_image')), validate(productUploadSchema), controller.addProduct);
 
     app
         .route("/api/products/:id")
         .get(controller.getProduct)
-        .patch(validate(productUpdateSchema), controller.updateProduct)
+        .patch(validateFile(multer.single('product_image')), validate(productUpdateSchema), controller.updateProduct)
         .delete(controller.deleteProduct);
 };

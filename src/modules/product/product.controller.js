@@ -49,6 +49,7 @@ async function addProduct(req, res) {
             price,
             description,
             category,
+            product_image: req.file.filename
         });
 
         res.status(201).send(product);
