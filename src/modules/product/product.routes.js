@@ -7,12 +7,20 @@ const { productUploadSchema, productUpdateSchema, validateFile } = require("./pr
 module.exports = (app) => {
     app
         .route("/api/products")
-        .get(controller.getProducts)
-        .post(validateFile(multer.single('product_image')), validate(productUploadSchema), controller.addProduct);
+        .get(controller.getProducts);
 
     app
         .route("/api/products/:id")
+        .get(controller.getProduct);
+
+    app
+        .route("/api/shops/:id/products/:id")
         .get(controller.getProduct)
         .patch(validateFile(multer.single('product_image')), validate(productUpdateSchema), controller.updateProduct)
         .delete(controller.deleteProduct);
+
+    app
+        .route("/api/shops/:id/products/")
+        .get(controller.getProducts)
+        .post(validateFile(multer.single('product_image')), validate(productUploadSchema), controller.addProduct);
 };

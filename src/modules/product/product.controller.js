@@ -73,6 +73,7 @@ async function updateProduct(req, res) {
         if (!product) return res.status(404).send("Product not found!");
 
         if (name) product.update({ name });
+        if (req.file) product.update({ product_image: req.file.filename });
         if (price) product.update({ price });
         if (description) product.update({ description });
         if (category) product.update({ category });

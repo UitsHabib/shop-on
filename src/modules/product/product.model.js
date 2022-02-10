@@ -3,32 +3,26 @@ const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 const { DataTypes } = require('sequelize');
 
 const Product = sequelize.define('products', {
-    product_name: {
-        allowNull: false,
+    shop_id: {          // Foreign key of shops table.
+        type: DataTypes.INTEGER,
+    },
+    category_id: {         // Foreign key of categories table.
+        type: DataTypes.INTEGER,
+    },
+    name: {
         type: DataTypes.STRING,
     },
-    product_image: {
+    image: {
         type: DataTypes.STRING(1024)
     },
     price: {
-        allowNull: false,
         type: DataTypes.DECIMAL(10, 2),
     },
     description: {
-        allowNull: true,
         type: DataTypes.STRING,
     },
-    category: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    quantity: {
-        allowNull: false,
+    stock_quantity: {
         type: DataTypes.INTEGER,
-    },
-    shop_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false
     },
 }, {
     tableName: 'products',
