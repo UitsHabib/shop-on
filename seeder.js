@@ -16,6 +16,8 @@ async function init() {
     const UserProfile = require(path.join(process.cwd(), 'src/modules/user/user-profile.model'));
     const Shop = require(path.join(process.cwd(), 'src/modules/shop/shop.model'));
     const Product = require(path.join(process.cwd(), 'src/modules/product/product.model'));
+    const Category = require(path.join(process.cwd(), 'src/modules/category/category.model'));
+    const SubCategory = require(path.join(process.cwd(), 'src/modules/category/sub-category.model'));
     require(path.join(process.cwd(), 'src/modules/product/product.model'));
 
     await sequelize.sync();
@@ -97,12 +99,41 @@ async function init() {
         })
     }
 
+    function categorySeeder(callback) {
+        Category.findOrCreate({
+            where: {
+                id: 1
+            },
+            defaults: {
+                category: 'Category 1'
+            }
+        }).then(function () {
+            callback();
+        });
+    }
+
+    function subCategorySeeder(callback) {
+        SubCategory.findOrCreate({
+            where: {
+                id: 1
+            },
+            defaults: {
+                category_id: 1,
+                sub_category: 'Sub Category 1'
+            }
+        }).then(function () {
+            callback();
+        });
+    }
+
     async.waterfall([
         userSeeder,
         shopSeeder,
         productSeeder,
         userProfileSeeder,
-        userUpdateSeeder
+        userUpdateSeeder,
+        categorySeeder,
+        subCategorySeeder
     ], function (err) {
         if (err) console.error(err);
         else console.info('DB seed completed!');

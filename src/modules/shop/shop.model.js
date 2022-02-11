@@ -52,4 +52,6 @@ Shop.prototype.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 }
 
+Shop.hasMany(Product, { as: 'products', foreignKey: 'shop_id' });
+
 module.exports = Shop;

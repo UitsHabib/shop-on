@@ -388,19 +388,24 @@ async function getShopOrder(req, res) {
 }
 
 async function acceptOrder(req, res) {
-    const { id, orderId } = req.params;
+    try {
+        const { id, orderId } = req.params;
 
-	const order = await Order.findOne({
-		where: {
-			id: orderId,
-			shop_id: id
-		}
-	});
-	if (!order) return res.status(404).send("Order not found.");
+        const order = await Order.findOne({
+            where: {
+                id: orderId,
+                shop_id: id
+            }
+        });
+        if (!order) return res.status(404).send("Order not found.");
 
-    await order.update({ order_status: "accept" });
+        await order.update({ order_status: "accept" });
 
-    res.status(200).send(order);
+        res.status(200).send(order);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error.');
+    }
 }
 
 
