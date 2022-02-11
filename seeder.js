@@ -1,6 +1,5 @@
 const path = require('path');
 const async = require('async');
-const crypto = require('crypto');
 
 async function init() {
     const config = require(path.join(process.cwd(), 'src/config/config'));
