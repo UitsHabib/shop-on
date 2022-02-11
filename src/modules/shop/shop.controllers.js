@@ -6,6 +6,36 @@ const Shop = require('./shop.model');
 const cloudinary = require(path.join(process.cwd(), 'src/config/lib/cloudinary'));
 
 
+async function login(req, res) {
+    try {
+        const { email, password } = req.body;
+
+        const shop = await Shop.findOne({
+            where: {
+                email
+            }
+        })
+
+        if (!shop || !shop.password || !shop.validPassword(password))
+            return res.status(400).send('Invalid Credentials.');
+
+        res.cookie("access_token", generateAccessToken(shop), { httpOnly: true, sameSite: true, signed: true });
+
+        res.status(200).send(shop);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error.');
+    }
+}
+
+async function logout(req, res) {
+    res.clearCookie("access_token");
+    res.clearCookie("refresh_token")
+    res.status(200).send('Logged out.');
+}
+
+
 async function registerShop(req, res) {
     try {
         const { shop_name, email, password, license_number } = req.body;
@@ -154,34 +184,6 @@ async function deleteShop(req, res) {
     }
 }
 
-async function login(req, res) {
-    try {
-        const { email, password } = req.body;
-
-        const shop = await Shop.findOne({
-            where: {
-                email
-            }
-        })
-
-        if (!shop || !shop.password || !shop.validPassword(password))
-            return res.status(400).send('Invalid Credentials.');
-
-        res.cookie("access_token", generateAccessToken(shop), { httpOnly: true, sameSite: true, signed: true });
-
-        res.status(200).send(shop);
-    }
-    catch (error) {
-        console.log(error);
-        res.status(500).send('Internal server error.');
-    }
-}
-
-async function logout(req, res) {
-    res.clearCookie("access_token");
-    res.clearCookie("refresh_token")
-    res.status(200).send('Logged out.');
-}
 
 async function getShopProducts(req, res) {
     try {
@@ -258,6 +260,56 @@ async function getShopProduct(req, res) {
         res.status(500).send('Internal server error.');
     }
 }
+
+async function deleteShopProduct(req, res) {
+    try {
+        const { id, productId } = req.params;
+
+        const product = await Product.findOne({
+            where: {
+                id: productId,
+                shop_id: id
+            },
+            include: [
+                {
+                    model: Shop,
+                    as: 'shops'
+                }
+            ]
+        });
+        if (!product) return res.status(404).send("Product not found.");
+
+        await product.destroy();
+
+        res.status(200).send(product);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error.');
+    }
+}
+
+async function deleteShopProducts(req, res) {
+    try {
+        const { id } = req.params;
+
+        const shop = await Shop.findOne({
+            where: {
+                id
+            }
+        })
+        if (!shop) return res.status(404).send('Shop not found.');
+
+        Product.destroy({
+            where: { shop_id: id }
+        })
+
+        res.status(200).send('Successfully deleted all products.');
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error.');
+    }
+}
+
 
 async function getShopOrders(req, res) {
     try {
@@ -346,21 +398,26 @@ async function acceptOrder(req, res) {
 	});
 	if (!order) return res.status(404).send("Order not found.");
 
-    await order.update({ status: "accept" });
+    await order.update({ order_status: "accept" });
 
     res.status(200).send(order);
 }
 
+
+module.exports.login = login;
+module.exports.logout = logout;
 
 module.exports.registerShop = registerShop;
 module.exports.getShop = getShop;
 module.exports.updateShop = updateShop;
 module.exports.updateShopInfo = updateShopInfo;
 module.exports.deleteShop = deleteShop;
-module.exports.login = login;
-module.exports.logout = logout;
+
 module.exports.getShopProducts = getShopProducts;
 module.exports.getShopProduct = getShopProduct;
+module.exports.deleteShopProduct = deleteShopProduct;
+module.exports.deleteShopProducts = deleteShopProducts;
+
 module.exports.getShopOrders = getShopOrders;
 module.exports.getShopOrder = getShopOrder;
 module.exports.acceptOrder = acceptOrder;

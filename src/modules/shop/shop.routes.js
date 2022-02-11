@@ -19,9 +19,13 @@ module.exports = (app) => {
         .patch(AuthStrategy, validateFile(multer.single('shop_profile_image')), validate(shopUpdateSchema), controller.updateShopInfo)
         .delete(AuthStrategy, controller.deleteShop);
 
-    app.get("/api/shops/:id/products", AuthStrategy, controller.getShopProducts);
+    app.route("/api/shops/:id/products")
+        .get(AuthStrategy, controller.getShopProducts)
+        .delete(AuthStrategy, controller.deleteShopProducts);
 
-    app.get("/api/shops/:id/products/:productId", AuthStrategy, controller.getShopProduct);
+    app.route("/api/shops/:id/products/:productId")
+        .get(AuthStrategy, controller.getShopProduct)
+        .delete(AuthStrategy, controller.deleteShopProduct);
 
     app.get("/api/shops/:id/orders", AuthStrategy, controller.getShopOrders);
 
