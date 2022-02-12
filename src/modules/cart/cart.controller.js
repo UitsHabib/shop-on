@@ -1,8 +1,9 @@
 const path = require('path');
 const Cart = require('./cart.model');
-const User = require(path.join(process.cwd(), "src/modules/user/user.model"))
-const Product = require(path.join(process.cwd(), "src/modules/product/product.model"))
-const getAllCart = async (req, res) => {
+const User = require(path.join(process.cwd(), "src/modules/user/user.model"));
+const Product = require(path.join(process.cwd(), "src/modules/product/product.model"));
+
+const getCartByUser = async (req, res) => {
   try {
     const cart = await Cart.findOne({
       where: {
@@ -39,5 +40,31 @@ const getAllCart = async (req, res) => {
   }
 };
 
+const addToCart = async (req, res) => {
+  Cart.findOne({
+    where: {
+      user_id: req.body.user_id
+    }
+  }).then(user => {
+    if (user) {
+      Cart.destroy({
+        where: {
+          user_id: req.body.user_id
+        }
+      }).then(c => {
+        if (req.body.cart_items.length > 0) {
+          Cart.create(req.body)
+            .then(res.send("Inserted in Cart Successfully"));
+        } else res.send("Cart is Empty!");
+      });
+    } else {
+      if (req.body.cart_items.length > 0) {
+        Cart.create(req.body)
+          .then(res.send("Inserted in Cart Successfully"));
+      } else res.send("Cart is Empty!");
+    }
+  });
+}
 
-module.exports.getAllCart = getAllCart;
+module.exports.gegetCartByUser = getCartByUser;
+module.expports.addToCart = addToCart;
