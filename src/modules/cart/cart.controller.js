@@ -67,4 +67,4 @@ const addToCart = async (req, res) => {
 }
 
 module.exports.gegetCartByUser = getCartByUser;
-module.expports.addToCart = addToCart;
+module.exports.addToCart = addToCart;
