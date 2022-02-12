@@ -12,7 +12,7 @@ module.exports = (app) => {
 
   app
     .route("/api/cart/:id")
-    .get(controller.getAllCart)
-    .patch(controller.patchProduct)
-    .delete(controller.deleteProduct);
+    .get(controller.getCartByUser)
+  // .patch(controller.patchProduct)
+  // .delete(controller.deleteProduct);
 };
