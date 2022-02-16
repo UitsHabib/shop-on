@@ -24,6 +24,11 @@ const Product = sequelize.define('products', {
     stock_quantity: {
         type: DataTypes.INTEGER,
     },
+    stock: {
+        type: DataTypes.ENUM,
+        values: ['available', 'sold out'],
+        defaultValue: 'available'
+    }
 }, {
     tableName: 'products',
     timestamps: true,
