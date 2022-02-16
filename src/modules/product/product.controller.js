@@ -1,4 +1,6 @@
 const Product = require("./product.model");
+const Category = require("./category.model");
+
 const { getPagination, getPagingData } = require("./services/product.service");
 
 async function getProducts(req, res) {
@@ -107,8 +109,56 @@ async function deleteProduct(req, res) {
     }
 };
 
+async function getCategories(req, res) {
+    try {
+        const { page, offset, limit, order } = getPagination(req);
+
+        const products = await Category.findAll({
+            offset,
+            limit,
+            order
+        });
+
+        const total = await Category.count();
+
+        const data = getPagingData(total, page, offset, limit, products);
+
+        res.status(200).send(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Internal server error!");
+    }
+};
+
+async function addCategory(req, res) {
+    try {
+        const { shop_id, name, description } = req.body;
+
+        const product = await Product.findOne({
+            where: {
+                id,
+            },
+        });
+
+        if (!product) return res.status(404).send("Product not found!");
+
+        const category = await Category.create({
+            shop_id,
+            name,
+            description
+        });
+
+        res.status(201).send(category);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Internal server error!");
+    }
+};
+
 module.exports.getProducts = getProducts;
 module.exports.getProduct = getProduct;
 module.exports.addProduct = addProduct;
 module.exports.updateProduct = updateProduct;
 module.exports.deleteProduct = deleteProduct;
+module.exports.getCategories = getCategories;
+module.exports.addCategory = addCategory;
