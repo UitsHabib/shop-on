@@ -9,9 +9,7 @@ async function init() {
 
     const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 
-    await sequelize.query(
-        `CREATE DATABASE IF NOT EXISTS ${nodecache.getValue("DB_NAME")}`
-    );
+    await sequelize.query(`CREATE DATABASE IF NOT EXISTS ${nodecache.getValue("DB_NAME")}`);
 
     const User = require(path.join(process.cwd(), "src/modules/platform/user/user.model"));
     const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/profile.model"));
@@ -108,12 +106,17 @@ async function init() {
         });
     }
 
-    function userUpdateSeeder(callback) {
-        User.findOne({
-            where: { email: 'habiburrahman3089@gmail.com' }
-        }).then(admin => {
-            UserProfile.findOne({ where: { title: 'System Admin' } }).then(sysAdminProfile => {
-                admin.update({ profile_id: sysAdminProfile.id }).then(function () {
+    function permissionSeeder(callback) {
+        User.findOne({ where: { email: 'habiburrahman3089@gmail.com' } }).then(admin => {
+            const permission = [
+                { title: "System Admin Permission", slug: "system-admin", type: 'standard', description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
+            ];
+
+            Permission.destroy({ truncate: { cascade: true } }).then(() => {
+                Permission.bulkCreate(permission, {
+                    returning: true,
+                    ignoreDuplicates: false
+                }).then(function () {
                     callback();
                 });
             });
