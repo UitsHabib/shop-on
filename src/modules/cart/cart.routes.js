@@ -7,11 +7,11 @@ const validate = require(path.join(
 
 module.exports = (app) => {
   app
-    .route("/api/Cart")
+    .route("/api/carts/users/:userId")
     .post(controller.addToCart);
 
   app
-    .route("/api/cart/:id")
+    .route("/api/cart/:id/users/:userId")
     .get(controller.getCartByUser)
   // .patch(controller.patchProduct)
   // .delete(controller.deleteProduct);
