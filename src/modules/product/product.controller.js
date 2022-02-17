@@ -5,7 +5,16 @@ const { getPagination, getPagingData } = require("./services/product.service");
 
 async function getProducts(req, res) {
     try {
-        const { page, offset, limit, order } = getPagination(req);
+        const page = +req.query.page || 1;
+        const limit = +req.query.limit || 15;
+        const offset = (page - 1) * limit;
+        let { orderBy, orderType } = req.query;
+        orderType = orderType || 'asc';
+        let order = [['created_at', 'desc']];
+
+        if (orderBy) {
+            order.push([orderBy, orderType]);
+        }
 
         const products = await Product.findAll({
             offset,
@@ -15,7 +24,15 @@ async function getProducts(req, res) {
 
         const total = await Product.count();
 
-        const data = getPagingData(total, page, offset, limit, products);
+        const data = {
+            meta: {
+                start: offset + 1,
+                end: Math.min(total, page * limit),
+                total,
+                page
+            },
+            products
+        };
 
         res.status(200).send(data);
     } catch (err) {
