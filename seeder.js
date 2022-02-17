@@ -108,26 +108,12 @@ async function init() {
         });
     }
 
-<<<<<<< HEAD
     function userUpdateSeeder(callback) {
         User.findOne({
             where: { email: 'habiburrahman3089@gmail.com' }
         }).then(admin => {
             UserProfile.findOne({ where: { title: 'System Admin' } }).then(sysAdminProfile => {
                 admin.update({ profile_id: sysAdminProfile.id }).then(function () {
-=======
-    function permissionSeeder(callback) {
-        User.findOne({ where: { email: 'habiburrahman3089@gmail.com' } }).then(admin => {
-            const permission = [
-                { title: "System Admin Permission", slug: "system-admin", type: 'standard', description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
-            ];
-
-            Permission.destroy({ truncate: { cascade: true } }).then(() => {
-                Permission.bulkCreate(permission, {
-                    returning: true,
-                    ignoreDuplicates: false
-                }).then(function () {
->>>>>>> 24a221209c8e1011643ce6247725df47e2506a85
                     callback();
                 });
             });
