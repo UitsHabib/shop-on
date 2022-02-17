@@ -13,7 +13,7 @@ const Category = sequelize.define('categories', {
         type: DataTypes.STRING(500)
     }
 }, {
-    tableName: 'products',
+    tableName: 'categories',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
