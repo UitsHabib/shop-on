@@ -1,17 +1,15 @@
 const { object, string, ref } = require('yup');
 
 const isEmailLengthValid = email => {
-    if (!email) return false;
-    const part = email.split('@');
-    const emailParts = part[0];
-    return emailParts.length <= 64;
+    if (email) {
+        const part = email.split('@');
+        const emailParts = part[0];
+        return emailParts.length <= 64;    
+    }
+    return true;
 }
 
 const userRegisterSchema = object().shape({
-    username: string()
-        .min(3, 'Username must be at least 3 characters.')
-        .max(50, 'Username must be at most 50 character long.')
-        .required('Username is required.'),
     email: string()
         .email('This field should be a valid email address.')
         .max(100, 'Email must be at most 100 characters long.')
@@ -28,9 +26,6 @@ const userRegisterSchema = object().shape({
 });
 
 const userUpdateSchema = object().shape({
-    username: string()
-        .min(3, 'Username must be at least 3 characters.')
-        .max(50, 'Username must be at most 50 characters long.'),
     email: string()
         .email('This field should be a valid email address.')
         .max(100, 'Email must be at most 100 characters long.')
