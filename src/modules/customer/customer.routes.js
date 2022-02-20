@@ -23,5 +23,9 @@ module.exports = (app) => {
 
     app.route('/api/customers/orders/:id')
         .get(AuthStrategy, controller.getOrder);
+
+    app.route('/api/customers/carts')
+        .get(AuthStrategy, controller.getCart)
+        .post(AuthStrategy, controller.addToCart);
 };
 

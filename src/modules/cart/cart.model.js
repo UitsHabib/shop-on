@@ -1,29 +1,34 @@
-const path = require('path');
-const sequelize = require(path.join(process.cwd(), 'src/config/lib/sequelize'));
-const { DataTypes } = require('sequelize');
+const path = require("path");
+const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
+const { DataTypes } = require("sequelize");
+const Product = require(path.join(process.cwd(), "src/modules/product/product.model"));
 
-const Cart = sequelize.define('cart', {
-  quantity: {
-    type: DataTypes.INTEGER,
-  },
-  product_id: {
-    type: DataTypes.INTEGER,
-  },
-  customer_id: {
-    type: DataTypes.INTEGER,
-  },
-  created_by: {
-    type: DataTypes.INTEGER
-  },
-  updated_by: {
-    type: DataTypes.INTEGER
-  },
-
+const Cart = sequelize.define("carts", {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+    },
+    customer_id: {
+        allowNull: false,
+        type: DataTypes.UUID,
+    },
+    product_id: {
+        allowNull: false,
+        type: DataTypes.UUID,
+    },
+    quantity: {
+        allowNull: false,
+        type: DataTypes.INTEGER,
+    }
 }, {
-  tableName: 'cart',
-  timestamps: true,
-  createdAt: 'created_at',
-  updatedAt: 'updated_at'
+    tableName: "carts",
+    timestamps: true,
+    createdAt: "created_at",
+    updatedAt: "updated_at",
 });
 
-module.exports = Cart
+Cart.belongsTo(Product, { as: 'product', foreignKey: 'product_id' });
+
+module.exports = Cart;

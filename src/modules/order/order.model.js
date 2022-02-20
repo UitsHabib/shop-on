@@ -14,10 +14,6 @@ const Order = sequelize.define('orders', {
         allowNull: false,
         type: DataTypes.UUID
     },  
-    total_price: {
-        allowNull: false,
-        type: DataTypes.DECIMAL(10, 2)
-    },
     status: {
         type: DataTypes.ENUM,
         values: ['pending', 'confirmed'],
@@ -28,6 +24,10 @@ const Order = sequelize.define('orders', {
         values: ['process-pending', 'processing', 'success', 'failed'],
         defaultValue: 'process-pending' 
     },
+    shipped_date: {
+        allowNull: true,
+        type: DataTypes.DATE
+    }
 }, {
     tableName: 'orders',
     timestamps: true,

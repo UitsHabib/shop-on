@@ -1,4 +1,5 @@
 const path = require("path");
+const Cart = require(path.join(process.cwd(), 'src/modules/cart/cart.model'));
 const Customer = require(path.join(process.cwd(), 'src/modules/customer/customer.model'));
 const { generateAccessToken } = require(path.join(process.cwd(), 'src/modules/customer/services/customer.service'));
 const cloudinary = require(path.join(process.cwd(), 'src/config/lib/cloudinary'));
@@ -116,8 +117,8 @@ async function getOrders (req, res) {
 
 async function getOrder (req, res) {
     try {
-        const orders = await Order.findOne({
-            where: { customer_id: req.user.id },
+        const order = await Order.findOne({
+            where: { id: req.params.id },
             include: [{
                 model: OrderProduct,
                 as: "order_products",
@@ -134,7 +135,7 @@ async function getOrder (req, res) {
             }]
         });
 
-        res.status(200).send(orders);
+        res.status(200).send(order);
         
     } catch (err) {
         console.error(err);
@@ -144,7 +145,112 @@ async function getOrder (req, res) {
 
 async function createOrder (req, res) {
     try {
-        
+        const carts = await Cart.findAll({
+            where: {
+                customer_id: req.user.id
+            },
+            include: [
+                {
+                    model: Product,
+                    as: 'product'
+                }
+            ]
+        });
+
+        await Cart.destroy({
+            where: {
+                customer_id: req.user.id
+            }
+        });
+
+        const order = await Order.create({ customer_id: req.user.id });
+
+        await Promise.all(carts.map(async cart => {
+            await OrderProduct.create({
+                order_id: order.id,
+                product_id: cart.product_id,
+                quantity: cart.quantity,
+                price: cart.product.price,
+                discount: cart.product.discount
+            });
+        }));
+
+        const currentOrder = await Order.findOne({
+            where: {
+                id: order.id
+            },
+            include: [
+                {
+                    model: OrderProduct,
+                    as: 'order_products',
+                    include: [
+                        {
+                            model: Product,
+                            as: 'product',
+                            include: [
+                                {
+                                    model: Shop,
+                                    as: 'shop'
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        });
+
+        res.status(201).send(currentOrder);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("Internal server error!");
+    }
+}
+
+async function addToCart (req, res) {
+    try {
+        const { product_id, quantity } = req.body;
+
+        const [cart, created] = await Cart.findOrCreate({
+            where: { 
+                customer_id: req.user.id,
+                product_id
+            },
+            defaults: {
+                customer_id: req.user.id,
+                product_id,
+                quantity
+            },
+        });
+
+        if(cart) await cart.update({ quantity });
+
+        res.status(201).send((cart || created));
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("Internal server error!");
+    }
+}
+
+async function getCart (req, res) {
+    try {
+        const cart = await Cart.findAll({ 
+            where: { 
+                customer_id: req.user.id 
+            },
+            include: [{
+                model: Product,
+                as: "product",
+                attributes: ["id", "name", "price"],
+                include: [{
+                    model: Shop,
+                    as: 'shop'
+                }]  
+            }]
+        });
+
+        res.send(cart);
     }
     catch (err) {
         console.error(err);
@@ -160,3 +266,5 @@ module.exports.updateSignedInCustomerProfile = updateSignedInCustomerProfile;
 module.exports.getOrders = getOrders;
 module.exports.getOrder = getOrder;
 module.exports.createOrder = createOrder;
+module.exports.addToCart = addToCart;
+module.exports.getCart = getCart;

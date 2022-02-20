@@ -23,6 +23,14 @@ const OrderProduct = sequelize.define('order_products', {
         allowNull: false,        
         type: DataTypes.INTEGER
     },
+    price: {
+        allowNull: false,
+        type: DataTypes.DECIMAL(10, 2)
+    },
+    discount: {
+        type: DataTypes.DECIMAL(10, 2),
+        defaultValue: 0
+    }
 }, {
     tableName: 'order_products',
     timestamps: true,
