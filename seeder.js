@@ -31,21 +31,16 @@ async function init() {
     await sequelize.sync();
 
     function userSeeder(callback) {
-        try {
-            User.findOrCreate({
-                where: { email: "habiburrahman3089@gmail.com" },
-                defaults: {
-                    first_name: "System",
-                    last_name: "Admin",
-                    password: "P@ssword123",
-                },
-            }).then(function () {
-                callback();
-            });
-        }
-        catch (err) {
-            console.log(err);
-        }
+        User.findOrCreate({
+            where: { email: "habiburrahman3089@gmail.com" },
+            defaults: {
+                first_name: "System",
+                last_name: "Admin",
+                password: "P@ssword123",
+            },
+        }).then(function () {
+            callback();
+        });
     }
 
     function profileSeeder(callback) {
@@ -107,7 +102,6 @@ async function init() {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
-                    console.log('User Profile Seeder Completed');
                     callback();
                 });
             });
