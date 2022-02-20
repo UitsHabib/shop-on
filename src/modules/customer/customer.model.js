@@ -3,6 +3,12 @@ const path = require("path");
 const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 const { DataTypes } = require("sequelize");
 const Customer = sequelize.define("customers", {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+    },
     first_name: {
         allowNull: false,
         type: DataTypes.STRING(50)
@@ -45,13 +51,7 @@ const Customer = sequelize.define("customers", {
     },
     password_updated_at: {
         type: DataTypes.DATE
-    },
-    created_at: {
-        type: DataTypes.DATE
-    },
-    updated_at: {
-        type: DataTypes.DATE
-    },
+    }
 }, {
     tableName: 'customers',
     timestamps: true,

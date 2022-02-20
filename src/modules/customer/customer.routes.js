@@ -11,7 +11,7 @@ module.exports = (app) => {
     app.get('/api/customer/logout', AuthStrategy, controller.logout);
 
     app.route('/api/customers')
-        .post(validate(customerRegisterSchema), controller.createCustomer);
+        .post(validate(customerRegisterSchema), controller.registerCustomer);
 
     app.route('/api/customers/:id')
         .get(AuthStrategy, controller.getCustomer)

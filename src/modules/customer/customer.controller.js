@@ -106,37 +106,22 @@ const getCustomer = async (req, res) => {
     }
 };
 
-const createCustomer = async (req, res) => {
+const registerCustomer = async (req, res) => {
     try {
-        const { username, email, password, customer_type_id } = req.body;
+        const { username, email, password } = req.body;
 
-        const existCustomer = await Customer.findOne({
-            where: {
+        const [customer, created] = await Customer.findOrCreate({
+            where: { email: email.toLowerCase() },
+            defaults: {
+                username,
                 email,
+                password,
             },
         });
 
-        if (existCustomer)
-            return res
-                .status(400)
-                .send("Already registered with this email address.");
+        if (!created) return res.status(400).send("Already registered with this email address.");
 
-        const customer = await Customer.create({
-            username,
-            email,
-            password,
-            customer_type_id: customer_type_id,
-        });
-
-        res.status(201).send({
-            status: "success",
-            message: "Customer created successfully!",
-            data:
-            {
-                email: customer.email,
-                username: customer.username,
-            }
-        });
+        res.status(201).send(customer);
     } catch (err) {
         console.log(err);
         res.status(500).send("Internal server error!");
@@ -222,7 +207,7 @@ module.exports.login = login;
 module.exports.logout = logout;
 module.exports.getCustomers = getCustomers;
 module.exports.getCustomer = getCustomer;
-module.exports.createCustomer = createCustomer;
+module.exports.registerCustomer = registerCustomer;
 module.exports.updateCustomer = updateCustomer;
 module.exports.updateCustomerDetails = updateCustomerDetails;
 module.exports.deleteCustomer = deleteCustomer;
