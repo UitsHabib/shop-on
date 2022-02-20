@@ -1,4 +1,3 @@
-const jwt = require("jsonwebtoken");
 const passport = require("passport");
 
 const AuthStrategy = (req, res, next) => { 
@@ -7,6 +6,7 @@ const AuthStrategy = (req, res, next) => {
             console.log(err);
             return res.status(500).send("Internal server error.");
         }
+
         if (!customer) return res.status(401).send("Unauthenticated customer.");
 
         req.logIn(customer, { session: false }, function (error) {
@@ -14,6 +14,7 @@ const AuthStrategy = (req, res, next) => {
             next();
         });
     });
+
     auth(req, res, next);
 }
 

@@ -1,70 +1,19 @@
 const path = require("path");
-const Customer = require("./customer.model");
-const { generateAccessToken } = require("./services/customer.service");
+const Customer = require(path.join(process.cwd(), 'src/modules/customer/customer.model'));
+const { generateAccessToken } = require(path.join(process.cwd(), 'src/modules/customer/services/customer.service'));
 const cloudinary = require(path.join(process.cwd(), 'src/config/lib/cloudinary'));
-
-
-async function updateAvatar(req, res, next) {
-    try {
-        const { id } = req.params;
-
-        const customer = await Customer.findOne({
-            where: {
-                id,
-            },
-        });
-
-        if (!customer) return res.status(404).send("Customer not found!");
-
-        const file_url = await cloudinary.uploader.upload(req.file.path);
-
-        customer.update({ avatar_url: file_url.secure_url });
-
-        res.status(201).send({
-            status: "success",
-            message: "Customer avatar updated successfully!",
-            data:
-            {
-                customer_id: customer.id,
-                avatar_url: file_url.secure_url,
-            }
-        });
-
-        
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            status: 500,
-            message: "Internal server error!",
-            data: error,
-        });
-    }
-}
 
 async function login(req, res) {
     try {
         const { email, password } = req.body;
 
-        const customer = await Customer.findOne({
-            where: {
-                email,
-            },
-        });
+        const customer = await Customer.findOne({ where: { email }});
 
-        if (!customer || !customer.password || !customer.validPassword(password))
-            return res.status(400).send("Invalid email or password!");
+        if (!customer || !customer.password || !customer.validPassword(password)) return res.status(400).send("Invalid email or password!");
 
         res.cookie("access_token", generateAccessToken(customer), { httpOnly: true, sameSite: true, signed: true });
 
-        res.status(201).send({
-            status: "success",
-            message: "Customer logged in successfully!",
-            data:
-            {
-                email: customer.email,
-                loggedInTime: new Date(),
-            }
-        });
+        res.status(200).send(customer);
     } catch (err) {
         console.log(err);
         res.status(500).json("Internal server error!");
@@ -73,38 +22,8 @@ async function login(req, res) {
 
 async function logout(req, res) {
     res.clearCookie("access_token");
-    res.clearCookie("refresh_token").redirect("/");
+    res.send('Ok');
 }
-
-const getCustomers = async (req, res) => {
-    try {
-        const customers = await Customer.findAll();
-
-        res.status(200).send(customers);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Internal server error!");
-    }
-};
-
-const getCustomer = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const customer = await Customer.findOne({
-            where: {
-                id,
-            },
-        });
-
-        if (!customer) return res.status(404).send("Customer not found!");
-
-        res.status(200).send(customer);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Internal server error!");
-    }
-};
 
 const registerCustomer = async (req, res) => {
     try {
@@ -128,86 +47,43 @@ const registerCustomer = async (req, res) => {
     }
 };
 
-const updateCustomer = async (req, res) => {
+async function getSignedInCustomerProfile (req, res) {
     try {
-        const { id } = req.params;
-        const { firstName, lastName, username, email } = req.body;
-
-        const customer = await Customer.update(
-            {
-                first_name: firstName,
-                last_name: lastName,
-                username,
-                email,
-            },
-            {
-                where: {
-                    id,
-                },
-            }
-        );
+        const customer = await Customer.findOne({ where: { id: req.user.id }});
 
         if (!customer) return res.status(404).send("Customer not found!");
 
-        res.status(201).send(customer);
+        res.status(200).send(customer);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Internal server error!");
+    }
+}
+
+async function updateSignedInCustomerProfile (req, res) {
+    try {
+        const { first_name, last_name, username, email, phone } = req.body;
+
+        const customer = await Customer.findOne({ where: { id: req.user.id }});
+
+        if (!customer) return res.status(404).send("Customer not found!");
+        
+        customer.update({ first_name, last_name, username, email, phone });
+
+        if(req.file?.path) {
+            const file_url = await cloudinary.uploader.upload(req.file.path);
+            customer.update({ avatar_url: file_url.secure_url });
+        }
+
+        res.send(customer);
     } catch (err) {
         console.log(err);
         res.status(500).send("Internal server error!");
     }
-};
+}
 
-const updateCustomerDetails = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { firstName, lastName, username, email } = req.body;
-
-        const customer = await Customer.findOne({
-            where: {
-                id,
-            },
-        });
-
-        if (!customer) return res.status(404).send("Customer not found!");
-
-        if (firstName) customer.update({ first_name: firstName });
-        if (lastName) customer.update({ first_name: lastName });
-        if (username) customer.update({ username });
-        if (email) customer.update({ email });
-
-        res.status(201).send(customer);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send("Internal server error!");
-    }
-};
-
-const deleteCustomer = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const customer = await Customer.findOne({
-            where: {
-                id,
-            },
-        });
-
-        if (!customer) return res.status(404).send("Customer not found!");
-
-        await customer.destroy();
-
-        res.sendStatus(200).send(customer);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send("Internal server error!");
-    }
-};
-
-module.exports.updateAvatar = updateAvatar;
 module.exports.login = login;
 module.exports.logout = logout;
-module.exports.getCustomers = getCustomers;
-module.exports.getCustomer = getCustomer;
 module.exports.registerCustomer = registerCustomer;
-module.exports.updateCustomer = updateCustomer;
-module.exports.updateCustomerDetails = updateCustomerDetails;
-module.exports.deleteCustomer = deleteCustomer;
+module.exports.getSignedInCustomerProfile = getSignedInCustomerProfile;
+module.exports.updateSignedInCustomerProfile = updateSignedInCustomerProfile;

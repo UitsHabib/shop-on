@@ -13,13 +13,8 @@ module.exports = (app) => {
     app.route('/api/customers')
         .post(validate(customerRegisterSchema), controller.registerCustomer);
 
-    app.route('/api/customers/:id')
-        .get(AuthStrategy, controller.getCustomer)
-        .put(AuthStrategy, validate(customerUpdateSchema), controller.updateCustomer)
-        .patch(AuthStrategy, validate(customerUpdateSchema), controller.updateCustomerDetails)
-        .delete(AuthStrategy, controller.deleteCustomer);
-
-    app.route('/api/customers/updateAvatar/:id')
-        .put(AuthStrategy, multer.single('image'), controller.updateAvatar);
+    app.route('/api/customers/profile')
+        .get(AuthStrategy, controller.getSignedInCustomerProfile)
+        .put(AuthStrategy, validate(customerUpdateSchema), multer.single('image'), controller.updateSignedInCustomerProfile);
 };
 
