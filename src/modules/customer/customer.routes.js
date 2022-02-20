@@ -6,9 +6,9 @@ const { customerRegisterSchema, customerUpdateSchema } = require("./customer.sch
 const multer = require('../../config/lib/multer');
 
 module.exports = (app) => {
-    app.post('/api/customer/login', controller.login);
+    app.post('/api/customers/login', controller.login);
 
-    app.get('/api/customer/logout', AuthStrategy, controller.logout);
+    app.get('/api/customers/logout', AuthStrategy, controller.logout);
 
     app.route('/api/customers')
         .post(validate(customerRegisterSchema), controller.registerCustomer);
@@ -19,7 +19,7 @@ module.exports = (app) => {
         .patch(AuthStrategy, validate(customerUpdateSchema), controller.updateCustomerDetails)
         .delete(AuthStrategy, controller.deleteCustomer);
 
-    app.route('/api/customer/updateAvatar/:id')
+    app.route('/api/customers/updateAvatar/:id')
         .put(AuthStrategy, multer.single('image'), controller.updateAvatar);
 };
 

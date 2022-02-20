@@ -10,17 +10,21 @@ const Customer = sequelize.define("customers", {
         defaultValue: DataTypes.UUIDV4
     },
     first_name: {
-        allowNull: false,
-        type: DataTypes.STRING(50)
+        allowNull: true,
+        type: DataTypes.STRING(255)
     },
     last_name: {
+        allowNull: true,
+        type: DataTypes.STRING(255)
+    },
+    username: {
         allowNull: false,
-        type: DataTypes.STRING(50)
+        type: DataTypes.STRING(255)
     },
     email: {
         unique: true,
         allowNull: false,
-        type: DataTypes.STRING(100),
+        type: DataTypes.STRING(255),
         validate: {
             isEmail: true
         },
