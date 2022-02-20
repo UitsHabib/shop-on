@@ -24,7 +24,7 @@ module.exports = (app) => {
 
     app.route("/api/shops/products/:id")
         .get(AuthStrategy, controller.getProduct)
-        .patch(validate(productUpdateSchema), validateFile(multer.single('product_image')), controller.updateProduct)
+        .patch(AuthStrategy, validate(productUpdateSchema), validateFile(multer.single('product_image')), controller.updateProduct)
         .delete(AuthStrategy, controller.deleteProduct);
 
     app.get("/api/shops/orders", AuthStrategy, controller.getOrders);
