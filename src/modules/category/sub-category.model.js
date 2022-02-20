@@ -1,6 +1,6 @@
+const path = require("path");
 const sequelize = require(path.join(process.cwd(), 'src/config/lib/sequelize'));
 const { DataTypes } = require('sequelize');
-const Category = require('./category.model');
 
 const SubCategory = sequelize.define('subCategories', {
     category_id: {
@@ -17,7 +17,5 @@ const SubCategory = sequelize.define('subCategories', {
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
-
-SubCategory.belongsTo(Category, { as: 'categories', foreignKey: 'category_id' });
 
 module.exports = SubCategory;

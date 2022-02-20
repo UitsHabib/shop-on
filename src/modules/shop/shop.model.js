@@ -2,9 +2,10 @@ const path = require("path");
 const sequelize = require(path.join(process.cwd(), 'src/config/lib/sequelize'));
 const { DataTypes } = require('sequelize');
 const bcrypt = require("bcrypt");
+const Product = require(path.join(process.cwd(), 'src/modules/product/product.model'));
 
 const Shop = sequelize.define('shops', {
-    shop_name: {
+    name: {
         type: DataTypes.STRING(255),
         allowNull: false
     },
@@ -53,5 +54,6 @@ Shop.prototype.validPassword = function (password) {
 }
 
 Shop.hasMany(Product, { as: 'products', foreignKey: 'shop_id' });
+Product.belongsTo(Shop, { as: 'shop', foreignKey: 'shop_id' });
 
 module.exports = Shop;

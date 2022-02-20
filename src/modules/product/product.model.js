@@ -1,7 +1,6 @@
 const path = require("path");
 const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 const { DataTypes } = require('sequelize');
-const Shop = require("../shop/shop.model");
 
 const Product = sequelize.define('products', {
     product_name: {
@@ -14,7 +13,11 @@ const Product = sequelize.define('products', {
     },
     description: {
         allowNull: true,
-        type: DataTypes.STRING,
+        type: DataTypes.STRING
+    },
+    productImage:  {
+        allowNull: false,
+        type: DataTypes.STRING
     },
     category: {
         allowNull: false,
@@ -37,7 +40,5 @@ const Product = sequelize.define('products', {
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
-
-Product.belongsTo(Shop, { as: 'shops', foreignKey: 'shop_id' });
 
 module.exports = Product;

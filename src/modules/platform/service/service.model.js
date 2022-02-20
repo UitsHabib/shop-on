@@ -2,24 +2,26 @@ const path = require("path");
 const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 const { DataTypes } = require('sequelize');
 
-const UserProfile = sequelize.define('user_profiles', {
+const service = sequelize.define('services', {
     title: {
-        type: DataTypes.STRING(50)
+        allowNull: false,
+        type: DataTypes.STRING,
     },
-    description: {
-        type: DataTypes.STRING(500)
+    slug: {
+        allowNull: false,
+        type: DataTypes.STRING,
     },
     created_by: {
-        type: DataTypes.UUID
+        type: DataTypes.INTEGER
     },
     updated_by: {
-        type: DataTypes.UUID
-    }
+        type: DataTypes.INTEGER
+    },
 }, {
-    tableName: 'user_profiles',
+    tabletitle: 'services',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-module.exports = UserProfile;
+module.exports = service;

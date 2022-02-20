@@ -9,6 +9,7 @@ Thumbs.db
 # ==========================
 .nodemonignore
 node_modules
+tmpnodejsnpm-cache
 .bower-*/
 bower_components
 coverage
