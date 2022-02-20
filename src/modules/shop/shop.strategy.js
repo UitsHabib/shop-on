@@ -1,6 +1,7 @@
 const passport = require("passport");
 const { Strategy } = require("passport-jwt");
-const User = require("./user.model");
+const Shop = require("./shop.model");
+
 
 module.exports = function () {
     function cookieExtractor(req) {
@@ -10,16 +11,16 @@ module.exports = function () {
     }
 
     passport.use(
-        "user-jwt",
+        "shop-jwt",
         new Strategy(
             { secretOrKey: process.env.TOKEN_SECRET, jwtFromRequest: cookieExtractor },
             function (payload, done) {
-                User.findOne({
+                Shop.findOne({
                     where: {
                         id: payload.id,
                     },
-                }).then((user) => {
-                    if (user) return done(null, user);
+                }).then((shop) => {
+                    if (shop) return done(null, shop);
                     return done(null, false);
                 });
             }

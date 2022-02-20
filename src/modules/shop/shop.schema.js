@@ -2,8 +2,8 @@ const { object, string, ref, boolean } = require('yup');
 const multer = require("multer");
 
 const shopRegisterSchema = object().shape({
-    shop_name: string()
-        .required('Shop name is required.'),
+    name: string()
+        .required('Name is required.'),
     email: string()
         .required('Email is required.')
         .email('Must be a valid email address.')

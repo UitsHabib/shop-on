@@ -1,4 +1,5 @@
 const path = require("path");
+const { AuthStrategy } = require("../shop/shop-authentication.middleware");
 const controller = require("./product.controller");
 const multer = require(path.join(process.cwd(), "src/config/lib/multer"));
 const validate = require(path.join(process.cwd(), "src/modules/core/middlewares/validate"));
@@ -11,9 +12,9 @@ module.exports = (app) => {
     app.route("/api/products/:id")
         .get(controller.getProduct);
 
-    app.route("/api/shops/:id/products/:id")
+    app.route("/api/shops/:id/products/:productId")
         .get(controller.getProduct)
-        .patch(validateFile(multer.single('product_image')), validate(productUpdateSchema), controller.updateProduct)
+        .patch(validate(productUpdateSchema), validateFile(multer.single('product_image')), controller.updateProduct)
         .delete(controller.deleteProduct);
 
     app.route("/api/shops/:id/products")
@@ -24,7 +25,7 @@ module.exports = (app) => {
         .get(controller.getCategories)
         .post(validate(productUploadSchema), controller.addCategory);
 
-    app.route("/api/shops/:id/category/:id")
-        .patch(controller.updateCategory)
-        .delete(validate(productUploadSchema), controller.deleteCategory);
+    // app.route("/api/shops/:id/category/:id")
+    //     .patch(controller.updateCategory)
+    //     .delete(validate(productUploadSchema), controller.deleteCategory);
 };

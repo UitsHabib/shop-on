@@ -17,28 +17,28 @@ async function init() {
     const Permission = require(path.join(process.cwd(), "src/modules/platform/permission/permission.model"));
     const ProfilePermission = require(path.join(process.cwd(), "src/modules/platform/permission/profile-permission.model"));
     const Service = require(path.join(process.cwd(), "src/modules/platform/service/service.model"));
-
+    
     require(path.join(process.cwd(), "src/modules/platform/permission/role-permission.model"));
     require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
+    require(path.join(process.cwd(), 'src/modules/customer/customer.model'));
+    require(path.join(process.cwd(), 'src/modules/shop/shop.model'));
+    require(path.join(process.cwd(), 'src/modules/product/product.model'));
+    require(path.join(process.cwd(), 'src/modules/category/category.model'));
+    require(path.join(process.cwd(), 'src/modules/category/sub-category.model'));
 
     await sequelize.sync();
 
     function userSeeder(callback) {
-        try {
-            User.findOrCreate({
-                where: { email: "habiburrahman3089@gmail.com" },
-                defaults: {
-                    first_name: "System",
-                    last_name: "Admin",
-                    password: "P@ssword123",
-                },
-            }).then(function () {
-                callback();
-            });
-        }
-        catch (err) {
-            console.log(err);
-        }
+        User.findOrCreate({
+            where: { email: "habiburrahman3089@gmail.com" },
+            defaults: {
+                first_name: "System",
+                last_name: "Admin",
+                password: "P@ssword123",
+            },
+        }).then(function () {
+            callback();
+        });
     }
 
     function profileSeeder(callback) {

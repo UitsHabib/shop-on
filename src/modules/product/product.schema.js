@@ -42,7 +42,7 @@ const productUpdateSchema = object().shape({
         .min(1, 'Minimum 1 product is required.'),
 });
 
-const validateFile = (upload) => {
+function validateFile(upload) {
     return function (req, res, next) {
         upload(req, res, function (err) {
             if (err instanceof multer.MulterError) return res.status(400).send(err);

@@ -4,22 +4,6 @@ const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/p
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
 const { generateAccessToken } = require("./service/user.service");
 
-const userAttributes = [
-    "id",
-    "profile_id",
-    "first_name",
-    "last_name",
-    "email",
-    "phone",
-    "status",
-    "last_login",
-    "created_by",
-    "updated_by",
-    "created_at",
-    "updated_at",
-    "role_id"
-]
-
 async function login(req, res) {
     try {
         const { email, password } = req.body;

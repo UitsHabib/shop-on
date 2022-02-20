@@ -2,15 +2,26 @@ const path = require("path");
 const sequelize = require(path.join(process.cwd(), 'src/config/lib/sequelize'));
 const { DataTypes } = require('sequelize');
 const bcrypt = require("bcrypt");
+const Product = require(path.join(process.cwd(), 'src/modules/product/product.model'));
 
 const Shop = sequelize.define('shops', {
-    shop_name: {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+    },
+    name: {
+        allowNull: false,
         type: DataTypes.STRING(255),
-        allowNull: false
+    },
+    description: {
+        allowNull: true,
+        type: DataTypes.STRING(2048)
     },
     email: {
-        unique: true,
         allowNull: false,
+        unique: true,
         type: DataTypes.STRING(255),
         validate: {
             isEmail: true
@@ -20,25 +31,23 @@ const Shop = sequelize.define('shops', {
         }
     },
     password: {
-        type: DataTypes.STRING(1024),
         allowNull: false,
+        type: DataTypes.STRING(1024),
         set(value) {
             this.setDataValue('password', bcrypt.hashSync(value, 8));
         }
     },
-    description: {
-        type: DataTypes.STRING(2048)
-    },
     license_number: {
+        allowNull: false,
         type: DataTypes.STRING(255),
-        allowNull: false
     },
     is_active: {
         type: DataTypes.ENUM,
         values: ['0', '1'],
         defaultValue: '1'
     },
-    shop_profile_image: {
+    profile_image: {
+        allowNull: true,
         type: DataTypes.STRING(1024)
     }
 }, {
@@ -53,5 +62,6 @@ Shop.prototype.validPassword = function (password) {
 }
 
 Shop.hasMany(Product, { as: 'products', foreignKey: 'shop_id' });
+Product.belongsTo(Shop, { as: 'shop', foreignKey: 'shop_id' });
 
 module.exports = Shop;
