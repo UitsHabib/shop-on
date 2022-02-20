@@ -11,11 +11,11 @@ const OrderProduct = sequelize.define('order_products', {
     },
     order_id: {  
         allowNull: false,
-        type: DataTypes.INTEGER
+        type: DataTypes.UUID
     },
     product_id: {
         allowNull: false,        
-        type: DataTypes.INTEGER
+        type: DataTypes.UUID
     },
     quantity: {
         allowNull: false,        
