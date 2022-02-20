@@ -3,7 +3,17 @@ const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 const { DataTypes } = require('sequelize');
 
 const Product = sequelize.define('products', {
-    product_name: {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+    },
+    shop_id: {
+        type: DataTypes.UUID,
+        allowNull: false
+    },
+    name: {
         allowNull: false,
         type: DataTypes.STRING,
     },
@@ -15,7 +25,7 @@ const Product = sequelize.define('products', {
         allowNull: true,
         type: DataTypes.STRING
     },
-    productImage:  {
+    product_image:  {
         allowNull: false,
         type: DataTypes.STRING
     },
@@ -26,10 +36,6 @@ const Product = sequelize.define('products', {
     quantity: {
         allowNull: false,
         type: DataTypes.INTEGER,
-    },
-    shop_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false
     },
     product_profile_image: {
         type: DataTypes.STRING

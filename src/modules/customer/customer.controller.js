@@ -22,7 +22,7 @@ async function login(req, res) {
 
 async function logout(req, res) {
     res.clearCookie("access_token");
-    res.send('Ok');
+    res.send('Logged out.');
 }
 
 const registerCustomer = async (req, res) => {
@@ -68,11 +68,11 @@ async function updateSignedInCustomerProfile (req, res) {
 
         if (!customer) return res.status(404).send("Customer not found!");
         
-        customer.update({ first_name, last_name, username, email, phone });
+        await customer.update({ first_name, last_name, username, email, phone });
 
         if(req.file?.path) {
             const file_url = await cloudinary.uploader.upload(req.file.path);
-            customer.update({ avatar_url: file_url.secure_url });
+            await customer.update({ avatar_url: file_url.secure_url });
         }
 
         res.send(customer);

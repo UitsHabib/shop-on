@@ -15,6 +15,7 @@ const AuthStrategy = (req, res, next) => {
             next();
         });
     });
+    
     auth(req, res, next);
 }
 

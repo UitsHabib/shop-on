@@ -13,23 +13,20 @@ module.exports = (app) => {
 
     app.post('/api/shops', validate(shopRegisterSchema), controller.registerShop);
 
-    app.route('/api/shops/:id')
-        .get(AuthStrategy, controller.getShop)
-        .put(AuthStrategy, validateFile(multer.single('shop_profile_image')), validate(shopRegisterSchema), controller.updateShop)
-        .patch(AuthStrategy, validateFile(multer.single('shop_profile_image')), validate(shopUpdateSchema), controller.updateShopInfo)
-        .delete(AuthStrategy, controller.deleteShop);
+    app.route('/api/shops/profile')
+        .get(AuthStrategy, controller.getSignedInShopProfile)
+        .put(AuthStrategy, validate(shopUpdateSchema), validateFile(multer.single('shop_profile_image')), controller.updateSignedInShopProfile);
 
-    app.route("/api/shops/:id/products")
-        .get(AuthStrategy, controller.getShopProducts)
-        .delete(AuthStrategy, controller.deleteShopProducts);
+    app.route("/api/shops/products")
+        .get(AuthStrategy, controller.getProducts)
 
-    app.route("/api/shops/:id/products/:productId")
-        .get(AuthStrategy, controller.getShopProduct)
-        .delete(AuthStrategy, controller.deleteShopProduct);
+    app.route("/api/shops/products/:id")
+        .get(AuthStrategy, controller.getProduct)
+        .delete(AuthStrategy, controller.deleteProduct);
 
-    app.get("/api/shops/:id/orders", AuthStrategy, controller.getShopOrders);
+    app.get("/api/shops/orders", AuthStrategy, controller.getOrders);
 
-    app.get("/api/shops/:id/orders/:orderId", AuthStrategy, controller.getShopOrder);
+    app.get("/api/shops/orders/:id", AuthStrategy, controller.getOrder);
 
-    app.patch("/api/shops/:id/orders/:orderId/accept-order", AuthStrategy, controller.acceptOrder);
+    app.patch("/api/shops/orders/id/accept", AuthStrategy, controller.acceptOrder);
 }
