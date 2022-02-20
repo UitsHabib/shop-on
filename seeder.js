@@ -22,6 +22,7 @@ async function init() {
 
     require(path.join(process.cwd(), "src/modules/platform/permission/role-permission.model"));
     require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
+    require(path.join(process.cwd(), 'src/modules/customer/customer.model'));
 
     await sequelize.sync();
 
@@ -102,6 +103,7 @@ async function init() {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
+                    console.log('User Profile Seeder Completed');
                     callback();
                 });
             });

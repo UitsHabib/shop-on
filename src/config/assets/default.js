@@ -11,6 +11,8 @@ module.exports = {
         "src/modules/platform/permission/**/*.routes.js",
         "src/modules/platform/service/*.routes.js",
         "src/modules/platform/service/**/*.routes.js",
+
+        "src/modules/customer/customer.routes.js",
     ],
     strategies: [
         "src/modules/**/*.strategy.js",
