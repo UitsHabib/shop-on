@@ -2,8 +2,6 @@ const path = require("path");
 const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 const { DataTypes } = require('sequelize');
 const Customer = require(path.join(process.cwd(), "src/modules/customer/customer.model"));
-const Product = require(path.join(process.cwd(), "src/modules/product/product.model"));
-const OrderProduct = require(path.join(process.cwd(), "src/modules/order/order-product.model"));
 
 const Order = sequelize.define('orders', {
     id: {
@@ -20,7 +18,7 @@ const Order = sequelize.define('orders', {
         allowNull: false,
         type: DataTypes.DECIMAL(10, 2)
     },
-    staus: {
+    status: {
         type: DataTypes.ENUM,
         values: ['pending', 'confirmed'],
         defaultValue: 'pending'    
@@ -39,8 +37,5 @@ const Order = sequelize.define('orders', {
 
 Customer.hasMany(Order, { as: 'orders', foreignKey: 'customer_id' });
 Order.belongsTo(Customer, { as: 'customer', foreignKey: 'customer_id' });
-Order.hasMany(OrderProduct, { as: 'order_products', foreignKey: 'order-product_id' });
-OrderProduct.belongsTo(Product, { as: "product", foreignKey: "product_id" });
 
-const OrderModel = new Order;
-module.exports = OrderModel;
+module.exports = Order;

@@ -2,6 +2,10 @@ const path = require("path");
 const Customer = require(path.join(process.cwd(), 'src/modules/customer/customer.model'));
 const { generateAccessToken } = require(path.join(process.cwd(), 'src/modules/customer/services/customer.service'));
 const cloudinary = require(path.join(process.cwd(), 'src/config/lib/cloudinary'));
+const Shop = require(path.join(process.cwd(), 'src/modules/shop/shop.model'));
+const Product = require(path.join(process.cwd(), 'src/modules/product/product.model'));
+const Order = require(path.join(process.cwd(), 'src/modules/order/order.model'));
+const OrderProduct = require(path.join(process.cwd(), 'src/modules/order/order-product.model'));
 
 async function login(req, res) {
     try {
@@ -82,8 +86,71 @@ async function updateSignedInCustomerProfile (req, res) {
     }
 }
 
+async function getOrders (req, res) {
+    try {
+        const orders = await Order.findAll({
+            where: { customer_id: req.user.id },
+            include: [{
+                model: OrderProduct,
+                as: "order_products",
+                attributes: ["id"],                    
+                include: [{
+                    model: Product,
+                    as: "product",
+                    attributes: ["id", "name", "price"],
+                    include: [{
+                        model: Shop,
+                        as: 'shop'
+                    }]  
+                }]
+            }]
+        });
+
+        res.status(200).send(orders);
+        
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Internal server error!");
+    } 
+}
+
+async function getOrder (req, res) {
+    try {
+        const orders = await Order.findOne({
+            where: { customer_id: req.user.id },
+            include: [{
+                model: OrderProduct,
+                as: "order_products",
+                attributes: ["id"],                    
+                include: [{
+                    model: Product,
+                    as: "product",
+                    attributes: ["id", "name", "price"],
+                    include: [{
+                        model: Shop,
+                        as: 'shop'
+                    }]  
+                }]
+            }]
+        });
+
+        res.status(200).send(orders);
+        
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Internal server error!");
+    } 
+}
+
+async function createOrder (req, res) {
+    
+}
+
 module.exports.login = login;
 module.exports.logout = logout;
 module.exports.registerCustomer = registerCustomer;
 module.exports.getSignedInCustomerProfile = getSignedInCustomerProfile;
 module.exports.updateSignedInCustomerProfile = updateSignedInCustomerProfile;
+module.exports.getOrders = getOrders;
+module.exports.getOrder = getOrder;
+module.exports.createOrder = createOrder;

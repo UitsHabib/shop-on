@@ -16,5 +16,12 @@ module.exports = (app) => {
     app.route('/api/customers/profile')
         .get(AuthStrategy, controller.getSignedInCustomerProfile)
         .put(AuthStrategy, validate(customerUpdateSchema), multer.single('image'), controller.updateSignedInCustomerProfile);
+
+    app.route('/api/customers/orders')
+        .get(AuthStrategy, controller.getOrders)
+        .post(AuthStrategy, controller.createOrder);
+
+    app.route('/api/customers/orders/:id')
+        .get(AuthStrategy, controller.getOrder);
 };
 
