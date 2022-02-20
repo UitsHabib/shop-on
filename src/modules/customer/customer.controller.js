@@ -143,7 +143,13 @@ async function getOrder (req, res) {
 }
 
 async function createOrder (req, res) {
-    
+    try {
+        
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send("Internal server error!");
+    }
 }
 
 module.exports.login = login;
