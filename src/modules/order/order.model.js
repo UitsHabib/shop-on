@@ -1,13 +1,20 @@
 const path = require("path");
 const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 const { DataTypes } = require('sequelize');
-const Customer = require(path.join(process.cwd(), "src/modules/platform/customer/customer.model"));
-const Product = require(path.join(process.cwd(), "src/modules/platform/product/product.model"));
+const Customer = require(path.join(process.cwd(), "src/modules/customer/customer.model"));
+const Product = require(path.join(process.cwd(), "src/modules/product/product.model"));
+const OrderProduct = require(path.join(process.cwd(), "src/modules/order/order-product.model"));
 
 const Order = sequelize.define('orders', {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+    },
     customer_id:{
         allowNull: false,
-        type: DataTypes.INTEGER
+        type: DataTypes.UUID
     },  
     total_price: {
         allowNull: false,
@@ -36,8 +43,9 @@ const Order = sequelize.define('orders', {
     updatedAt: 'updated_at'
 });
 
-Customer.hasMany(Order, { as: 'orders', foreignKey: 'order_id' });
+Customer.hasMany(Order, { as: 'orders', foreignKey: 'customer_id' });
 Order.belongsTo(Customer, { as: 'customer', foreignKey: 'customer_id' });
+Order.hasMany(OrderProduct, { as: 'order_products', foreignKey: 'order-product_id' });
 
 const OrderModel = new Order;
 module.exports = OrderModel;

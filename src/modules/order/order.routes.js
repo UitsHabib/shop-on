@@ -5,7 +5,7 @@ const controller = require("./order.controller");
 module.exports = (app) => {
     app.route("/api/orders")
         .get(controller.getOrders)
-        .post(controller.createOrder).
+        .post(controller.createOrder);
 
     app.route("/api/orders/:id")
         .get(controller.getOrder)
@@ -22,7 +22,7 @@ module.exports = (app) => {
         .post(controller.updateOrder)
         .delete(controller.deleteOrder);
 
-    app.get("/api/orders/:id/shops", controller.getShopOrders);
-    app.get("/api/orders/:id/shops/:id", controller.getShopOrders);
-    app.get("/api/orders/:id/product/:id/shops/:id", controller.getOrderShopProduct);       
+    // app.get("/api/orders/:id/shops", controller.getShopOrders);
+    // app.get("/api/orders/:id/shops/:id", controller.getShopOrders);
+    // app.get("/api/orders/:id/product/:id/shops/:id", controller.getOrderShopProduct);       
 };  

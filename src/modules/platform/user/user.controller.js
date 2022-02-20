@@ -4,22 +4,6 @@ const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/p
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
 const { generateAccessToken } = require("./service/user.service");
 
-const userAttributes = [
-    "id",
-    "profile_id",
-    "first_name",
-    "last_name",
-    "email",
-    "phone",
-    "status",
-    "last_login",
-    "created_by",
-    "updated_by",
-    "created_at",
-    "updated_at",
-    "role_id"
-]
-
 async function login(req, res) {
     try {
         const { email, password } = req.body;
@@ -47,7 +31,7 @@ async function logout(req, res) {
     res.clearCookie("refresh_token").redirect("/");
 }
 
-const getUsers = async (req, res) => {
+async function getUsers(req, res) {
     try {
         const users = await User.findAll({
             attributes: userAttributes,
@@ -66,7 +50,7 @@ const getUsers = async (req, res) => {
     }
 };
 
-const getUser = async (req, res) => {
+async function getUser(req, res) {
     try {
         const { id } = req.params;
 
@@ -92,7 +76,7 @@ const getUser = async (req, res) => {
     }
 };
 
-const createUser = async (req, res) => {
+async function createUser(req, res) {
     try {
         const loggedUser = req.user;
         const { first_name, last_name, email, password, profile_id, role_id } = req.body;
@@ -142,7 +126,7 @@ const createUser = async (req, res) => {
     }
 };
 
-const updateUser = async (req, res) => {
+async function updateUser(req, res) {
     try {
         const { id } = req.params;
         const { first_name, last_name, email, profile_id, role_id } = req.body;
@@ -204,7 +188,7 @@ const updateUser = async (req, res) => {
     }
 };
 
-const deleteUser = async (req, res) => {
+async function deleteUser(req, res) {
     try {
         const { id } = req.params;
 

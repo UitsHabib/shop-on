@@ -1,10 +1,15 @@
 const path = require('path');
 const sequelize = require(path.join(process.cwd(), 'src/config/lib/sequelize'));
 const Product = require(path.join(process.cwd(), "src/modules/product/product.model"));
-const Order = require(path.join(process.cwd(), "src/modules/order/order.model"));
 const { DataTypes } = require('sequelize');
 
-const OrderProduct = sequelize.define('order-products', {
+const OrderProduct = sequelize.define('order_products', {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+    },
     order_id: {  
         allowNull: false,
         type: DataTypes.INTEGER
@@ -18,12 +23,12 @@ const OrderProduct = sequelize.define('order-products', {
         type: DataTypes.INTEGER
     },
 }, {
-    tableName: 'order-products',
+    tableName: 'order_products',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
 OrderProduct.belongsTo(Product, { as: "product", foreignKey: "product_id" });
-Order.hasMany(OrderProduct, { as: 'order-products', foreignKey: 'order-product_id' });
+
 module.exports = OrderProduct;

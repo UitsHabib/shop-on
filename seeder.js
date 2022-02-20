@@ -9,47 +9,38 @@ async function init() {
 
     const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 
-    await sequelize.query(
-        `CREATE DATABASE IF NOT EXISTS ${nodecache.getValue("DB_NAME")}`
-    );
+    await sequelize.query(`CREATE DATABASE IF NOT EXISTS ${nodecache.getValue("DB_NAME")}`);
 
-<<<<<<< HEAD
-    const User = require(path.join(process.cwd(), 'src/modules/user/user.model'));
-    const UserProfile = require(path.join(process.cwd(), 'src/modules/user/user-profile.model'));
-
-    const Customer = require(path.join(process.cwd(), 'src/modules/customer/customer.model'));
-
-    require(path.join(process.cwd(), 'src/modules/product/product.model'));
-=======
     const User = require(path.join(process.cwd(), "src/modules/platform/user/user.model"));
     const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/profile.model"));
     const PermissionService = require(path.join(process.cwd(), "src/modules/platform/permission/permission-service.model"));
     const Permission = require(path.join(process.cwd(), "src/modules/platform/permission/permission.model"));
     const ProfilePermission = require(path.join(process.cwd(), "src/modules/platform/permission/profile-permission.model"));
     const Service = require(path.join(process.cwd(), "src/modules/platform/service/service.model"));
-
+    
     require(path.join(process.cwd(), "src/modules/platform/permission/role-permission.model"));
     require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
->>>>>>> 24a221209c8e1011643ce6247725df47e2506a85
+    require(path.join(process.cwd(), 'src/modules/customer/customer.model'));
+    require(path.join(process.cwd(), 'src/modules/shop/shop.model'));
+    require(path.join(process.cwd(), 'src/modules/product/product.model'));
+    require(path.join(process.cwd(), 'src/modules/category/category.model'));
+    require(path.join(process.cwd(), 'src/modules/category/sub-category.model'));
+    require(path.join(process.cwd(), 'src/modules/order/order.model'));
+    require(path.join(process.cwd(), 'src/modules/order/order-product.model'));
 
     await sequelize.sync();
 
     function userSeeder(callback) {
-        try {
-            User.findOrCreate({
-                where: { email: "habiburrahman3089@gmail.com" },
-                defaults: {
-                    first_name: "System",
-                    last_name: "Admin",
-                    password: "P@ssword123",
-                },
-            }).then(function () {
-                callback();
-            });
-        }
-        catch (err) {
-            console.log(err);
-        }
+        User.findOrCreate({
+            where: { email: "habiburrahman3089@gmail.com" },
+            defaults: {
+                first_name: "System",
+                last_name: "Admin",
+                password: "P@ssword123",
+            },
+        }).then(function () {
+            callback();
+        });
     }
 
     function profileSeeder(callback) {
@@ -77,11 +68,6 @@ async function init() {
                     }
                 );
             }
-<<<<<<< HEAD
-        }).then(function () {
-            console.log('User Seeder Completed');
-            callback();
-=======
         );
     }
 
@@ -98,7 +84,6 @@ async function init() {
                         });
                 }
             );
->>>>>>> 24a221209c8e1011643ce6247725df47e2506a85
         });
     }
 
@@ -117,22 +102,12 @@ async function init() {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
-                    console.log('User Profile Seeder Completed');
                     callback();
                 });
             });
         });
     }
 
-<<<<<<< HEAD
-    function userUpdateSeeder(callback) {
-        User.findOne({
-            where: { email: 'habiburrahman3089@gmail.com' }
-        }).then(admin => {
-            UserProfile.findOne({ where: { title: 'System Admin' } }).then(sysAdminProfile => {
-                admin.update({ profile_id: sysAdminProfile.id }).then(function() {
-                    console.log('User Update Seeder Completed');
-=======
     function permissionSeeder(callback) {
         User.findOne({ where: { email: 'habiburrahman3089@gmail.com' } }).then(admin => {
             const permission = [
@@ -144,7 +119,6 @@ async function init() {
                     returning: true,
                     ignoreDuplicates: false
                 }).then(function () {
->>>>>>> 24a221209c8e1011643ce6247725df47e2506a85
                     callback();
                 });
             });
@@ -212,31 +186,6 @@ async function init() {
         });
     }
 
-<<<<<<< HEAD
-    function customerSeeder(callback) {
-        Customer.findOrCreate({
-            where: { email: 'farhan@admin.com' }, defaults: {
-                first_name: 'Farhan',
-                last_name: 'Sadek',
-                password : 'myp@assword',
-            }
-        }).then(function () {
-            console.log('Customer Seeder Completed');
-            callback();
-        });
-    }
-
-    async.waterfall([
-        userSeeder,
-        userProfileSeeder,
-        userUpdateSeeder,
-        customerSeeder
-    ], function (err) {
-        if (err) console.error(err);
-        else console.info('DB seed completed!');
-        process.exit();
-    });
-=======
     async.waterfall(
         [userSeeder, profileSeeder, userUpdateSeeder, serviceSeeder, permissionSeeder, permissionServiceSeeder, profilePermissionSeeder],
         function (err) {
@@ -245,7 +194,6 @@ async function init() {
             process.exit();
         }
     );
->>>>>>> 24a221209c8e1011643ce6247725df47e2506a85
 }
 
 init();
