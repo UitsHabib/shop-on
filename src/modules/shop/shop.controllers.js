@@ -89,6 +89,50 @@ async function updateSignedInShopProfile (req, res) {
     }
 }
 
+async function addProduct(req, res) {
+    try {
+        const { category_id, name, price, description, stock_quantity } = req.body;
+
+        const product = await Product.create({
+            shop_id: req.user.id,
+            category_id,
+            name,
+            price,
+            description,
+            stock_quantity
+        });
+
+        if(req.file?.filename) await product.update({ profile_image: req.file.filename });
+
+        res.status(201).send(product);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Internal server error.");
+    }
+};
+
+async function updateProduct(req, res) {
+    try {
+        const { category_id, name, price, description, stock_quantity } = req.body;
+
+        const product = await Product.findOne({ where: { id: req.params.id }});
+
+        if (!product) return res.status(404).send('Product not found.');
+
+        await product.update({ category_id, name, price, description, stock_quantity });
+
+        if(req.file?.path) {
+            const file_url = await cloudinary.uploader.upload(req.file.path);
+            await product.update({ profile_image: file_url.secure_url });
+        }
+
+        res.status(201).send(product);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Internal server error!");
+    }
+};
+
 async function getProducts(req, res) {
     try {
         const page = +req.query.page || 1;
@@ -280,6 +324,8 @@ module.exports.registerShop = registerShop;
 module.exports.getSignedInShopProfile = getSignedInShopProfile;
 module.exports.updateSignedInShopProfile = updateSignedInShopProfile;
 
+module.exports.addProduct = addProduct;
+module.exports.updateProduct = updateProduct;
 module.exports.getProducts = getProducts;
 module.exports.getProduct = getProduct;
 module.exports.deleteProduct = deleteProduct;

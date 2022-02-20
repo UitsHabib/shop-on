@@ -4,7 +4,13 @@ const { DataTypes } = require('sequelize');
 const SubCategory = require('./sub-category.model');
 
 const Category = sequelize.define('categories', {
-    category: {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+    },
+    name: {
         type: DataTypes.STRING(255),
         allowNull: false
     }
