@@ -18,7 +18,7 @@ const Order = sequelize.define('orders', {
     },  
     total_price: {
         allowNull: false,
-        type: DataTypes.INTEGER
+        type: DataTypes.DECIMAL(10, 2)
     },
     staus: {
         type: DataTypes.ENUM,
@@ -30,12 +30,6 @@ const Order = sequelize.define('orders', {
         values: ['process-pending', 'processing', 'success', 'failed'],
         defaultValue: 'process-pending' 
     },
-    created_by: {
-        type: DataTypes.INTEGER
-    },
-    updated_by: {
-        type: DataTypes.INTEGER
-    }
 }, {
     tableName: 'orders',
     timestamps: true,
@@ -46,6 +40,7 @@ const Order = sequelize.define('orders', {
 Customer.hasMany(Order, { as: 'orders', foreignKey: 'customer_id' });
 Order.belongsTo(Customer, { as: 'customer', foreignKey: 'customer_id' });
 Order.hasMany(OrderProduct, { as: 'order_products', foreignKey: 'order-product_id' });
+OrderProduct.belongsTo(Product, { as: "product", foreignKey: "product_id" });
 
 const OrderModel = new Order;
 module.exports = OrderModel;
