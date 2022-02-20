@@ -4,25 +4,6 @@ const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/p
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
 const { generateAccessToken } = require("./service/user.service");
 
-<<<<<<< HEAD:src/modules/user/user.controller.js
-=======
-const userAttributes = [
-    "id",
-    "profile_id",
-    "first_name",
-    "last_name",
-    "email",
-    "phone",
-    "status",
-    "last_login",
-    "created_by",
-    "updated_by",
-    "created_at",
-    "updated_at",
-    "role_id"
-]
-
->>>>>>> a31e2237f570f89a617543e568d426be8fcd8957:src/modules/platform/user/user.controller.js
 async function login(req, res) {
     try {
         const { email, password } = req.body;
@@ -56,13 +37,8 @@ async function getUsers(req, res) {
             attributes: userAttributes,
             include: [
                 {
-<<<<<<< HEAD:src/modules/user/user.controller.js
-                    model: UserProfile,
-                    as: "user-profile",
-=======
                     model: Profile,
                     as: "profile",
->>>>>>> a31e2237f570f89a617543e568d426be8fcd8957:src/modules/platform/user/user.controller.js
                 },
             ],
         });
@@ -153,40 +129,8 @@ async function createUser(req, res) {
 async function updateUser(req, res) {
     try {
         const { id } = req.params;
-<<<<<<< HEAD:src/modules/user/user.controller.js
-        const { firstName, lastName, username, email } = req.body;
-
-        const user = await User.update(
-            {
-                first_name: firstName,
-                last_name: lastName,
-                username,
-                email,
-            },
-            {
-                where: {
-                    id,
-                },
-            }
-        );
-
-        if (!user) return res.status(404).send("User not found!");
-
-        res.status(201).send(user);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send("Internal server error!");
-    }
-};
-
-async function updateUserDetails(req, res) {
-    try {
-        const { id } = req.params;
-        const { firstName, lastName, username, email } = req.body;
-=======
         const { first_name, last_name, email, profile_id, role_id } = req.body;
         const userId = req.user.id;
->>>>>>> a31e2237f570f89a617543e568d426be8fcd8957:src/modules/platform/user/user.controller.js
 
         const user = await User.findOne({
             where: {
@@ -258,14 +202,10 @@ async function deleteUser(req, res) {
 
         await user.destroy();
 
-<<<<<<< HEAD:src/modules/user/user.controller.js
-        res.status(200).send(user);
-=======
         {
             const { password, password_updated_at, ...userInfo } = user.dataValues;
             res.status(201).send(userInfo);
         }
->>>>>>> a31e2237f570f89a617543e568d426be8fcd8957:src/modules/platform/user/user.controller.js
     } catch (err) {
         console.log(err);
         res.status(500).send("Internal server error!");

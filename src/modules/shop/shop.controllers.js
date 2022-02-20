@@ -1,6 +1,6 @@
 const path = require("path");
 const Product = require(path.join(process.cwd(), 'src/modules/product/product.model'));
-const Order = require(path.join(process.cwd(), 'src/modules/order/order.model'));
+// const Order = require(path.join(process.cwd(), 'src/modules/order/order.model'));
 const { generateAccessToken } = require('./services/shop.service');
 const Shop = require('./shop.model');
 const cloudinary = require(path.join(process.cwd(), 'src/config/lib/cloudinary'));

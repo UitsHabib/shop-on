@@ -1,7 +1,7 @@
-const bcrypt = require("bcrypt");
 const path = require("path");
 const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 const { DataTypes } = require("sequelize");
+const bcrypt = require("bcrypt");
 const Customer = sequelize.define("customers", {
     id: {
         allowNull: false,
