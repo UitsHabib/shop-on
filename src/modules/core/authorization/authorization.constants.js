@@ -5,7 +5,8 @@ const Services = {
     MANAGE_SHOP: "manage-shop",
     MANAGE_CLIENT: "manage-client",
     MANAGE_PERMISSION: "manage-permissions",
-    MANAGE_ROLE: "manage-roles"
+    MANAGE_ROLE: "manage-roles",
+    MANAGE_REVIEW: "manage-review"
 };
 
 module.exports = { Services };
