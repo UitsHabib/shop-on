@@ -2,6 +2,11 @@ const path = require("path");
 const User = require("./user.model");
 const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/profile.model"));
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
+const ProfilePermission = require(path.join(process.cwd(), "src/modules/platform/permission/profile-permission.model"));
+const RolePermission = require(path.join(process.cwd(), "src/modules/platform/permission/role-permission.model"));
+const Permission = require(path.join(process.cwd(), "src/modules/platform/permission/permission.model"));
+const PermissionService = require(path.join(process.cwd(), "src/modules/platform/permission/permission-service.model"));
+const Service = require(path.join(process.cwd(), "src/modules/platform/service/service.model"));
 const { generateAccessToken } = require("./service/user.service");
 
 async function login(req, res) {
@@ -31,6 +36,114 @@ async function logout(req, res) {
     res.clearCookie("refresh_token").redirect("/");
 }
 
+async function getSignedInUserProfile (req, res) {
+    try {
+        const user = await User.findOne({
+            where: {
+                id: req.user.id,
+            },
+            include: [
+                {
+                    model: Profile,
+                    as: "profile",
+                    include: [
+                        {
+                            model: ProfilePermission,
+                            as: 'profile_permissions',
+                            include: [
+                                {
+                                    model: Permission,
+                                    as: 'permission',
+                                    include: [
+                                        {
+                                            model: PermissionService,
+                                            as: 'permission_services',
+                                            include: [
+                                                {
+                                                    model: Service,
+                                                    as: 'service'
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    model: Role,
+                    as: 'role',
+                    include: [
+                        {
+                            model: RolePermission,
+                            as: 'role_permissions',
+                            include: [
+                                {
+                                    model: Permission,
+                                    as: 'permission',
+                                    include: [
+                                        {
+                                            model: PermissionService,
+                                            as: 'permission_services',
+                                            include: [
+                                                {
+                                                    model: Service,
+                                                    as: 'service'
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+        });
+
+        res.status(200).send(user);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Internal server error!");
+    }
+}
+
+async function updateSignedInUserProfile (req, res) {
+    try {
+        const { first_name, last_name, password, phone, profile_id, role_id } = req.body;
+
+        const user = await User.findOne({ where: { id: req.user.id }});
+
+        if (!user) return res.status(404).send("User not found!");
+
+        if (first_name) await user.update({ first_name });
+
+        if (last_name) user.update({ last_name });
+
+        if (password) user.update({ password });
+
+        if (phone) user.update({ phone });
+
+        if (profile_id) {
+            const profile = await Profile.findOne({ where: { id: profile_id }});
+            if (profile) await user.update({ profile_id });
+        }
+
+        if (role_id) {
+            const role = await Role.findOne({ where: { id: role_id }});
+            if (!role) await user.update({ role_id });
+        }
+
+        await user.update({ updated_by: req.user.id });
+        
+        res.status(200).send(user);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Internal server error!");
+    }
+}
+
 async function getUsers(req, res) {
     try {
         const users = await User.findAll({
@@ -58,7 +171,6 @@ async function getUser(req, res) {
             where: {
                 id,
             },
-            attributes: userAttributes,
             include: [
                 {
                     model: Profile,
@@ -219,3 +331,5 @@ module.exports.getUser = getUser;
 module.exports.createUser = createUser;
 module.exports.updateUser = updateUser;
 module.exports.deleteUser = deleteUser;
+module.exports.getSignedInUserProfile = getSignedInUserProfile;
+module.exports.updateSignedInUserProfile = updateSignedInUserProfile;
