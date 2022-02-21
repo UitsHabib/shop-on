@@ -48,7 +48,8 @@ async function createCategory(req, res) {
         if (existCategory) return res.status(400).send('Duplicate category.');
 
         const newCategory = await Category.create({
-            category
+            category,
+            shop_id: req.user.id
         });
 
         res.status(201).send(newCategory);

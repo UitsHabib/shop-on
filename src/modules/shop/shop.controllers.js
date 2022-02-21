@@ -167,12 +167,9 @@ async function deleteShop(req, res) {
         })
         if (!shop) return res.status(404).send('Shop not found.');
 
-        const product = await Product.findOne({
-            where: { 
-                shop_id: id
-            }
-        })
-        if (product) return res.status(400).send('Shop can not be deleted it has some products.');
+        Product.destroy({
+            where: { shop_id: id }
+        });
 
         await shop.destroy();
 
