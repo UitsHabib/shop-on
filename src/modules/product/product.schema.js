@@ -1,58 +1,46 @@
 const { object, string, number } = require("yup");
-const multer = require("multer");
 
 const productUploadSchema = object().shape({
-    product_name: string()
-        .min(3, "Product name must be at least 3 characters.")
-        .max(255, "Product name must be at most 255 characters long.")
-        .required("Product name is required."),
+    name: string()
+        .min(3, "Name must be at least 3 characters.")
+        .max(255, "Name must be at most 255 characters long.")
+        .required("Name is required."),
     price: number()
         .typeError('Price must be a number')
         .positive('Price must be a positive number.')
         .required("Price is required."),
     description: string()
-        .max(2000, "Description must be at most 2000 characters long.")
-        .required("Description is required."),
-    category: string()
-        .max(255, "Category must be at most 255 characters long.")
-        .required("category is required."),
-    quantity: number()
+        .max(2000, "Description must be at most 2000 characters long."),
+    category_id: string()
+        .required("Category is required."),
+    stock_quantity: number()
         .typeError('Quantity must be a number.')
-        .required('Quantity is required.')
         .positive('Quantity must be a positive number.')
         .integer('Quantity must be a integer number.')
-        .min(1, 'Minimum 1 product is required.'),
+        .min(1, 'Minimum 1 product is required.')
+        .required('Quantity is required.'),
 });
 
 const productUpdateSchema = object().shape({
-    product_name: string()
-        .min(3, "Product name must be at least 3 characters.")
-        .max(255, "Product name must be at most 255 characters long."),
+    name: string()
+        .min(3, "Name must be at least 3 characters.")
+        .max(255, "Name must be at most 255 characters long.")
+        .required("Name is required."),
     price: number()
         .typeError('Price must be a number')
-        .positive('Price must be a positive number.'),
+        .positive('Price must be a positive number.')
+        .required("Price is required."),
     description: string()
         .max(2000, "Description must be at most 2000 characters long."),
-    category: string()
-        .max(255, "Category must be at most 255 characters long."),
-    quantity: number()
+    category_id: string()
+        .required("Category is required."),
+    stock_quantity: number()
         .typeError('Quantity must be a number.')
         .positive('Quantity must be a positive number.')
         .integer('Quantity must be a integer number.')
-        .min(1, 'Minimum 1 product is required.'),
+        .min(1, 'Minimum 1 product is required.')
+        .required('Quantity is required.'),
 });
-
-function validateFile(upload) {
-    return function (req, res, next) {
-        upload(req, res, function (err) {
-            if (err instanceof multer.MulterError) return res.status(400).send(err);
-            else if (err) return res.status(400).send(err);
-
-            next();
-        });
-    }
-}
 
 module.exports.productUploadSchema = productUploadSchema;
 module.exports.productUpdateSchema = productUpdateSchema;
-module.exports.validateFile = validateFile;

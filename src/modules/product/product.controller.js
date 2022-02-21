@@ -1,7 +1,9 @@
 const path = require("path");
 const Shop = require("../shop/shop.model");
 const Product = require("./product.model");
-const cloudinary = require(path.join(process.cwd(), 'src/config/lib/cloudinary'));
+const Category = require("./category.model");
+
+const { getPagination, getPagingData } = require("./services/product.service");
 
 
 async function getProducts(req, res) {
@@ -21,7 +23,7 @@ async function getProducts(req, res) {
             include: [
                 {
                     model: Shop,
-                    as: 'shops'
+                    as: 'shop'
                 }
             ],
             offset,
@@ -72,106 +74,53 @@ async function getProduct(req, res) {
     }
 };
 
-async function addProduct(req, res) {
+async function getCategories(req, res) {
     try {
-        const { product_name, price, description, category, quantity } = req.body;
+        const { page, offset, limit, order } = getPagination(req);
 
-        const product = await Product.create({
-            product_name,
-            price,
-            description,
-            category,
-            quantity,
-            shop_id: req.user.id
+        const products = await Category.findAll({
+            offset,
+            limit,
+            order
         });
 
-        res.status(201).send(product);
+        const total = await Category.count();
+
+        const data = getPagingData(total, page, offset, limit, products);
+
+        res.status(200).send(data);
     } catch (err) {
-        console.log(err);
-        res.status(500).send("Internal server error.");
-    }
-};
-
-async function updateProduct(req, res) {
-    try {
-        const { id } = req.params;
-        const { product_name, price, description, category } = req.body;
-        const file_url = await cloudinary.uploader.upload(req.file.path);
-
-        const product = await Product.findOne({
-            where: {
-                id
-            }
-        });
-        if (!product) return res.status(404).send('Product not found.');
-
-        await product.update({
-            product_name,
-            price,
-            description,
-            category,
-            product_profile_image: file_url.secure_url
-        }
-        );
-
-        res.status(201).send(product);
-    } catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).send("Internal server error!");
     }
 };
 
-async function updateProductInfo(req, res) {
+async function addCategory(req, res) {
     try {
-        const { id } = req.params;
-        const { product_name, price, description, category } = req.body;
-        const file_url = req.file && await cloudinary.uploader.upload(req.file.path);
+        const { shop_id, name, description } = req.body;
 
         const product = await Product.findOne({
             where: {
                 id,
             },
         });
+
         if (!product) return res.status(404).send("Product not found!");
 
-        if (product_name) product.update({ product_name });
-        if (price) product.update({ price });
-        if (description) product.update({ description });
-        if (category) product.update({ category });
-        if (file_url) await product.update({ product_profile_image: file_url.secure_url });
+        const category = await Category.create({
+            shop_id,
+            name,
+            description
+        });
 
-        res.status(201).send(product);
+        res.status(201).send(category);
     } catch (err) {
         console.log(err);
         res.status(500).send("Internal server error!");
     }
 };
 
-async function deleteProduct(req, res) {
-    try {
-        const { id } = req.params;
-
-        const product = await Product.findOne({
-            where: {
-                id
-            }
-        });
-        if (!product) return res.status(404).send("Product not found.");
-
-        await product.destroy();
-
-        res.status(200).send(product);
-    }
-    catch (error) {
-        console.log(error);
-        res.status(500).send("Internal server error.");
-    }
-};
-
-
 module.exports.getProducts = getProducts;
 module.exports.getProduct = getProduct;
-module.exports.addProduct = addProduct;
-module.exports.updateProduct = updateProduct;
-module.exports.updateProductInfo = updateProductInfo;
-module.exports.deleteProduct = deleteProduct;
+module.exports.getCategories = getCategories;
+module.exports.addCategory = addCategory;

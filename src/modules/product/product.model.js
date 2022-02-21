@@ -1,10 +1,23 @@
 const path = require("path");
 const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 const { DataTypes } = require('sequelize');
-const Shop = require("../shop/shop.model");
 
 const Product = sequelize.define('products', {
-    product_name: {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+    },
+    shop_id: {
+        allowNull: false,
+        type: DataTypes.UUID,
+    },
+    category_id: {
+        allowNull: false,
+        type: DataTypes.UUID,
+    },
+    name: {
         allowNull: false,
         type: DataTypes.STRING,
     },
@@ -16,19 +29,14 @@ const Product = sequelize.define('products', {
         allowNull: true,
         type: DataTypes.STRING,
     },
-    category: {
-        allowNull: false,
-        type: DataTypes.STRING,
+    discount: {
+        allowNull: true,
+        type: DataTypes.DECIMAL(10, 2)
     },
-    quantity: {
-        allowNull: false,
+    stock_quantity: {
         type: DataTypes.INTEGER,
     },
-    shop_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-    },
-    product_profile_image: {
+    profile_image: {
         type: DataTypes.STRING
     }
 }, {
@@ -37,7 +45,5 @@ const Product = sequelize.define('products', {
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
-
-Product.belongsTo(Shop, { as: 'shops', foreignKey: 'shop_id' });
 
 module.exports = Product;

@@ -1,29 +1,34 @@
-const bcrypt = require("bcrypt");
 const path = require("path");
 const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 const { DataTypes } = require("sequelize");
-const UserProfile = require("./user-profile.model");
-const User = sequelize.define("users", {
-    profile_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true
+const bcrypt = require("bcrypt");
+const Customer = sequelize.define("customers", {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
     },
     first_name: {
-        allowNull: false,
-        type: DataTypes.STRING(50)
+        allowNull: true,
+        type: DataTypes.STRING(255)
     },
     last_name: {
+        allowNull: true,
+        type: DataTypes.STRING(255)
+    },
+    username: {
         allowNull: false,
-        type: DataTypes.STRING(50)
+        type: DataTypes.STRING(255)
     },
     email: {
         unique: true,
         allowNull: false,
-        type: DataTypes.STRING(100),
+        type: DataTypes.STRING(255),
         validate: {
             isEmail: true
         },
-        set(value) {
+        set(value){
             this.setDataValue('email', value.toLowerCase());
         }
     },
@@ -36,6 +41,10 @@ const User = sequelize.define("users", {
     phone: {
         type: DataTypes.STRING(25)
     },
+    avatar_url: {
+        allowNull: true,
+        type: DataTypes.STRING(255)
+    },
     status: {
         type: DataTypes.ENUM,
         values: ['active', 'inactive'],
@@ -46,25 +55,16 @@ const User = sequelize.define("users", {
     },
     password_updated_at: {
         type: DataTypes.DATE
-    },
-    created_by: {
-        type: DataTypes.INTEGER
-    },
-    updated_by: {
-        type: DataTypes.INTEGER
-    },
+    }
 }, {
-    tableName: 'users',
+    tableName: 'customers',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-User.prototype.validPassword = function (password) {
+Customer.prototype.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
 
-User.belongsTo(UserProfile, { as: 'user-profile', foreignKey: 'profile_id' });
-UserProfile.hasMany(User, { as: 'users', foreignKey: 'profile_id' });
-
-module.exports = User;
+module.exports = Customer;
