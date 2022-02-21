@@ -5,9 +5,19 @@ const { DataTypes } = require("sequelize");
 const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/profile.model"));
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
 const User = sequelize.define("users", {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+    },
     profile_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true
+        allowNull: true,
+        type: DataTypes.UUID
+    },
+    role_id: {
+        allowNull: true,
+        type: DataTypes.UUID
     },
     first_name: {
         allowNull: true,

@@ -5,6 +5,12 @@ const Permission = require(path.join(process.cwd(), 'src/modules/platform/permis
 const { DataTypes } = require('sequelize');
 
 const Profile = sequelize.define('profiles', {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+    },
     title: {
         type: DataTypes.STRING(50)
     },
@@ -20,10 +26,10 @@ const Profile = sequelize.define('profiles', {
         type: DataTypes.STRING(500)
     },
     created_by: {
-        type: DataTypes.INTEGER
+        type: DataTypes.UUID
     },
     updated_by: {
-        type: DataTypes.INTEGER
+        type: DataTypes.UUID
     }
 }, {
     tableName: 'profiles',

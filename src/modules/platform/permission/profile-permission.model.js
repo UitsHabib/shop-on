@@ -4,11 +4,17 @@ const Permission = require(path.join(process.cwd(), 'src/modules/platform/permis
 const { DataTypes } = require('sequelize');
 
 const ProfilePermission = sequelize.define('profile_permissions', {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+    },
     permission_id: {
-        type: DataTypes.INTEGER
+        type: DataTypes.UUID
     },
     profile_id: {
-        type: DataTypes.INTEGER
+        type: DataTypes.UUID
     },
 }, {
     tableName: 'profile_permissions',
