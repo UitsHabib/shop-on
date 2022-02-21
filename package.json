@@ -21,6 +21,7 @@
         "formidable": "^2.0.1",
         "jsonwebtoken": "^8.5.1",
         "multer": "^1.4.4",
+        "multer-storage-cloudinary": "^4.0.0",
         "mysql2": "^2.3.3",
         "node-cache": "^5.1.2",
         "passport": "^0.5.2",
