@@ -102,13 +102,9 @@ async function addProduct(req, res) {
             stock_quantity
         });
 
-<<<<<<< HEAD
         Product.destroy({
             where: { shop_id: id }
         });
-=======
-        if(req.file?.filename) await product.update({ profile_image: req.file.filename });
->>>>>>> master
 
         res.status(201).send(product);
     } catch (err) {

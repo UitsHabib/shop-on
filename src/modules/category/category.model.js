@@ -27,10 +27,6 @@ const Category = sequelize.define('categories', {
 });
 
 Category.hasMany(SubCategory, { as: 'subCategories', foreignKey: 'category_id' });
-<<<<<<< HEAD
-Category.belongsTo(Shop, { as: 'shops', foreignKey: 'shop_id' });
-=======
 SubCategory.belongsTo(Category, { as: 'category', foreignKey: 'category_id' });
->>>>>>> master
 
 module.exports = Category;
