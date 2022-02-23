@@ -99,7 +99,15 @@ async function getSignedInUserProfile (req, res) {
                             ]
                         }
                     ]
-                }
+                },
+                {
+                    model: User,
+                    as: "createdByUser",
+                },
+                {
+                    model: User,
+                    as: "updatedByUser",
+                },
             ],
         });
 
@@ -202,6 +210,14 @@ async function getUsers(req, res) {
                     model: Role,
                     as: "role",
                 },
+                {
+                    model: User,
+                    as: "createdByUser",
+                },
+                {
+                    model: User,
+                    as: "updatedByUser",
+                },
             ],
         });
 
@@ -287,7 +303,15 @@ async function getUser(req, res) {
                             ]
                         }
                     ]
-                }
+                },
+                {
+                    model: User,
+                    as: "createdByUser",
+                },
+                {
+                    model: User,
+                    as: "updatedByUser",
+                },
             ],
         });
 
@@ -302,7 +326,6 @@ async function getUser(req, res) {
 
 async function createUser(req, res) {
     try {
-        const loggedUser = req.user;
         const { first_name, last_name, email, password, profile_id, role_id } = req.body;
 
         const existUser = await User.findOne({
@@ -337,8 +360,8 @@ async function createUser(req, res) {
             password,
             profile_id: profile_id,
             role_id: role?.id || null,
-            created_by: loggedUser.id,
-            updated_by: loggedUser.id,
+            created_by: req.user.id,
+            updated_by: req.user.id,
         });
 
 
@@ -354,7 +377,6 @@ async function updateUser(req, res) {
     try {
         const { id } = req.params;
         const { first_name, last_name, email, profile_id, role_id } = req.body;
-        const userId = req.user.id;
 
         const user = await User.findOne({
             where: {
@@ -364,8 +386,8 @@ async function updateUser(req, res) {
 
         if (!user) return res.status(404).send("User not found!");
 
-        if (first_name) user.update({ first_name, updated_by: userId });
-        if (last_name) user.update({ last_name, updated_by: userId });
+        if (first_name) user.update({ first_name, updated_by: req.user.id });
+        if (last_name) user.update({ last_name, updated_by: req.user.id });
         if (email) {
             const existingUser = await User.findOne({
                 where: {
@@ -374,7 +396,7 @@ async function updateUser(req, res) {
             });
             if (existingUser) return res.status(400).send("Already registered with this email address.");
 
-            user.update({ email, updated_by: userId });
+            user.update({ email, updated_by: req.user.id });
         }
 
         if (profile_id) {
@@ -384,9 +406,9 @@ async function updateUser(req, res) {
                 },
             });
 
-            if (!profile) return res.status(400).send("Bad Request!");
+            if (!profile) return res.status(400).send("Profile not found");
 
-            user.update({ profile_id, updated_by: userId });
+            user.update({ profile_id, updated_by: req.user.id });
         }
 
         if (role_id) {
@@ -396,9 +418,9 @@ async function updateUser(req, res) {
                 },
             });
 
-            if (!role) return res.status(400).send("Bad Request!");
+            if (!role) return res.status(400).send("Role not found!");
 
-            user.update({ role_id, updated_by: userId });
+            user.update({ role_id, updated_by: req.user.id });
         }
 
         {

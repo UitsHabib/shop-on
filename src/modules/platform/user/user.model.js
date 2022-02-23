@@ -58,6 +58,14 @@ const User = sequelize.define("users", {
     },
     password_updated_at: {
         type: DataTypes.DATE
+    },
+    created_by: {
+        allowNull: true,
+        type: DataTypes.UUID
+    },
+    updated_by: {
+        allowNull: true,
+        type: DataTypes.UUID
     }
 }, {
     tableName: 'users',
@@ -69,6 +77,9 @@ const User = sequelize.define("users", {
 User.prototype.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
+
+User.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
+User.belongsTo(User, { as: 'updatedByUser', foreignKey: 'created_by' });
 
 Profile.hasMany(User, { as: 'users', foreignKey: 'profile_id' });
 User.belongsTo(Profile, { as: 'profile', foreignKey: 'profile_id' });
