@@ -5,7 +5,6 @@ const validate = require(path.join(process.cwd(), "src/modules/core/middlewares/
 const {reviewSchema} = require("./review.schema");
 
 module.exports = (app) => {
-   
     app.route("/api/reviews/products")
         .get(controller.getProductReviews)
         .post(AuthStrategy, ServiceGuard([Services.MANAGE_REVIEW]), validate(reviewSchema), controller.createProductReview);

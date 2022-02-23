@@ -6,11 +6,17 @@ const Role = require(path.join(process.cwd(), 'src/modules/platform/role/role.mo
 const { DataTypes } = require('sequelize');
 
 const RolePermission = sequelize.define('role_permissions', {
-    permission_id: {  //FK of permission table
-        type: DataTypes.INTEGER
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
     },
-    role_id: {        //FK of role table
-        type: DataTypes.INTEGER
+    permission_id: {
+        type: DataTypes.UUID
+    },
+    role_id: {
+        type: DataTypes.UUID
     },
 }, {
     tableName: 'role_permissions',
@@ -19,7 +25,6 @@ const RolePermission = sequelize.define('role_permissions', {
     updatedAt: 'updated_at'
 });
 
-// Permission.hasMany(RolePermission, { as: "role_permissions", foreignKey: "permission_id" });
 RolePermission.belongsTo(Permission, { as: "permission", foreignKey: "permission_id" });
 Role.hasMany(RolePermission, { as: "role_permissions", foreignKey: "role_id" });
 
