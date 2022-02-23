@@ -91,6 +91,9 @@ Profile.belongsTo(User, { as: "updatedByUser", foreignKey: "updated_by" });
 Role.hasMany(User, { as: 'users', foreignKey: 'role_id' });
 User.belongsTo(Role, { as: 'role', foreignKey: 'role_id' });
 
+Role.belongsTo(User, { as: "createdByUser", foreignKey: "created_by" });
+Role.belongsTo(User, { as: "updatedByUser", foreignKey: "updated_by" });
+
 Permission.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
 Permission.belongsTo(User, { as: 'updatedByUser', foreignKey: 'created_by' });
 

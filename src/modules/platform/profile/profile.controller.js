@@ -1,6 +1,7 @@
 const path = require('path');
 const Profile = require('./profile.model');
 const Permission = require(path.join(process.cwd(), 'src/modules/platform/permission/permission.model'));
+const User = require(path.join(process.cwd(), 'src/modules/platform/user/user.model'));
 const ProfilePermission = require(path.join(process.cwd(), 'src/modules/platform/permission/profile-permission.model'));
 const { makeCustomSlug } = require(path.join(process.cwd(), 'src/modules/core/services/slug'));
 const { Op } = require('sequelize');
@@ -64,7 +65,17 @@ async function getProfiles(req, res) {
                             attributes: ["id", "title", "slug"]
                         }
                     ]
-                }
+                },
+                {
+                    model: User,
+                    as: "createdByUser",
+                    attributes: ["id", "first_name", "last_name"]
+                },
+                {
+                    model: User,
+                    as: "updatedByUser",
+                    attributes: ["id", "first_name", "last_name"]
+                },
             ]
         });
 
@@ -106,8 +117,18 @@ async function getProfile(req, res) {
                             as: "permission",
                             attributes: ["id", "title", "slug"]
                         }
-                    ]
-                }
+                    ],
+                },
+                {
+                    model: User,
+                    as: "createdByUser",
+                    attributes: ["id", "first_name", "last_name"]
+                },
+                {
+                    model: User,
+                    as: "updatedByUser",
+                    attributes: ["id", "first_name", "last_name"]
+                },
             ]
         });
 
