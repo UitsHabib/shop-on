@@ -13,6 +13,5 @@ module.exports = (app) => {
   app
     .route("/api/cart/:id/users/:userId")
     .get(controller.getCartByUser)
-  // .patch(controller.patchProduct)
-  // .delete(controller.deleteProduct);
+
 };
