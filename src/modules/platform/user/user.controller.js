@@ -224,12 +224,14 @@ async function getUsers(req, res) {
         const totalUser = countByUser.length;
 
         const data = {
-            users: users,
-            page: page + 1,
-            limit: limit,
-            total: totalUser,
-            start: limit * page + 1,
-            end: offset + limit > totalUser ? totalUser : offset + limit,
+            users,
+            metaData: {
+                page: page + 1,
+                limit: limit,
+                total: totalUser,
+                start: limit * page + 1,
+                end: offset + limit > totalUser ? totalUser : offset + limit,
+            }
         };
 
         res.status(200).send(data);
