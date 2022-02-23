@@ -1,5 +1,5 @@
 const path = require('path');
-const Profile = require('./profile.model');
+const Profile = require(path.join(process.cwd(), 'src/modules/platform/profile/profile.model'));
 const Permission = require(path.join(process.cwd(), 'src/modules/platform/permission/permission.model'));
 const User = require(path.join(process.cwd(), 'src/modules/platform/user/user.model'));
 const ProfilePermission = require(path.join(process.cwd(), 'src/modules/platform/permission/profile-permission.model'));
@@ -90,7 +90,7 @@ async function getProfiles(req, res) {
                 start: limit * page + 1,
                 end: offset + limit > totalProfiles ? totalProfiles : offset + limit,
             }
-        }
+        };
 
         res.status(200).send(data);
     }
