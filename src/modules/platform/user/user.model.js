@@ -4,6 +4,7 @@ const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 const { DataTypes } = require("sequelize");
 const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/profile.model"));
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
+const Permission = require(path.join(process.cwd(), "src/modules/platform/permission/permission.model"));
 const User = sequelize.define("users", {
     id: {
         allowNull: false,
@@ -86,5 +87,8 @@ User.belongsTo(Profile, { as: 'profile', foreignKey: 'profile_id' });
 
 Role.hasMany(User, { as: 'users', foreignKey: 'role_id' });
 User.belongsTo(Role, { as: 'role', foreignKey: 'role_id' });
+
+Permission.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
+Permission.belongsTo(User, { as: 'updatedByUser', foreignKey: 'created_by' });
 
 module.exports = User;
