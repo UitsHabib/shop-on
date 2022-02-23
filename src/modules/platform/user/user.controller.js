@@ -222,9 +222,6 @@ async function getUsers(req, res) {
             ],
         });
 
-<<<<<<< HEAD
-        res.status(200).send(reviews);
-=======
         const totalUser = countByUser.length;
 
         const data = {
@@ -239,7 +236,6 @@ async function getUsers(req, res) {
         };
 
         res.status(200).send(data);
->>>>>>> 4ed0ded93c76c96b132e2a67037ff35e6f3d4faa
     } catch (err) {
         console.error(err);
         res.status(500).send("Internal server error!");
@@ -367,13 +363,8 @@ async function createUser(req, res) {
             password,
             profile_id: profile_id,
             role_id: role?.id || null,
-<<<<<<< HEAD
-            created_by: loggedreview.id,
-            updated_by: loggedreview.id,
-=======
             created_by: req.user.id,
             updated_by: req.user.id,
->>>>>>> 4ed0ded93c76c96b132e2a67037ff35e6f3d4faa
         });
 
 
@@ -398,13 +389,8 @@ async function updateUser(req, res) {
 
         if (!review) return res.status(404).send("review not found!");
 
-<<<<<<< HEAD
-        if (first_name) review.update({ first_name, updated_by: reviewId });
-        if (last_name) review.update({ last_name, updated_by: reviewId });
-=======
         if (first_name) user.update({ first_name, updated_by: req.user.id });
         if (last_name) user.update({ last_name, updated_by: req.user.id });
->>>>>>> 4ed0ded93c76c96b132e2a67037ff35e6f3d4faa
         if (email) {
             const existingreview = await review.findOne({
                 where: {
@@ -413,11 +399,7 @@ async function updateUser(req, res) {
             });
             if (existingreview) return res.status(400).send("Already registered with this email address.");
 
-<<<<<<< HEAD
-            review.update({ email, updated_by: reviewId });
-=======
             user.update({ email, updated_by: req.user.id });
->>>>>>> 4ed0ded93c76c96b132e2a67037ff35e6f3d4faa
         }
 
         if (profile_id) {
@@ -429,11 +411,7 @@ async function updateUser(req, res) {
 
             if (!profile) return res.status(400).send("Profile not found");
 
-<<<<<<< HEAD
-            review.update({ profile_id, updated_by: reviewId });
-=======
             user.update({ profile_id, updated_by: req.user.id });
->>>>>>> 4ed0ded93c76c96b132e2a67037ff35e6f3d4faa
         }
 
         if (role_id) {
@@ -445,11 +423,7 @@ async function updateUser(req, res) {
 
             if (!role) return res.status(400).send("Role not found!");
 
-<<<<<<< HEAD
-            review.update({ role_id, updated_by: reviewId });
-=======
             user.update({ role_id, updated_by: req.user.id });
->>>>>>> 4ed0ded93c76c96b132e2a67037ff35e6f3d4faa
         }
 
         {
