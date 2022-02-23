@@ -6,6 +6,7 @@ const ProfilePermission = require(path.join(process.cwd(), 'src/modules/platform
 const RolePermission = require(path.join(process.cwd(), 'src/modules/platform/permission/role-permission.model'));
 const { makeCustomSlug } = require(path.join(process.cwd(), 'src/modules/core/services/slug'));
 const PermissionService = require(path.join(process.cwd(), 'src/modules/platform/permission/permission-service.model'));
+const { Op } = require('sequelize');
 
 
 async function getPermissions(req, res) {
@@ -81,7 +82,7 @@ async function getPermissions(req, res) {
             ]
         });
 
-        const totalPermissions = Permission.count();
+        const totalPermissions = await Permission.count();
 
         const data = {
             permissions,
@@ -194,16 +195,7 @@ async function updatePermission(req, res) {
     try {
         const { title, type, description, services } = req.body;
 
-        const permission = await Permission.findOne({
-            where: { id: req.params.id },
-            include: [
-                {
-                    model: PermissionService,
-                    as: "permission_services"
-                }
-            ]
-        });
-
+        const permission = await Permission.findOne({ where: { id: req.params.id }});
         if (!permission) return res.status(404).send('Permission not found!');
 
         if (title) {
@@ -216,10 +208,7 @@ async function updatePermission(req, res) {
         if (description) await permission.update({ description });
 
         if (services) {
-
-            permission.permission_services.forEach( async () => {
-                await PermissionService.destroy({ where: { permission_id: permission.id }})
-            });
+            await PermissionService.destroy({ where: { permission_id: permission.id }});
 
             services.forEach(async serviceId => {
                 const service = await Service.findOne({ where: { id: serviceId }});
