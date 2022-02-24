@@ -4,10 +4,21 @@ const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 const { DataTypes } = require("sequelize");
 const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/profile.model"));
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
+const Permission = require(path.join(process.cwd(), "src/modules/platform/permission/permission.model"));
 const User = sequelize.define("users", {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+    },
     profile_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true
+        allowNull: true,
+        type: DataTypes.UUID
+    },
+    role_id: {
+        allowNull: true,
+        type: DataTypes.UUID
     },
     first_name: {
         allowNull: true,
@@ -49,12 +60,14 @@ const User = sequelize.define("users", {
     password_updated_at: {
         type: DataTypes.DATE
     },
-    created_at: {
-        type: DataTypes.DATE
+    created_by: {
+        allowNull: true,
+        type: DataTypes.UUID
     },
-    updated_at: {
-        type: DataTypes.DATE
-    },
+    updated_by: {
+        allowNull: true,
+        type: DataTypes.UUID
+    }
 }, {
     tableName: 'users',
     timestamps: true,
@@ -66,10 +79,22 @@ User.prototype.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
 
+User.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
+User.belongsTo(User, { as: 'updatedByUser', foreignKey: 'created_by' });
+
 Profile.hasMany(User, { as: 'users', foreignKey: 'profile_id' });
 User.belongsTo(Profile, { as: 'profile', foreignKey: 'profile_id' });
 
+Profile.belongsTo(User, { as: "createdByUser", foreignKey: "created_by" });
+Profile.belongsTo(User, { as: "updatedByUser", foreignKey: "updated_by" });
+
 Role.hasMany(User, { as: 'users', foreignKey: 'role_id' });
 User.belongsTo(Role, { as: 'role', foreignKey: 'role_id' });
+
+Role.belongsTo(User, { as: "createdByUser", foreignKey: "created_by" });
+Role.belongsTo(User, { as: "updatedByUser", foreignKey: "updated_by" });
+
+Permission.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
+Permission.belongsTo(User, { as: 'updatedByUser', foreignKey: 'created_by' });
 
 module.exports = User;

@@ -3,8 +3,14 @@ const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 const { DataTypes } = require('sequelize');
 
 const Category = sequelize.define('categories', {
-    shop_id: {      // Foreign key of shops table
-        type: DataTypes.INTEGER
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+    },
+    shop_id: {
+        type: DataTypes.UUID
     },
     name: {
         type: DataTypes.STRING(50)

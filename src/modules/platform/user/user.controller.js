@@ -8,6 +8,7 @@ const Permission = require(path.join(process.cwd(), "src/modules/platform/permis
 const PermissionService = require(path.join(process.cwd(), "src/modules/platform/permission/permission-service.model"));
 const Service = require(path.join(process.cwd(), "src/modules/platform/service/service.model"));
 const { generateAccessToken } = require("./service/user.service");
+const { Op } = require("sequelize");
 
 async function login(req, res) {
     try {
@@ -33,7 +34,7 @@ async function login(req, res) {
 
 async function logout(req, res) {
     res.clearCookie("access_token");
-    res.clearCookie("refresh_token").redirect("/");
+    res.send("Logged out.");
 }
 
 async function getSignedInUserProfile (req, res) {
@@ -98,7 +99,15 @@ async function getSignedInUserProfile (req, res) {
                             ]
                         }
                     ]
-                }
+                },
+                {
+                    model: User,
+                    as: "createdByUser",
+                },
+                {
+                    model: User,
+                    as: "updatedByUser",
+                },
             ],
         });
 
@@ -146,17 +155,86 @@ async function updateSignedInUserProfile (req, res) {
 
 async function getUsers(req, res) {
     try {
-        const users = await User.findAll({
-            attributes: userAttributes,
+        const page = req.query.page ? req.query.page - 1 : 0;
+        if (page < 0) return res.status(404).send("page must be greater or equal 1");
+
+        const limit = req.query.limit ? +req.query.limit : 15;
+        const offset = page * limit;
+
+        const orderBy = req.query.orderBy ? req.query.orderBy : null;
+        const orderType = req.query.orderType === "asc" || req.query.orderType === "desc" ? req.query.orderType : "asc";
+
+        const order = [
+            ["created_at", "DESC"],
+            ["id", "DESC"]
+        ];
+
+        const sortableColumns = [
+            "first_name",
+            "last_name",
+            "email",
+            "status",
+            "created_at"
+        ];
+
+        if (orderBy && sortableColumns.includes(orderBy)) {
+            order.splice(0, 0, [orderBy, orderType]);
+        }
+
+        if (orderBy === "created_by") {
+            order.splice(0, 0, [
+                { model: User, as: "createdByUser" },
+                "first_name",
+                orderType
+            ]);
+            order.splice(1, 0, [
+                { model: User, as: "createdByUser" },
+                "last_name",
+                orderType
+            ]);
+        }
+
+        const filterOptions = { id: { [Op.ne]: req.user.id } };
+
+        const { count: countByUser, rows: users } = await User.findAndCountAll({
+            where: filterOptions,
+            offset,
+            limit,
+            order,
             include: [
                 {
                     model: Profile,
                     as: "profile",
                 },
+                {
+                    model: Role,
+                    as: "role",
+                },
+                {
+                    model: User,
+                    as: "createdByUser",
+                },
+                {
+                    model: User,
+                    as: "updatedByUser",
+                },
             ],
         });
 
-        res.status(200).send(users);
+        const totalUser = countByUser.length;
+
+        const data = {
+            users,
+            metaData: {
+                page: page + 1,
+                limit: limit,
+                total: totalUser,
+                start: limit * page + 1,
+                end: offset + limit > totalUser ? totalUser : offset + limit,
+            }
+        };
+
+        res.status(200).send(data);
     } catch (err) {
         console.error(err);
         res.status(500).send("Internal server error!");
@@ -175,6 +253,66 @@ async function getUser(req, res) {
                 {
                     model: Profile,
                     as: "profile",
+                    include: [
+                        {
+                            model: ProfilePermission,
+                            as: 'profile_permissions',
+                            include: [
+                                {
+                                    model: Permission,
+                                    as: 'permission',
+                                    include: [
+                                        {
+                                            model: PermissionService,
+                                            as: 'permission_services',
+                                            include: [
+                                                {
+                                                    model: Service,
+                                                    as: 'service'
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    model: Role,
+                    as: 'role',
+                    include: [
+                        {
+                            model: RolePermission,
+                            as: 'role_permissions',
+                            include: [
+                                {
+                                    model: Permission,
+                                    as: 'permission',
+                                    include: [
+                                        {
+                                            model: PermissionService,
+                                            as: 'permission_services',
+                                            include: [
+                                                {
+                                                    model: Service,
+                                                    as: 'service'
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    model: User,
+                    as: "createdByUser",
+                },
+                {
+                    model: User,
+                    as: "updatedByUser",
                 },
             ],
         });
@@ -190,7 +328,6 @@ async function getUser(req, res) {
 
 async function createUser(req, res) {
     try {
-        const loggedUser = req.user;
         const { first_name, last_name, email, password, profile_id, role_id } = req.body;
 
         const existUser = await User.findOne({
@@ -225,8 +362,8 @@ async function createUser(req, res) {
             password,
             profile_id: profile_id,
             role_id: role?.id || null,
-            created_by: loggedUser.id,
-            updated_by: loggedUser.id,
+            created_by: req.user.id,
+            updated_by: req.user.id,
         });
 
 
@@ -242,7 +379,6 @@ async function updateUser(req, res) {
     try {
         const { id } = req.params;
         const { first_name, last_name, email, profile_id, role_id } = req.body;
-        const userId = req.user.id;
 
         const user = await User.findOne({
             where: {
@@ -252,8 +388,8 @@ async function updateUser(req, res) {
 
         if (!user) return res.status(404).send("User not found!");
 
-        if (first_name) user.update({ first_name, updated_by: userId });
-        if (last_name) user.update({ last_name, updated_by: userId });
+        if (first_name) user.update({ first_name, updated_by: req.user.id });
+        if (last_name) user.update({ last_name, updated_by: req.user.id });
         if (email) {
             const existingUser = await User.findOne({
                 where: {
@@ -262,7 +398,7 @@ async function updateUser(req, res) {
             });
             if (existingUser) return res.status(400).send("Already registered with this email address.");
 
-            user.update({ email, updated_by: userId });
+            user.update({ email, updated_by: req.user.id });
         }
 
         if (profile_id) {
@@ -272,9 +408,9 @@ async function updateUser(req, res) {
                 },
             });
 
-            if (!profile) return res.status(400).send("Bad Request!");
+            if (!profile) return res.status(400).send("Profile not found");
 
-            user.update({ profile_id, updated_by: userId });
+            user.update({ profile_id, updated_by: req.user.id });
         }
 
         if (role_id) {
@@ -284,9 +420,9 @@ async function updateUser(req, res) {
                 },
             });
 
-            if (!role) return res.status(400).send("Bad Request!");
+            if (!role) return res.status(400).send("Role not found!");
 
-            user.update({ role_id, updated_by: userId });
+            user.update({ role_id, updated_by: req.user.id });
         }
 
         {

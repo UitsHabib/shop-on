@@ -36,6 +36,7 @@ async function init() {
         User.findOrCreate({
             where: { email: "habiburrahman3089@gmail.com" },
             defaults: {
+                id: "479753f6-dfeb-47da-abf4-6b41332842a0",
                 first_name: "System",
                 last_name: "Admin",
                 password: "P@ssword123",
@@ -50,6 +51,7 @@ async function init() {
             (admin) => {
                 const profiles = [
                     {
+                        id: "1da2bb9b-9594-42f4-ae3d-f543756e9430",
                         title: "System Admin",
                         slug: "system-admin",
                         type: 'standard',
@@ -92,11 +94,11 @@ async function init() {
     function serviceSeeder(callback) {
         User.findOne({ where: { email: 'habiburrahman3089@gmail.com' } }).then(admin => {
             const services = [
-                { title: "Management of Platform", slug: "platform-management", created_by: admin.id, updated_by: admin.id },
-                { title: "Manage Users", slug: "manage-users", description: 'Manage CDP users', created_by: admin.id, updated_by: admin.id },
-                { title: "Manage Profiles", slug: "manage-profiles", description: 'Manage user profiles', created_by: admin.id, updated_by: admin.id },
-                { title: "Manage Roles", slug: "manage-roles", description: 'Manage user roles', created_by: admin.id, updated_by: admin.id },
-                { title: "Manage Permissions", slug: "manage-permissions", description: 'Assign rights to Permission', created_by: admin.id, updated_by: admin.id },
+                { id: "6f8cb12c-c3a6-44c6-b1af-9f0a6c8cb401", title: "Management of Platform", slug: "platform-management", created_by: admin.id, updated_by: admin.id },
+                { id: "79f26ef2-52f9-429e-b4bf-c307aa0a6040", title: "Manage Users", slug: "manage-users", description: 'Manage CDP users', created_by: admin.id, updated_by: admin.id },
+                { id: "7ae9a3ba-132e-407b-8b0f-bc31bd8b52c1", title: "Manage Profiles", slug: "manage-profiles", description: 'Manage user profiles', created_by: admin.id, updated_by: admin.id },
+                { id: "6d1d48c5-565c-4b3b-b4f5-5ad424070333", title: "Manage Roles", slug: "manage-roles", description: 'Manage user roles', created_by: admin.id, updated_by: admin.id },
+                { id: "bd690286-de0a-416d-9d04-fda113fb9366", title: "Manage Permissions", slug: "manage-permissions", description: 'Assign rights to Permission', created_by: admin.id, updated_by: admin.id },
             ];
 
             Service.destroy({ truncate: { cascade: true } }).then(() => {
@@ -113,7 +115,7 @@ async function init() {
     function permissionSeeder(callback) {
         User.findOne({ where: { email: 'habiburrahman3089@gmail.com' } }).then(admin => {
             const permission = [
-                { title: "System Admin Permission", slug: "system-admin", type: 'standard', description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
+                { id: "bffd87d0-3843-4e5f-b564-0edf6b208149", title: "System Admin Permission", slug: "system-admin", type: 'standard', description: "This is the default permission set for System Admin", created_by: admin.id, updated_by: admin.id },
             ];
 
             Permission.destroy({ truncate: { cascade: true } }).then(() => {
