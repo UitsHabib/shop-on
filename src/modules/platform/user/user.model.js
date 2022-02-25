@@ -79,22 +79,22 @@ User.prototype.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
 
-User.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
-User.belongsTo(User, { as: 'updatedByUser', foreignKey: 'created_by' });
+// User.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
+// User.belongsTo(User, { as: 'updatedByUser', foreignKey: 'created_by' });
 
 Profile.hasMany(User, { as: 'users', foreignKey: 'profile_id' });
 User.belongsTo(Profile, { as: 'profile', foreignKey: 'profile_id' });
 
-Profile.belongsTo(User, { as: "createdByUser", foreignKey: "created_by" });
-Profile.belongsTo(User, { as: "updatedByUser", foreignKey: "updated_by" });
+// Profile.belongsTo(User, { as: "createdByUser", foreignKey: "created_by" });
+// Profile.belongsTo(User, { as: "updatedByUser", foreignKey: "updated_by" });
 
 Role.hasMany(User, { as: 'users', foreignKey: 'role_id' });
 User.belongsTo(Role, { as: 'role', foreignKey: 'role_id' });
 
-Role.belongsTo(User, { as: "createdByUser", foreignKey: "created_by" });
-Role.belongsTo(User, { as: "updatedByUser", foreignKey: "updated_by" });
+// Role.belongsTo(User, { as: "createdByUser", foreignKey: "created_by" });
+// Role.belongsTo(User, { as: "updatedByUser", foreignKey: "updated_by" });
 
-Permission.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
-Permission.belongsTo(User, { as: 'updatedByUser', foreignKey: 'created_by' });
+// Permission.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
+// Permission.belongsTo(User, { as: 'updatedByUser', foreignKey: 'created_by' });
 
 module.exports = User;
