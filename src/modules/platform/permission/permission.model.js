@@ -2,7 +2,13 @@ const path = require('path');
 const sequelize = require(path.join(process.cwd(), 'src/config/lib/sequelize'));
 const { DataTypes } = require('sequelize');
 
-const Permission = sequelize.define('permission', {
+const Permission = sequelize.define('permissions', {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+    },
     title: {
         type: DataTypes.STRING(50)
     },
@@ -18,13 +24,15 @@ const Permission = sequelize.define('permission', {
         type: DataTypes.STRING(500)
     },
     created_by: {
-        type: DataTypes.INTEGER
+        allowNull: false,
+        type: DataTypes.UUID
     },
     updated_by: {
-        type: DataTypes.INTEGER
+        allowNull: false,
+        type: DataTypes.UUID
     }
 }, {
-    tableName: 'permission',
+    tableName: 'permissions',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'

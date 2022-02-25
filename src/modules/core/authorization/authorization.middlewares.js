@@ -36,8 +36,8 @@ async function getRolePermissions(role) {
     return services;
 }
 
-async function isPermitted(userServices, allowedServices) {
-    if (userServices.some(userService => allowedServices.includes(userService))) {
+function isPermitted(userServices, allowedServices) {
+    if (userServices.some(userService => allowedServices.includes(userService.slug))) {
         return true;
     }
     return false;
@@ -49,6 +49,11 @@ const ServiceGuard = (allowedServices) => {
         const profileServices = await getProfilePermissions(user.profile);
         const roleServices = await getRolePermissions(user.role);
         const userServices = profileServices.concat(roleServices);
+
+        console.log(userServices);
+        console.log(allowedServices);
+        console.log(isPermitted(userServices, allowedServices));
+
 
         if (!isPermitted(userServices, allowedServices)) {
             return res.status(403).send("Forbidden. You are not authorized.");

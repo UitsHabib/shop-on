@@ -1,34 +1,44 @@
 const path = require("path");
 const sequelize = require(path.join(process.cwd(), "src/config/lib/sequelize"));
 const { DataTypes } = require('sequelize');
-const { string } = require("yup/lib/locale");
 
 const Product = sequelize.define('products', {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+    },
+    shop_id: {
+        allowNull: false,
+        type: DataTypes.UUID,
+    },
+    category_id: {
+        allowNull: false,
+        type: DataTypes.UUID,
+    },
     name: {
         allowNull: false,
         type: DataTypes.STRING,
     },
     price: {
         allowNull: false,
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL(10, 2),
     },
     description: {
         allowNull: true,
         type: DataTypes.STRING,
     },
-    productImage:  {
-        type: string, required: true
+    discount: {
+        allowNull: true,
+        type: DataTypes.DECIMAL(10, 2)
     },
-    category: {
-        allowNull: false,
-        type: DataTypes.STRING,
+    stock_quantity: {
+        type: DataTypes.INTEGER,
     },
-    created_by: {
-        type: DataTypes.INTEGER
-    },
-    updated_by: {
-        type: DataTypes.INTEGER
-    },
+    profile_image: {
+        type: DataTypes.STRING
+    }
 }, {
     tableName: 'products',
     timestamps: true,
