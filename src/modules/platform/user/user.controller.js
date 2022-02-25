@@ -6,7 +6,6 @@ const { generateAccessToken } = require("./service/user.service");
 
 const userAttributes = [
     "id",
-    "profile_id",
     "first_name",
     "last_name",
     "email",
@@ -17,7 +16,6 @@ const userAttributes = [
     "updated_by",
     "created_at",
     "updated_at",
-    "role_id"
 ]
 
 async function login(req, res) {
@@ -35,7 +33,9 @@ async function login(req, res) {
 
         res.cookie("access_token", generateAccessToken(user), { httpOnly: true, sameSite: true, signed: true });
 
-        res.status(200).json(user);
+
+        const { password: Password, ...restUserInfo } = user.dataValues;
+        res.status(200).json(restUserInfo);
     } catch (err) {
         console.log(err);
         res.status(500).json("Internal server error!");
@@ -55,6 +55,10 @@ const getUsers = async (req, res) => {
                 {
                     model: Profile,
                     as: "profile",
+                },
+                {
+                    model: Role,
+                    as: "role",
                 },
             ],
         });
@@ -80,12 +84,17 @@ const getUser = async (req, res) => {
                     model: Profile,
                     as: "profile",
                 },
+                {
+                    model: Role,
+                    as: "role",
+                },
             ],
         });
 
         if (!user) return res.status(404).send("User not found!");
 
-        res.status(200).send(user);
+        const { password: Password, ...restUserInfo } = user.dataValues;
+        res.status(200).send(restUserInfo);
     } catch (err) {
         console.error(err);
         res.status(500).send("Internal server error!");
@@ -133,8 +142,11 @@ const createUser = async (req, res) => {
             updated_by: loggedUser.id,
         });
 
+        const { password: Password, profile_id: profileId, role_id: roleId, ...restUserInfo } = user.dataValues;
 
-        const { password: Password, ...restUserInfo } = user.dataValues;
+        restUserInfo.profile = profile;
+        role_id && (restUserInfo.role = role);
+
         res.status(201).send(restUserInfo);
     } catch (err) {
         console.log(err);
@@ -152,12 +164,30 @@ const updateUser = async (req, res) => {
             where: {
                 id,
             },
+            include: [
+                {
+                    model: Profile,
+                    as: "profile",
+                },
+                {
+                    model: Role,
+                    as: "role",
+                },
+            ],
         });
 
         if (!user) return res.status(404).send("User not found!");
 
-        if (first_name) user.update({ first_name, updated_by: userId });
-        if (last_name) user.update({ last_name, updated_by: userId });
+        const { password: Password, password_updated_at: PasswordUpdateAt, ...restInfo } = user.dataValues;
+
+        if (first_name) {
+            user.update({ first_name, updated_by: userId });
+            restInfo.first_name = first_name;
+        }
+        if (last_name) {
+            user.update({ last_name, updated_by: userId });
+            restInfo.last_name = last_name;
+        }
         if (email) {
             const existingUser = await User.findOne({
                 where: {
@@ -167,6 +197,7 @@ const updateUser = async (req, res) => {
             if (existingUser) return res.status(400).send("Already registered with this email address.");
 
             user.update({ email, updated_by: userId });
+            restInfo.email = email;
         }
 
         if (profile_id) {
@@ -176,9 +207,11 @@ const updateUser = async (req, res) => {
                 },
             });
 
-            if (!profile) return res.status(400).send("Bad Request!");
+            if (!profile) return res.status(400).send("Profile not found");
 
             user.update({ profile_id, updated_by: userId });
+            restInfo.profile_id = profile_id;
+            restInfo.profile = profile;
         }
 
         if (role_id) {
@@ -188,15 +221,14 @@ const updateUser = async (req, res) => {
                 },
             });
 
-            if (!role) return res.status(400).send("Bad Request!");
+            if (!role) return res.status(400).send("Role not found.");
 
             user.update({ role_id, updated_by: userId });
+            restInfo.role_id = role_id;
+            restInfo.role = role;
         }
 
-        {
-            const { password, password_updated_at, ...userInfo } = user.dataValues;
-            res.status(201).send(userInfo);
-        }
+        res.status(201).send(restInfo);
 
     } catch (err) {
         console.log(err);
@@ -212,16 +244,26 @@ const deleteUser = async (req, res) => {
             where: {
                 id,
             },
+            attributes: userAttributes,
+            include: [
+                {
+                    model: Profile,
+                    as: "profile",
+                },
+                {
+                    model: Role,
+                    as: "role",
+                },
+            ],
         });
 
         if (!user) return res.status(404).send("User not found!");
 
         await user.destroy();
 
-        {
-            const { password, password_updated_at, ...userInfo } = user.dataValues;
-            res.status(201).send(userInfo);
-        }
+        const { password: Password, password_updated_at: PasswordUpdateAt, ...userInfo } = user.dataValues;
+        res.status(201).send(userInfo);
+
     } catch (err) {
         console.log(err);
         res.status(500).send("Internal server error!");
