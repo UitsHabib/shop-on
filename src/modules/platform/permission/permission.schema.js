@@ -11,8 +11,9 @@ const permissionCreateSchema = object().shape({
         .oneOf(Object.values(types)),
     description: string().max(500, "Description must be at most 500 characters long.")
         .required("Description is required."),
-    services: array().
-        min(1, 'At least one permission service is required.')
+    services: array()
+        .of(string())
+        .min(1, 'At least one permission service is required.')
 });
 
 const permissionUpdateSchema = object().shape({
@@ -23,6 +24,8 @@ const permissionUpdateSchema = object().shape({
         .oneOf(Object.values(types)),
     description: string().max(500, "Description must be at most 500 characters long."),
     services: array()
+        .of(string())
+        .min(1, 'At least one permission service is required.')
 });
 
 module.exports.permissionCreateSchema = permissionCreateSchema;

@@ -6,11 +6,17 @@ const Service = require(path.join(process.cwd(), 'src/modules/platform/service/s
 const { DataTypes } = require('sequelize');
 
 const PermissionService = sequelize.define('permission_services', {
-    permission_id: {  //FK of permission table
-        type: DataTypes.INTEGER
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
     },
-    service_id: {        //FK of service table
-        type: DataTypes.INTEGER
+    permission_id: {
+        type: DataTypes.UUID
+    },
+    service_id: {
+        type: DataTypes.UUID
     },
 }, {
     tableName: 'permission_services',
@@ -20,7 +26,6 @@ const PermissionService = sequelize.define('permission_services', {
 });
 
 Permission.hasMany(PermissionService, { as: "permission_services", foreignKey: "permission_id" });
-// Permission.belongsToMany(Service, { through: PermissionService, foreignKey: "permission_id", otherKey: "service_id" });
 PermissionService.belongsTo(Permission, { as: "permission", foreignKey: "permission_id" });
 PermissionService.belongsTo(Service, { as: "service", foreignKey: "service_id" });
 
