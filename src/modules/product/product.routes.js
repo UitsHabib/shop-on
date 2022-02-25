@@ -1,25 +1,21 @@
 const path = require("path");
+const { AuthStrategy } = require("../shop/shop-authentication.middleware");
 const controller = require("./product.controller");
-const multer = require('../../modules/product/product.multer');
-const validate = require(path.join(
-  process.cwd(),
-  "src/modules/core/middlewares/validate"
-));
-const {
-  productUploadSchema,
-  productUpdateSchema,
-} = require("./product.schema");
+const validate = require(path.join(process.cwd(), "src/modules/core/middlewares/validate"));
+const { productUploadSchema, productUpdateSchema } = require("./product.schema");
 
 module.exports = (app) => {
-  app
-    .route("/api/products")
-    .get(controller.getProducts)
-    .post(validate(productUploadSchema), controller.addProduct);
+    app.route("/api/products")
+        .get(controller.getProducts);
 
-  app
-    .route("/api/products/:id")
-    .get(controller.getProduct)
-    .put(validate(productUploadSchema), controller.putProduct)
-    .patch(validate(productUpdateSchema), controller.patchProduct)
-    .delete(controller.deleteProduct);
+    app.route("/api/products/:id")
+        .get(controller.getProduct);
+
+    app.route("/api/shops/:id/categories")
+        .get(controller.getCategories)
+        .post(validate(productUploadSchema), controller.addCategory);
+
+    // app.route("/api/shops/:id/category/:id")
+    //     .patch(controller.updateCategory)
+    //     .delete(validate(productUploadSchema), controller.deleteCategory);
 };

@@ -1,6 +1,7 @@
+const path = require("path");
 const passport = require("passport");
 const { Strategy } = require("passport-jwt");
-const User = require("./user.model");
+const User = require(path.join(process.cwd(), "src/modules/platform/user/user.model"));
 
 module.exports = function () {
     function cookieExtractor(req) {

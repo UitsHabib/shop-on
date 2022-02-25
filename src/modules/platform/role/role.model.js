@@ -3,6 +3,12 @@ const sequelize = require(path.join(process.cwd(), 'src/config/lib/sequelize'));
 const { DataTypes } = require('sequelize');
 
 const Role = sequelize.define('roles', {
+    id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+    },
     title: {
         type: DataTypes.STRING(50),
         allowNull: false,
@@ -21,10 +27,10 @@ const Role = sequelize.define('roles', {
         allowNull: true
     },
     created_by: {
-        type: DataTypes.INTEGER
+        type: DataTypes.UUID
     },
     updated_by: {
-        type: DataTypes.INTEGER
+        type: DataTypes.UUID
     }
 }, {
     tableName: 'roles',

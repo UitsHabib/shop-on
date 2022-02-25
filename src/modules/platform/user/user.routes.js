@@ -9,7 +9,11 @@ const { userRegisterSchema, userUpdateSchema } = require("./user.schema");
 module.exports = (app) => {
     app.post("/api/login", controller.login);
 
-    app.get("/api/logout", controller.logout);
+    app.get("/api/logout", AuthStrategy, controller.logout);
+
+    app.route('/api/users/profile')
+        .get(AuthStrategy, controller.getSignedInUserProfile)
+        .put(AuthStrategy, validate(userUpdateSchema), controller.updateSignedInUserProfile);
 
     app.route("/api/users")
         .get(AuthStrategy, ServiceGuard([Services.MANAGE_USER]), controller.getUsers)

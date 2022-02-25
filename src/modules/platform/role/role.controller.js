@@ -1,12 +1,58 @@
 const path = require('path');
-const Role = require('./role.model');
+const Role = require(path.join(process.cwd(), 'src/modules/platform/role/role.model'));
+const User = require(path.join(process.cwd(), 'src/modules/platform/user/user.model'));
 const Permission = require(path.join(process.cwd(), 'src/modules/platform/permission/permission.model'));
 const RolePermission = require(path.join(process.cwd(), 'src/modules/platform/permission/role-permission.model'));
 const { makeCustomSlug } = require(path.join(process.cwd(), 'src/modules/core/services/slug'));
+const { Op } = require('sequelize');
 
 async function getRoles(req, res) {
     try {
+        const page = req.query.page ? req.query.page - 1 : 0;
+        if (page < 0) return res.status(404).send("page must be greater or equal 1");
+
+        const limit = req.query.limit ? +req.query.limit : 15;
+        const offset = page * limit;
+
+        const orderBy = req.query.orderBy ? req.query.orderBy : null;
+        const orderType = req.query.orderType === "asc" || req.query.orderType === "desc" ? req.query.orderType : "asc";
+
+        const order = [
+            ["created_at", "DESC"],
+            ["id", "DESC"]
+        ];
+
+        const sortableColumns = [
+            "title",
+            "slug",
+            "type",
+            "description",
+            "created_at"
+        ];
+
+        if (orderBy && sortableColumns.includes(orderBy)) {
+            order.splice(0, 0, [orderBy, orderType]);
+        }
+
+        if (orderBy === "created_by") {
+            order.splice(0, 0, [
+                { model: User, as: "createdByUser" },
+                "first_name",
+                orderType
+            ]);
+            order.splice(1, 0, [
+                { model: User, as: "createdByUser" },
+                "last_name",
+                orderType
+            ]);
+        }
+
+        // const filterOptions = { id: { [Op.ne]: req.user.id } };
+
         const roles = await Role.findAll({
+            offset,
+            limit,
+            order,
             include: [
                 {
                     model: RolePermission,
@@ -19,11 +65,34 @@ async function getRoles(req, res) {
                             attributes: ["id", "title", "slug"]
                         }
                     ]
-                }
+                },
+                {
+                    model: User,
+                    as: "createdByUser",
+                    attributes: ["id", "first_name", "last_name"]
+                },
+                {
+                    model: User,
+                    as: "updatedByUser",
+                    attributes: ["id", "first_name", "last_name"]
+                },
             ]
         });
 
-        res.status(200).send(roles);
+        const totalRoles = await Role.count();
+
+        const data = {
+            roles,
+            metaData: {
+                page: page + 1,
+                limit: limit,
+                total: totalRoles,
+                start: limit * page + 1,
+                end: offset + limit > totalRoles ? totalRoles : offset + limit,
+            }
+        };
+
+        res.status(200).send(data);
     }
     catch (err) {
         console.error(err);
@@ -33,11 +102,9 @@ async function getRoles(req, res) {
 
 async function getRole(req, res) {
     try {
-        const { id } = req.params;
-
         const role = await Role.findOne({
             where: {
-                id
+                id: req.params.id
             },
             include: [
                 {
@@ -51,11 +118,19 @@ async function getRole(req, res) {
                             attributes: ["id", "title", "slug"]
                         }
                     ]
-                }
+                },
+                {
+                    model: User,
+                    as: "createdByUser",
+                    attributes: ["id", "first_name", "last_name"]
+                },
+                {
+                    model: User,
+                    as: "updatedByUser",
+                    attributes: ["id", "first_name", "last_name"]
+                },
             ]
         });
-
-        if (!role) return res.status(404).send('Role not found!');
 
         res.status(200).send(role);
     }
@@ -68,43 +143,34 @@ async function getRole(req, res) {
 async function createRole(req, res) {
     try {
         const { title, type, description, permissions } = req.body;
-        const userId = req.user.id;
-
-        permissions.forEach(async permissionId => {
-            const permissionExist = await Permission.findOne({
-                where: {
-                    id: permissionId
-                }
-            });
-
-            if (!permissionExist) return res.status(400).send('Bad request.');
-        });
-
         const slug = makeCustomSlug(title);
 
-        const existRole = await Role.findOne({
+        const [role, created] = await Role.findOrCreate({
             where: {
                 slug
+            },
+            defaults: {
+                title,
+                slug,
+                type,
+                description,
+                created_by: req.user.id,
+                updated_by: req.user.id
             }
         });
 
-        if (existRole) return res.status(400).send('Role already exists!');
+        if (!created) return res.status(400).send('Role already exists!');
 
-        const role = await Role.create({
-            title,
-            slug,
-            type,
-            description,
-            created_by: userId,
-            updated_by: userId
+        permissions.forEach(async permissionId => {
+            const permission = await Permission.findOne({ where: { id: permissionId }});
+
+            if(permission) {
+                await RolePermission.create({
+                    permission_id: permission.id,
+                    role_id: role.id
+                });
+            }
         });
-
-        permissions.forEach(async element =>
-            await RolePermission.create({
-                permission_id: element,
-                role_id: role.id
-            })
-        );
 
         res.status(201).send(role);
     }
@@ -116,57 +182,34 @@ async function createRole(req, res) {
 
 async function updateRole(req, res) {
     try {
-        const { id } = req.params;
         const { title, type, description, permissions } = req.body;
-        const userId = req.user.id;
 
         const role = await Role.findOne({
             where: {
-                id
-            },
-            include: [
-                {
-                    model: RolePermission,
-                    as: "role_permissions"
-                }
-            ]
+                id: req.params.id
+            }
         });
 
         if (!role) return res.status(404).send('Role not found!');
 
         if (title) {
             const slug = makeCustomSlug(title);
-            await role.update({ title, slug, updated_by: userId });
+            await role.update({ title, slug, updated_by: req.params.id });
         }
 
-        if (type) await role.update({ type, updated_by: userId });
-        if (description) await role.update({ description, updated_by: userId });
+        if (type) await role.update({ type, updated_by: req.params.id });
+
+        if (description) await role.update({ description, updated_by: req.params.id });
 
         if (permissions) {
+            await RolePermission.destroy({ where: { role_id: role.id }});
+
             permissions.forEach(async permissionId => {
-                const permissionExist = await Permission.findOne({
-                    where: {
-                        id: permissionId
-                    }
-                });
-
-                if (!permissionExist) return res.status(400).send('Bad request.');
-            });
-
-            role.role_permissions.forEach(async element =>
-                await RolePermission.destroy({
-                    where: {
-                        role_id: role.id,
-                    }
-                })
-            );
-
-            permissions.forEach(async permissionId =>
                 await RolePermission.create({
                     permission_id: permissionId,
                     role_id: role.id
-                })
-            );
+                });
+            });
         }
 
         res.status(201).send(role);
@@ -179,11 +222,10 @@ async function updateRole(req, res) {
 
 async function deleteRole(req, res) {
     try {
-        const { id } = req.params;
-
         const role = await Role.findOne({
             where: {
-                id
+                id: req.params.id,
+                type: { [Op.ne]: 'standard' }
             },
             include: [
                 {
@@ -202,16 +244,8 @@ async function deleteRole(req, res) {
         });
 
         if (!role) return res.status(404).send('Role not found!');
-        if (role.type == 'standard') return res.status(400).send("You can't delete default profile.");
 
-        role.role_permissions.forEach(async element =>
-            await RolePermission.destroy({
-                where: {
-                    role_id: role.id
-                }
-            })
-        );
-
+        await RolePermission.destroy({ where: { role_id: role.id }});
         await role.destroy();
 
         res.status(200).send(role);
