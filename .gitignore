@@ -18,7 +18,6 @@ coverage
 .env.production
 tmpnodejsnpm-cache
 package-lock.json
-.yarnrc.yml
 yarn.lock
 
 # General
