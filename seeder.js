@@ -17,7 +17,7 @@ async function init() {
     const Permission = require(path.join(process.cwd(), "src/modules/platform/permission/permission.model"));
     const ProfilePermission = require(path.join(process.cwd(), "src/modules/platform/permission/profile-permission.model"));
     const Service = require(path.join(process.cwd(), "src/modules/platform/service/service.model"));
-    
+
     require(path.join(process.cwd(), "src/modules/platform/permission/role-permission.model"));
     require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
     require(path.join(process.cwd(), 'src/modules/customer/customer.model'));
@@ -28,7 +28,8 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/order/order-product.model'));
     require(path.join(process.cwd(), 'src/modules/order/order.model'));
     require(path.join(process.cwd(), 'src/modules/cart/cart.model'));
-    require(path.join(process.cwd(), 'src/modules/review/review.model'));
+    require(path.join(process.cwd(), 'src/modules/review/product-review.model'));
+    require(path.join(process.cwd(), 'src/modules/review/shop-review.model'));
 
     await sequelize.sync();
 

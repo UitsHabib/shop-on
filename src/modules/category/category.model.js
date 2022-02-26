@@ -1,5 +1,6 @@
 const path = require("path");
 const sequelize = require(path.join(process.cwd(), 'src/config/lib/sequelize'));
+const Product = require(path.join(process.cwd(), 'src/modules/product/product.model'));
 const { DataTypes } = require('sequelize');
 const SubCategory = require('./sub-category.model');
 const Shop = require(path.join(process.cwd(), 'src/modules/shop/shop.model.js'));
@@ -16,8 +17,8 @@ const Category = sequelize.define('categories', {
         allowNull: false
     },
     shop_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        type: DataTypes.UUID
     },
 }, {
     tableName: 'categories',
@@ -28,5 +29,7 @@ const Category = sequelize.define('categories', {
 
 Category.hasMany(SubCategory, { as: 'subCategories', foreignKey: 'category_id' });
 SubCategory.belongsTo(Category, { as: 'category', foreignKey: 'category_id' });
+
+Product.belongsTo(Category, { as: 'category', foreignKey: 'category_id' });
 
 module.exports = Category;
