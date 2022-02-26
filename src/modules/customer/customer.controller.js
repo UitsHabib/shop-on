@@ -12,7 +12,7 @@ async function login(req, res) {
     try {
         const { email, password } = req.body;
 
-        const customer = await Customer.findOne({ where: { email }});
+        const customer = await Customer.findOne({ where: { email } });
 
         if (!customer || !customer.password || !customer.validPassword(password)) return res.status(400).send("Invalid email or password!");
 
@@ -52,9 +52,9 @@ const registerCustomer = async (req, res) => {
     }
 };
 
-async function getSignedInCustomerProfile (req, res) {
+async function getSignedInCustomerProfile(req, res) {
     try {
-        const customer = await Customer.findOne({ where: { id: req.user.id }});
+        const customer = await Customer.findOne({ where: { id: req.user.id } });
 
         if (!customer) return res.status(404).send("Customer not found!");
 
@@ -65,17 +65,17 @@ async function getSignedInCustomerProfile (req, res) {
     }
 }
 
-async function updateSignedInCustomerProfile (req, res) {
+async function updateSignedInCustomerProfile(req, res) {
     try {
         const { first_name, last_name, username, email, phone } = req.body;
 
-        const customer = await Customer.findOne({ where: { id: req.user.id }});
+        const customer = await Customer.findOne({ where: { id: req.user.id } });
 
         if (!customer) return res.status(404).send("Customer not found!");
-        
+
         await customer.update({ first_name, last_name, username, email, phone });
 
-        if(req.file?.path) {
+        if (req.file?.path) {
             const file_url = await cloudinary.uploader.upload(req.file.path);
             await customer.update({ avatar_url: file_url.secure_url });
         }
@@ -87,14 +87,14 @@ async function updateSignedInCustomerProfile (req, res) {
     }
 }
 
-async function getOrders (req, res) {
+async function getOrders(req, res) {
     try {
         const orders = await Order.findAll({
             where: { customer_id: req.user.id },
             include: [{
                 model: OrderProduct,
                 as: "order_products",
-                attributes: ["id"],                    
+                attributes: ["id"],
                 include: [{
                     model: Product,
                     as: "product",
@@ -102,27 +102,27 @@ async function getOrders (req, res) {
                     include: [{
                         model: Shop,
                         as: 'shop'
-                    }]  
+                    }]
                 }]
             }]
         });
 
         res.status(200).send(orders);
-        
+
     } catch (err) {
         console.error(err);
         res.status(500).send("Internal server error!");
-    } 
+    }
 }
 
-async function getOrder (req, res) {
+async function getOrder(req, res) {
     try {
         const order = await Order.findOne({
             where: { id: req.params.id },
             include: [{
                 model: OrderProduct,
                 as: "order_products",
-                attributes: ["id"],                    
+                attributes: ["id"],
                 include: [{
                     model: Product,
                     as: "product",
@@ -130,20 +130,20 @@ async function getOrder (req, res) {
                     include: [{
                         model: Shop,
                         as: 'shop'
-                    }]  
+                    }]
                 }]
             }]
         });
 
         res.status(200).send(order);
-        
+
     } catch (err) {
         console.error(err);
         res.status(500).send("Internal server error!");
-    } 
+    }
 }
 
-async function createOrder (req, res) {
+async function createOrder(req, res) {
     try {
         const carts = await Cart.findAll({
             where: {
@@ -207,12 +207,12 @@ async function createOrder (req, res) {
     }
 }
 
-async function addToCart (req, res) {
+async function addToCart(req, res) {
     try {
         const { product_id, quantity } = req.body;
 
         const [cart, created] = await Cart.findOrCreate({
-            where: { 
+            where: {
                 customer_id: req.user.id,
                 product_id
             },
@@ -223,7 +223,7 @@ async function addToCart (req, res) {
             },
         });
 
-        if(cart) await cart.update({ quantity });
+        if (cart) await cart.update({ quantity });
 
         res.status(201).send((cart || created));
     }
@@ -233,11 +233,11 @@ async function addToCart (req, res) {
     }
 }
 
-async function getCart (req, res) {
+async function getCart(req, res) {
     try {
-        const cart = await Cart.findAll({ 
-            where: { 
-                customer_id: req.user.id 
+        const cart = await Cart.findAll({
+            where: {
+                customer_id: req.user.id
             },
             include: [{
                 model: Product,
@@ -246,7 +246,7 @@ async function getCart (req, res) {
                 include: [{
                     model: Shop,
                     as: 'shop'
-                }]  
+                }]
             }]
         });
 
@@ -256,6 +256,36 @@ async function getCart (req, res) {
         console.error(err);
         res.status(500).send("Internal server error!");
     }
+}
+
+async function deleteFromCart(req, res) {
+    try {
+
+        const cart = await Cart.findOne({
+            where: {
+                customer_id: req.user.id
+            },
+            include: [
+                {
+                    model: Product,
+                    as: 'product'
+                }
+            ]
+        });
+
+        await Cart.destroy({
+            where: {
+                customer_id: req.user.id
+            }
+        });
+        if (cart) await cart.update({ quantity });
+        res.status(201).send(('cart updated '));
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Internal server error!");
+    }
+
 }
 
 module.exports.login = login;
@@ -268,3 +298,4 @@ module.exports.getOrder = getOrder;
 module.exports.createOrder = createOrder;
 module.exports.addToCart = addToCart;
 module.exports.getCart = getCart;
+module.exports.deleteFromCart = deleteFromCart;

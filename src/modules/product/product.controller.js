@@ -1,10 +1,6 @@
 const path = require("path");
-const Shop = require("../shop/shop.model");
-const Product = require("./product.model");
-const Category = require("./category.model");
-
-const { getPagination, getPagingData } = require("./services/product.service");
-
+const Product = require(path.join(process.cwd(), "src/modules/product/product.model"));
+const Shop = require(path.join(process.cwd(), "src/modules/shop/shop.model"));
 
 async function getProducts(req, res) {
     try {
