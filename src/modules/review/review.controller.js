@@ -1,32 +1,20 @@
-const Review = require("./review.model");
-const {Op } = require("sequelize");
-
-async function getProductReviews(req, res) {
-    try {
-        const reviews = await Review.findAll({ 
-            where: {
-                product_id: {[Op.ne]: null}
-            }
-         });
-
-        res.status(200).send(reviews);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Internal server error!");
-    }
-};
+const ProductReview = require(path.join(process.cwd(), "src/modules/review/product-review.model"));
+const ShopReview = require(path.join(process.cwd(), "src/modules/review/shop-review.model"));
+const Product = require(path.join(process.cwd(), "src/modules/product/product.model"));
 
 async function getProductReview(req, res) {
     try {
-        const { id } = req.params;
-
-        const review = await Review.findOne({
-            where: {
-                product_id: id,
-            },
+        const review = await ProductReview.findOne({ 
+            where: { id: req.params.id },
+            include: [
+                {
+                    model: Product,
+                    as: 'product'
+                }
+            ]
         });
 
-        if (!review) return res.status(404).send("review not found!");
+        if (!review) return res.status(404).send("Review not found!");
 
         res.status(200).send(review);
     } catch (err) {
@@ -35,28 +23,97 @@ async function getProductReview(req, res) {
     }
 };
 
-async function getShopReviews(req, res) {
+async function reviewProduct(req, res) {
     try {
-        const reviews = await Review.findAll({  });
+        const { rating, comment } = req.body;
+        const { id: productId } = req.params;
+        const { id: customerId } = req.user;
 
-        res.status(200).send(reviews);
+        const product = await Product.findOne({ where: { id: productId }});
+        
+        if(!product) return res.status(404).send('Product not found.');
+
+        const review = await ProductReview.create({
+            customer_id: customerId,
+            product_id: productId,
+            rating,
+            comment
+        });
+
+        res.status(201).send(review);
     } catch (err) {
-        console.error(err);
+        console.log(err);
+        res.status(500).send("Internal server error!");
+    }
+};
+
+async function updateProductReview (req, res) {
+    try {
+        const { rating, comment } = req.body;
+        const { id: reviewId } = req.params;
+
+        const review = await ProductReview.findOne({
+            where: { id: reviewId },
+            include: [
+                {
+                    model: Product,
+                    as: 'product'
+                }
+            ]
+        });
+
+        if (!review) return res.status(404).send("Review not found!");
+
+        if (rating) review.update({ rating });
+        if (comment) review.update({ comment });
+
+        res.send(review);
+    } 
+    catch (err) {
+        console.log(err);
+        res.status(500).send("Internal server error!");
+    }
+};
+
+async function deleteProductReview (req, res) {
+    try {
+        const { id: reviewId } = req.params;
+
+        const review = await ProductReview.findOne({
+            where: { id: reviewId },
+            include: [
+                {
+                    model: Product,
+                    as: 'product'
+                }
+            ]
+        });
+
+        if (!review) return res.status(404).send("Review not found!");
+
+        await review.destroy();
+
+        res.send(review);
+    } 
+    catch (err) {
+        console.log(err);
         res.status(500).send("Internal server error!");
     }
 };
 
 async function getShopReview(req, res) {
     try {
-        const { id } = req.params;
-
-        const review = await Review.findOne({
-            where: {
-                shop_id: id,
-            },
+        const review = await ShopReview.findOne({ 
+            where: { id: req.params.id },
+            include: [
+                {
+                    model: Shop,
+                    as: 'shop'
+                }
+            ]
         });
 
-        if (!review) return res.status(404).send("review not found!");
+        if (!review) return res.status(404).send("Review not found!");
 
         res.status(200).send(review);
     } catch (err) {
@@ -65,15 +122,21 @@ async function getShopReview(req, res) {
     }
 };
 
-async function createProductReview(req, res) {
+async function reviewShop(req, res) {
     try {
-        const { customer_id, product_id, rating, description } = req.body;
+        const { rating, comment } = req.body;
+        const { id: shopId } = req.params;
+        const { id: customerId } = req.user;
 
-        const review = await Review.create({
-            product_id,
-            customer_id,
+        const shop = await Shop.findOne({ where: { id: shopId }});
+        
+        if(!shop) return res.status(404).send('Shop not found.');
+
+        const review = await ProductReview.create({
+            customer_id: customerId,
+            product_id: shopId,
             rating,
-            description,
+            comment
         });
 
         res.status(201).send(review);
@@ -83,65 +146,27 @@ async function createProductReview(req, res) {
     }
 };
 
-
-async function createShopReview(req, res) {
+async function updateShopReview (req, res) {
     try {
-        const { customer_id, shop_id, rating, description } = req.body;
+        const { rating, comment } = req.body;
+        const { id: reviewId } = req.params;
 
-        const review = await Review.create({
-            customer_id,
-            shop_id,
-            rating,
-            description,
+        const review = await ShopReview.findOne({
+            where: { id: reviewId },
+            include: [
+                {
+                    model: Shop,
+                    as: 'shop'
+                }
+            ]
         });
 
-        res.status(201).send(review);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send("Internal server error!");
-    }
-};
+        if (!review) return res.status(404).send("Review not found!");
 
-const updateProductReview = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { product_id, customer_id, rating, description, } = req.body;
-        const product_id = req.product.id;
+        if (rating) review.update({ rating });
+        if (comment) review.update({ comment });
 
-        const Review = await Review.findOne({
-            where: {
-                product_id: id,
-            },
-        });
-
-        if (!Review) return res.status(404).send("Review not found!");
-
-        if (rating) Review.update({ rating, updated_by: customer_id });
-        if (description) Review.update({ description, updated_by: customer_id });
-
-        if (product_id) {
-            const profile = await review.findOne({
-                where: {
-                    id: product_id,
-                },
-            });
-
-            if (!review) return res.status(400).send("Bad Request!");
-
-            Review.update({ product_id, updated_by: customer_id });
-        }
-
-        if (role_id) {
-            const role = await Role.findOne({
-                where: {
-                    id,
-                },
-            });
-
-            if (!role) return res.status(400).send("Bad Request!");
-
-            Review.update({ role_id, updated_by: ReviewId });
-        }
+        res.send(review);
     } 
     catch (err) {
         console.log(err);
@@ -149,46 +174,25 @@ const updateProductReview = async (req, res) => {
     }
 };
 
-const updateShopReview = async (req, res) => {
+async function deleteShopReview (req, res) {
     try {
-        const { id } = req.params;
-        const { shop_id, customer_id, rating, description, } = req.body;
-        const shop_id = req.product.id;
+        const { id: reviewId } = req.params;
 
-        const Review = await Review.findOne({
-            where: {
-                id,
-            },
+        const review = await ShopReview.findOne({
+            where: { id: reviewId },
+            include: [
+                {
+                    model: Shop,
+                    as: 'shop'
+                }
+            ]
         });
 
-        if (!Review) return res.status(404).send("Review not found!");
+        if (!review) return res.status(404).send("Review not found!");
 
-        if (rating) Review.update({ rating, updated_by: customer_id });
-        if (description) Review.update({ description, updated_by: customer_id });
+        await review.destroy();
 
-        if (shop_id) {
-            const review = await review.findOne({
-                where: {
-                    id: shop_id,
-                },
-            });
-
-            if (!review) return res.status(400).send("Bad Request!");
-
-            Review.update({ shop_id, updated_by: customer_id });
-        }
-
-        if (role_id) {
-            const role = await Role.findOne({
-                where: {
-                    id: role_id,
-                },
-            });
-
-            if (!role) return res.status(400).send("Bad Request!");
-
-            Review.update({ role_id, updated_by: ReviewId });
-        }
+        res.send(review);
     } 
     catch (err) {
         console.log(err);
@@ -196,51 +200,11 @@ const updateShopReview = async (req, res) => {
     }
 };
 
-const deleteProductReview = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const Review = await Review.findOne({
-            where: {
-                id,
-            },
-        });
-
-        if (!product) return res.status(404).send("Product not found!");
-
-        await product.destroy();
-    } catch (err) {
-        console.log(err);
-        res.status(500).send("Internal server error!");
-    }
-};
-
-const deleteShopReview = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const Review = await Review.findOne({
-            where: {
-                id,
-            },
-        });
-
-        if (!Review) return res.status(404).send("Review not found!");
-
-        await Review.destroy();
-    } catch (err) {
-        console.log(err);
-        res.status(500).send("Internal server error!");
-    }
-};
-
-module.exports.getProductReviews = getProductReviews;
 module.exports.getProductReview = getProductReview;
-module.exports.createProductReview = createProductReview;
+module.exports.reviewProduct = reviewProduct;
 module.exports.updateProductReview = updateProductReview;
 module.exports.deleteProductReview = deleteProductReview;
-module.exports.getShopReviews = getShopReviews;
 module.exports.getShopReview = getShopReview;
-module.exports.createShopReview = createShopReview;
+module.exports.reviewShop = reviewShop;
 module.exports.updateShopReview = updateShopReview;
 module.exports.deleteShopReview = deleteShopReview;
