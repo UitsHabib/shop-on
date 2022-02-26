@@ -48,7 +48,7 @@ async function getProducts(req, res) {
                     limit: limit,
                     total: totalProducts,
                     start: limit * page + 1,
-                    end: offset + limit > totalRoles ? totalRoles : offset + limit,
+                    end: offset + limit > totalProducts ? totalProducts : offset + limit,
                 }
             }
         };
@@ -86,17 +86,40 @@ async function getProduct(req, res) {
 
 async function getCategories(req, res) {
     try {
-        const { page, offset, limit, order } = getPagination(req);
+        const page = req.query.page ? req.query.page - 1 : 0;
+        if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
-        const products = await Category.findAll({
+        const limit = req.query.limit ? +req.query.limit : 15;
+        const offset = page * limit;
+
+        const orderBy = req.query.orderBy ? req.query.orderBy : null;
+        const orderType = req.query.orderType === "asc" || req.query.orderType === "desc" ? req.query.orderType : "asc";
+
+        const order = [
+            ["created_at", "DESC"],
+            ["id", "DESC"]
+        ];
+
+        const categories = await Category.findAll({
             offset,
             limit,
             order
         });
 
-        const total = await Category.count();
+        const totalCategories = await Category.count();
 
-        const data = getPagingData(total, page, offset, limit, products);
+        const data = {
+            categories,
+            meta: {
+                metaData: {
+                    page: page + 1,
+                    limit: limit,
+                    total: totalCategories,
+                    start: limit * page + 1,
+                    end: offset + limit > totalCategories ? totalCategories : offset + limit,
+                }
+            }
+        };
 
         res.status(200).send(data);
     } catch (err) {
