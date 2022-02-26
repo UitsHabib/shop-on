@@ -28,7 +28,8 @@ async function init() {
     require(path.join(process.cwd(), 'src/modules/order/order-product.model'));
     require(path.join(process.cwd(), 'src/modules/order/order.model'));
     require(path.join(process.cwd(), 'src/modules/cart/cart.model'));
-    require(path.join(process.cwd(), 'src/modules/review/review.model'));
+    require(path.join(process.cwd(), 'src/modules/review/product-review.model'));
+    require(path.join(process.cwd(), 'src/modules/review/shop-review.model'));
 
     await sequelize.sync();
 
