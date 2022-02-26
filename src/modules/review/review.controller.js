@@ -1,6 +1,7 @@
 const ProductReview = require(path.join(process.cwd(), "src/modules/review/product-review.model"));
 const ShopReview = require(path.join(process.cwd(), "src/modules/review/shop-review.model"));
 const Product = require(path.join(process.cwd(), "src/modules/product/product.model"));
+const Shop = require(path.join(process.cwd(), "src/modules/shop/shop.model"));
 
 async function getProductReview(req, res) {
     try {
