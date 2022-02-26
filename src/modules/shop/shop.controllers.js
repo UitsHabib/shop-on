@@ -1,6 +1,7 @@
 const path = require("path");
 const Product = require(path.join(process.cwd(), 'src/modules/product/product.model'));
-// const Order = require(path.join(process.cwd(), 'src/modules/order/order.model'));
+const Order = require(path.join(process.cwd(), 'src/modules/order/order.model'));
+const OrderProduct = require(path.join(process.cwd(), 'src/modules/order/order-product.model'));
 const { generateAccessToken } = require('./services/shop.service');
 const Shop = require('./shop.model');
 const cloudinary = require(path.join(process.cwd(), 'src/config/lib/cloudinary'));
@@ -71,7 +72,7 @@ async function updateSignedInShopProfile (req, res) {
         const { name, description, password, license_number } = req.body;
 
         const shop = await Shop.findOne({ where: { id: req.user.id }});
-        
+
         if (!shop) return res.status(404).send('Shop not found.');
 
         await shop.update({ name, description, password, license_number });
@@ -100,10 +101,6 @@ async function addProduct(req, res) {
             price,
             description,
             stock_quantity
-        });
-
-        Product.destroy({
-            where: { shop_id: id }
         });
 
         res.status(201).send(product);
@@ -210,7 +207,7 @@ async function getProduct(req, res) {
 async function deleteProduct(req, res) {
     try {
         const product = await Product.findOne({ where: { id: req.params.id }});
-        
+
         if (!product) return res.status(404).send("Product not found.");
 
         await product.destroy();
@@ -224,8 +221,6 @@ async function deleteProduct(req, res) {
 
 async function getOrders(req, res) {
     try {
-        const { id } = req.params;
-
         const page = +req.query.page || 1;
         const limit = +req.query.limit || 15;
         const offset = (page - 1) * limit;
@@ -237,14 +232,20 @@ async function getOrders(req, res) {
             order.push([orderBy, orderType]);
         }
 
-        const orders = await Order.findAll({
-            where: {
-                shop_id: id
-            },
+        const orders = await OrderProduct.findAll({
             include: [
                 {
-                    model: Shop,
-                    as: 'shops'
+                    model: Product,
+                    as: 'product',
+                    include: [
+                        {
+                            model: Shop,
+                            as: 'shop',
+                            where: {
+                                id: req.user.id
+                            }
+                        },
+                    ]
                 }
             ],
             offset,
@@ -274,12 +275,12 @@ async function getOrders(req, res) {
 
 async function getOrder(req, res) {
     try {
-        const { id, orderId } = req.params;
+        const { id } = req.params;
 
         const order = await Order.findOne({
             where: {
-                id: orderId,
-                shop_id: id
+                id,
+                shop_id: req.user.id,
             },
             include: [
                 {
@@ -298,7 +299,7 @@ async function getOrder(req, res) {
     }
 }
 
-async function acceptOrder(req, res) {
+async function updateDeliveryStatus(req, res) {
     try {
         const { id, orderId } = req.params;
 
@@ -334,4 +335,5 @@ module.exports.deleteProduct = deleteProduct;
 
 module.exports.getOrders = getOrders;
 module.exports.getOrder = getOrder;
-module.exports.acceptOrder = acceptOrder;
+module.exports.updateDeliveryStatus = updateDeliveryStatus;
+

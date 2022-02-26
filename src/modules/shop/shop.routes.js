@@ -31,5 +31,5 @@ module.exports = (app) => {
 
     app.get("/api/shops/orders/:id", AuthStrategy, controller.getOrder);
 
-    app.patch("/api/shops/orders/id/accept", AuthStrategy, controller.acceptOrder);
+    app.patch("/api/shops/orders/:id/:status", AuthStrategy, controller.updateDeliveryStatus);
 }
