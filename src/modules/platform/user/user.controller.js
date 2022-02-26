@@ -1,6 +1,5 @@
 const path = require("path");
-const Review = require("../../review/review.model");
-const review = require("./review.model");
+const User = require("./user.model");
 const Profile = require(path.join(process.cwd(), "src/modules/platform/profile/profile.model"));
 const Role = require(path.join(process.cwd(), "src/modules/platform/role/role.model"));
 const ProfilePermission = require(path.join(process.cwd(), "src/modules/platform/permission/profile-permission.model"));
@@ -204,8 +203,8 @@ async function getUsers(req, res) {
             order,
             include: [
                 {
-                    model: Review,
-                    as: "review",
+                    model: Profile,
+                    as: "profile",
                 },
                 {
                     model: Role,
@@ -246,7 +245,7 @@ async function getUser(req, res) {
     try {
         const { id } = req.params;
 
-        const review = await review.findOne({
+        const user = await User.findOne({
             where: {
                 id,
             },
@@ -318,9 +317,9 @@ async function getUser(req, res) {
             ],
         });
 
-        if (!review) return res.status(404).send("Review not found!");
+        if (!user) return res.status(404).send("User not found!");
 
-        res.status(200).send(review);
+        res.status(200).send(user);
     } catch (err) {
         console.error(err);
         res.status(500).send("Internal server error!");
@@ -331,18 +330,18 @@ async function createUser(req, res) {
     try {
         const { first_name, last_name, email, password, profile_id, role_id } = req.body;
 
-        const existReview = await Review.findOne({
+        const existUser = await User.findOne({
             where: {
                 email,
             },
         });
 
-        if (existReview)
+        if (existUser)
             return res
                 .status(400)
                 .send("Already registered with this email address.");
 
-        const review = await Review.findOne({
+        const profile = await Profile.findOne({
             where: {
                 id: profile_id,
             },
@@ -356,7 +355,7 @@ async function createUser(req, res) {
             },
         });
 
-        const review = await review.create({
+        const user = await User.create({
             first_name,
             last_name,
             email,
@@ -368,8 +367,8 @@ async function createUser(req, res) {
         });
 
 
-        const { password: Password, ...restreviewInfo } = review.dataValues;
-        res.status(201).send(restreviewInfo);
+        const { password: Password, ...restUserInfo } = user.dataValues;
+        res.status(201).send(restUserInfo);
     } catch (err) {
         console.log(err);
         res.status(500).send("Internal server error!");
@@ -381,23 +380,23 @@ async function updateUser(req, res) {
         const { id } = req.params;
         const { first_name, last_name, email, profile_id, role_id } = req.body;
 
-        const review = await review.findOne({
+        const user = await User.findOne({
             where: {
                 id,
             },
         });
 
-        if (!review) return res.status(404).send("review not found!");
+        if (!user) return res.status(404).send("User not found!");
 
         if (first_name) user.update({ first_name, updated_by: req.user.id });
         if (last_name) user.update({ last_name, updated_by: req.user.id });
         if (email) {
-            const existingreview = await review.findOne({
+            const existingUser = await User.findOne({
                 where: {
                     email: email,
                 }
             });
-            if (existingreview) return res.status(400).send("Already registered with this email address.");
+            if (existingUser) return res.status(400).send("Already registered with this email address.");
 
             user.update({ email, updated_by: req.user.id });
         }
@@ -427,8 +426,8 @@ async function updateUser(req, res) {
         }
 
         {
-            const { password, password_updated_at, ...reviewInfo } = review.dataValues;
-            res.status(201).send(reviewInfo);
+            const { password, password_updated_at, ...userInfo } = user.dataValues;
+            res.status(201).send(userInfo);
         }
 
     } catch (err) {
@@ -441,19 +440,19 @@ async function deleteUser(req, res) {
     try {
         const { id } = req.params;
 
-        const review = await review.findOne({
+        const user = await User.findOne({
             where: {
                 id,
             },
         });
 
-        if (!review) return res.status(404).send("review not found!");
+        if (!user) return res.status(404).send("User not found!");
 
-        await review.destroy();
+        await user.destroy();
 
         {
-            const { password, password_updated_at, ...reviewInfo } = review.dataValues;
-            res.status(201).send(reviewInfo);
+            const { password, password_updated_at, ...userInfo } = user.dataValues;
+            res.status(201).send(userInfo);
         }
     } catch (err) {
         console.log(err);
