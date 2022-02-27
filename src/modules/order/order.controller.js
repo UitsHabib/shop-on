@@ -79,6 +79,23 @@ const createOrder = async (req, res) => {
 };
 
 const updateOrder = async (req, res) => {
+    try {
+        const { order_id, status, delivery_status, shipped_date } = req.body;
+
+        const order = await Order.findOne({ where: { id: order_id }});
+
+        if (!order) return res.status(404).send("Order not found!");
+
+        if (status) await order.update({ status });
+        if (delivery_status) order.update({ delivery_status });
+        if (shipped_date) order.update({ shipped_date });
+        
+        res.status(200).send(order);
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Internal server error!");
+    }
 };
 
 const deleteOrder = async (req, res) => {
