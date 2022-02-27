@@ -3,6 +3,7 @@ const Cart = require(path.join(process.cwd(), 'src/modules/cart/cart.model'));
 const Customer = require(path.join(process.cwd(), 'src/modules/customer/customer.model'));
 const { generateAccessToken } = require(path.join(process.cwd(), 'src/modules/customer/services/customer.service'));
 const cloudinary = require(path.join(process.cwd(), 'src/config/lib/cloudinary'));
+const emailService = require(path.join(process.cwd(), 'src/modules/core/email/email.service'));
 const Shop = require(path.join(process.cwd(), 'src/modules/shop/shop.model'));
 const Product = require(path.join(process.cwd(), 'src/modules/product/product.model'));
 const Order = require(path.join(process.cwd(), 'src/modules/order/order.model'));
@@ -30,6 +31,7 @@ async function logout(req, res) {
     res.send('Logged out.');
 }
 
+
 const registerCustomer = async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -44,6 +46,10 @@ const registerCustomer = async (req, res) => {
         });
 
         if (!created) return res.status(400).send("Already registered with this email address.");
+
+        const subject = "Verify your email";
+    
+        emailService.send({subject, email});
 
         res.status(201).send(customer);
     } catch (err) {
