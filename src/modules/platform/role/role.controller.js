@@ -194,12 +194,12 @@ async function updateRole(req, res) {
 
         if (title) {
             const slug = makeCustomSlug(title);
-            await role.update({ title, slug, updated_by: req.params.id });
+            await role.update({ title, slug, updated_by: req.user.id });
         }
 
-        if (type) await role.update({ type, updated_by: req.params.id });
+        if (type) await role.update({ type, updated_by: req.user.id });
 
-        if (description) await role.update({ description, updated_by: req.params.id });
+        if (description) await role.update({ description, updated_by: req.user.id });
 
         if (permissions) {
             await RolePermission.destroy({ where: { role_id: role.id }});

@@ -264,36 +264,6 @@ async function getCart(req, res) {
     }
 }
 
-async function deleteFromCart(req, res) {
-    try {
-
-        const cart = await Cart.findOne({
-            where: {
-                customer_id: req.user.id
-            },
-            include: [
-                {
-                    model: Product,
-                    as: 'product'
-                }
-            ]
-        });
-
-        await Cart.destroy({
-            where: {
-                customer_id: req.user.id
-            }
-        });
-        if (cart) await cart.update({ quantity });
-        res.status(201).send(('cart updated '));
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Internal server error!");
-    }
-
-}
-
 module.exports.login = login;
 module.exports.logout = logout;
 module.exports.registerCustomer = registerCustomer;
@@ -304,4 +274,3 @@ module.exports.getOrder = getOrder;
 module.exports.createOrder = createOrder;
 module.exports.addToCart = addToCart;
 module.exports.getCart = getCart;
-module.exports.deleteFromCart = deleteFromCart;
