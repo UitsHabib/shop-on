@@ -4,38 +4,74 @@ const Shop = require(path.join(process.cwd(), "src/modules/shop/shop.model"));
 
 async function getProducts(req, res) {
     try {
-        const page = +req.query.page || 1;
-        const limit = +req.query.limit || 15;
-        const offset = (page - 1) * limit;
-        let { orderBy, orderType } = req.query;
-        orderType = orderType || 'asc';
-        let order = [['created_at', 'desc']];
+        const page = req.query.page ? req.query.page - 1 : 0;
+        if (page < 0) return res.status(400).send("page must be greater or equal 1");
 
-        if (orderBy) {
-            order.push([orderBy, orderType]);
+        const limit = req.query.limit ? +req.query.limit : 15;
+        const offset = page * limit;
+
+        const orderBy = req.query.orderBy ? req.query.orderBy : null;
+        const orderType = req.query.orderType === "asc" || req.query.orderType === "desc" ? req.query.orderType : "asc";
+
+        const order = [
+            ["created_at", "DESC"],
+            ["id", "DESC"]
+        ];
+
+        const sortableColumns = [
+            "name",
+            "price",
+            "description",
+            "discount",
+            "stock_quantity",
+            "created_at"
+        ];
+
+        if (orderBy && sortableColumns.includes(orderBy)) {
+            order.splice(0, 0, [orderBy, orderType]);
         }
 
+        if (orderBy === "shop") {
+            order.splice(0, 0, [
+                { model: Shop, as: "shop" },
+                "name",
+                orderType
+            ]);
+
+        }
+
+        if (orderBy === "category") {
+            order.splice(0, 0, [
+                { model: Category, as: "category" },
+                "name",
+                orderType
+            ]);
+        }
+
+        // const filterOptions = { id: { [Op.ne]: req.user.id } };
+
         const products = await Product.findAll({
+            offset,
+            limit,
+            order,
             include: [
                 {
                     model: Shop,
                     as: 'shop'
                 }
-            ],
-            offset,
-            limit,
-            order
+            ]
         });
 
-        const total = await Product.count();
+        const totalProducts = await Product.count();
 
         const data = {
             products,
-            meta: {
-                start: offset + 1,
-                end: Math.min(total, page * limit),
-                total,
-                page
+            metaData: {
+                page: page + 1,
+                limit: limit,
+                total: totalProducts,
+                start: limit * page + 1,
+                end: offset + limit > totalProducts ? totalProducts : offset + limit,
             }
         };
 
@@ -48,11 +84,9 @@ async function getProducts(req, res) {
 
 async function getProduct(req, res) {
     try {
-        const { id } = req.params;
-
         const product = await Product.findOne({
             where: {
-                id
+                id: req.params.id
             },
             include: [
                 {
@@ -61,6 +95,7 @@ async function getProduct(req, res) {
                 }
             ]
         });
+
         if (!product) return res.status(404).send("Product not found.");
 
         res.status(200).send(product);
