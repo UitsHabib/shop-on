@@ -6,6 +6,7 @@ const Services = {
     MANAGE_ROLE: "manage-roles",
     MANAGE_SHOP: "manage-shop",
     MANAGE_CLIENT: "manage-client",
+    MANAGE_REVIEW: "manage-review"
 };
 
 module.exports = { Services };
