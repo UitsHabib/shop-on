@@ -70,13 +70,13 @@ async function getSignedInShopProfile (req, res) {
 
 async function updateSignedInShopProfile (req, res) {
     try {
-        const { name, description, password, license_number } = req.body;
+        const { name, description, password, license_number, is_active } = req.body;
 
         const shop = await Shop.findOne({ where: { id: req.user.id }});
 
         if (!shop) return res.status(404).send('Shop not found.');
 
-        await shop.update({ name, description, password, license_number });
+        await shop.update({ name, description, password, license_number, is_active });
 
         if(req.file?.path) {
             const file_url = await cloudinary.uploader.upload(req.file.path);
@@ -113,17 +113,17 @@ async function addProduct(req, res) {
 
 async function updateProduct(req, res) {
     try {
-        const { category_id, name, price, description, stock_quantity } = req.body;
+        const { category_id, name, price, description, stock_quantity, discount } = req.body;
 
         const product = await Product.findOne({ where: { id: req.params.id }});
 
         if (!product) return res.status(404).send('Product not found.');
 
-        await product.update({ category_id, name, price, description, stock_quantity });
+        await product.update({ category_id, name, price, description, stock_quantity, discount });
 
         if(req.file?.path) {
             const file_url = await cloudinary.uploader.upload(req.file.path);
-            await product.update({ profile_image: file_url.secure_url });
+            await product.update({ product_image: file_url.secure_url });
         }
 
         res.status(201).send(product);
@@ -259,18 +259,59 @@ async function deleteProduct(req, res) {
 
 async function getOrders(req, res) {
     try {
-        const page = +req.query.page || 1;
-        const limit = +req.query.limit || 15;
-        const offset = (page - 1) * limit;
-        let { orderBy, orderType } = req.query;
-        orderType = orderType || 'asc';
-        let order = [['created_at', 'desc']];
+        const page = req.query.page ? req.query.page - 1 : 0;
+        if (page < 0) return res.status(404).send("page must be greater or equal 1");
 
-        if (orderBy) {
-            order.push([orderBy, orderType]);
+        const limit = req.query.limit ? +req.query.limit : 15;
+        const offset = page * limit;
+
+        const orderBy = req.query.orderBy ? req.query.orderBy : null;
+        const orderType = req.query.orderType === "asc" || req.query.orderType === "desc" ? req.query.orderType : "asc";
+
+        const order = [
+            ["created_at", "DESC"],
+            ["id", "DESC"]
+        ];
+
+        const sortableColumns = [
+            "status",
+            "delivery_status",
+            "shipped_date",
+            "created_at"
+        ];
+
+        if (orderBy && sortableColumns.includes(orderBy)) {
+            order.splice(0, 0, [orderBy, orderType]);
         }
 
+        if (orderBy === "order_products") {
+            order.splice(0, 0, [
+                { model: OrderProduct, as: "order_products" },
+                "quantity",
+                orderType
+            ]);
+            order.splice(1, 0, [
+                { model: OrderProduct, as: "order_products" },
+                "price",
+                orderType
+            ]);
+            order.splice(2, 0, [
+                { model: OrderProduct, as: "order_products" },
+                "discount",
+                orderType
+            ]);
+        }
+
+        // const filterOptions = { shop_id: req.user.id };
+
         const orders = await Order.findAll({
+            offset,
+            limit,
+            order,
+            // where: {
+            //     '$order_products.product.shop_id$': req.user.id
+            //     // sequelize.col("order_products.product.shop_id"): req.user.id
+            // },
             include: [
                 {
                     model: OrderProduct,
@@ -285,13 +326,10 @@ async function getOrders(req, res) {
                         }
                     ]
                 }
-            ],
-            offset,
-            limit,
-            order
+            ]
         });
 
-        const total = orders.length;
+        const total = await Order.count();
 
         const data = {
             orders,
@@ -345,27 +383,6 @@ async function getOrder(req, res) {
     }
 }
 
-async function updateDeliveryStatus(req, res) {
-    try {
-        const { id, orderId } = req.params;
-
-        const order = await Order.findOne({
-            where: {
-                id: orderId,
-                shop_id: id
-            }
-        });
-        if (!order) return res.status(404).send("Order not found.");
-
-        await order.update({ order_status: "accept" });
-
-        res.status(200).send(order);
-    } catch (error) {
-        console.log(error);
-        res.status(500).send('Internal server error.');
-    }
-}
-
 
 module.exports.login = login;
 module.exports.logout = logout;
@@ -381,5 +398,3 @@ module.exports.deleteProduct = deleteProduct;
 
 module.exports.getOrders = getOrders;
 module.exports.getOrder = getOrder;
-module.exports.updateDeliveryStatus = updateDeliveryStatus;
-

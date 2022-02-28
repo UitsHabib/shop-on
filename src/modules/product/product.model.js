@@ -36,7 +36,7 @@ const Product = sequelize.define('products', {
     stock_quantity: {
         type: DataTypes.INTEGER,
     },
-    profile_image: {
+    product_image: {
         type: DataTypes.STRING
     }
 }, {

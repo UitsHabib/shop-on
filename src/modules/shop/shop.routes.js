@@ -16,7 +16,7 @@ module.exports = (app) => {
 
     app.route('/api/shops/profile')
         .get(AuthStrategy, controller.getSignedInShopProfile)
-        .put(AuthStrategy, validate(shopUpdateSchema), validateFile(multer.single('shop_profile_image')), controller.updateSignedInShopProfile);
+        .put(AuthStrategy, validate(shopUpdateSchema), validateFile(multer.single('profile_image')), controller.updateSignedInShopProfile);
 
     app.route("/api/shops/products")
         .get(AuthStrategy, controller.getProducts)
@@ -30,6 +30,4 @@ module.exports = (app) => {
     app.get("/api/shops/orders", AuthStrategy, controller.getOrders);
 
     app.get("/api/shops/orders/:id", AuthStrategy, controller.getOrder);
-
-    app.patch("/api/shops/orders/:id/:status", AuthStrategy, controller.updateDeliveryStatus);
 }
