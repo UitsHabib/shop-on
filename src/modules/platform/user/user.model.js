@@ -80,7 +80,7 @@ User.prototype.validPassword = function (password) {
 };
 
 User.belongsTo(User, { as: 'createdByUser', foreignKey: 'created_by' });
-User.belongsTo(User, { as: 'updatedByUser', foreignKey: 'created_by' });
+User.belongsTo(User, { as: 'updatedByUser', foreignKey: 'updated_by' });
 
 Profile.hasMany(User, { as: 'users', foreignKey: 'profile_id', constraints: false });
 User.belongsTo(Profile, { as: 'profile', foreignKey: 'profile_id', constraints: false });
