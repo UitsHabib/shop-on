@@ -254,7 +254,7 @@ async function getUsers(req, res) {
             ],
         });
 
-        const totalUser = countByUser.length;
+        const totalUser = countByUser;
 
         const data = {
             users,
